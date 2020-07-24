@@ -41,25 +41,42 @@ redrawEnv;
     function redrawRobot
         cla(RobotAxes);
         
-        for i = 1:length(robotLinks)
-            trisurf(robotLinks(i).mesh, 'Parent', RobotAxes, ...
-                'FaceColor', [.8, .8, 1], 'FaceAlpha', .7, ...
-                'EdgeColor', 'none',...
-                'SpecularStrength', .5, 'AmbientStrength', .5);
-            hold(RobotAxes, 'on');
-            F = reduceEdges(robotLinks(i).mesh, pi/20)';
-            pts = robotLinks(i).mesh.Points;
-            plot3(reshape(pts(F,1),[],2)',...
-                reshape(pts(F,2),[],2)',...
-                reshape(pts(F,3),[],2)',...
-                'k','LineWidth',1.5,'Parent',RobotAxes);
-        end
-        
-        for i = 1:length(robotJoints)
-            o = robotJoints(i).origin;
-            a = robotJoints(i).axis;
-            plot3([o(1) o(1)-.5*a(1)], [o(2) o(2)-.5*a(2)], [o(3) o(3)-.5*a(3)],...
-                'r','LineWidth',3,'Parent',RobotAxes);
+        if ~isempty(robotLinks)
+            link_queue = [1; 0]; % assume link 1 is the root
+            while ~isempty(link_queue)
+                i = link_queue(:,1); link_queue(:,1) = [];
+                
+                % transform mesh according to joint
+                mesh = robotLinks(i(1)).mesh;
+                pts = mesh.Points;
+                if i(2)>0
+                    pts = bsxfun(@plus, pts, robotJoints(i(2)).origin+robotLinks(i(1)).origin);
+                    mesh = triangulation(mesh.ConnectivityList, pts);
+                    
+                    % draw joint
+                    o = robotJoints(i(2)).origin;
+                    a = robotJoints(i(2)).axis;
+                    plot3([o(1)+.25*a(1) o(1)-.25*a(1)], [o(2)+.25*a(2) o(2)-.25*a(2)], [o(3)+.25*a(3) o(3)-.25*a(3)],...
+                        'r','LineWidth',3,'Parent',RobotAxes);
+                end
+                
+                % draw link
+                trisurf(mesh, 'Parent', RobotAxes, ...
+                    'FaceColor', [.8, .8, 1], 'FaceAlpha', .7, ...
+                    'EdgeColor', 'none',...
+                    'SpecularStrength', .5, 'AmbientStrength', .5);
+                hold(RobotAxes, 'on');
+                F = reduceEdges(mesh, pi/20)';
+                plot3(reshape(pts(F,1),[],2)',...
+                    reshape(pts(F,2),[],2)',...
+                    reshape(pts(F,3),[],2)',...
+                    'k','LineWidth',1.5,'Parent',RobotAxes);
+                
+                % get children
+                childjoints = robotLinks(i(1)).childjoints;
+                children = [robotJoints(childjoints).child];
+                link_queue(:, end+1:end+length(childjoints)) = [children; childjoints];
+            end
         end
         
         updateAxesProperties(RobotAxes);
@@ -79,7 +96,7 @@ redrawEnv;
             {'*.urdf','URDF (*.urdf)';
             '*.*',  'All Files (*.*)'}, ...
             'Select a robot to load.',...
-            '.\','MultiSelect', 'off');
+            '..\robots\','MultiSelect', 'off');
         if isequal(filename,0)
             disp('No file selected')
         else

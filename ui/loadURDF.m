@@ -19,7 +19,7 @@ ignore = {};
 inignore = false; ignoreword = [];
 
 name = '';
-links = struct('name', {}, 'mesh', {});
+links = struct('name', {}, 'mesh', {}, 'origin', {}, 'childjoints', {});
 joints = struct('name', {}, 'parent', {}, 'child', {}, 'origin', {}, 'axis', {});
 
 fid = fopen(filename);
@@ -89,8 +89,7 @@ while (~eof)
                     
                     idx = strfind(tline, 'xyz');
                     colloc = find(tline(idx:end)=='"',2,'first');
-                    xyz = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
-                    xyz=[0 0 0];
+                    links(end).origin = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
                     
                     idx = strfind(tline, 'filename');
                     colloc = find(tline(idx:end)=='"',2,'first');
@@ -100,10 +99,17 @@ while (~eof)
                     colloc = find(tline(idx:end)=='"',2,'first');
                     scale = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
                     
-                    mesh = stlread(fullfile(filepath, stlname));
+                    [~,~,ext] = fileparts(stlname);
+                    switch (ext)
+                        case '.stl'
+                            mesh = stlread(fullfile(filepath, stlname));
+                        case '.obj'
+                            obj = readObj(fullfile(filepath, stlname));
+                            mesh = triangulation(obj.f.v, obj.v);
+                    end
                     pts = mesh.Points;
                     pts = bsxfun(@times,pts,scale);
-                    pts = pts(:,[3 1 2]);
+                    %pts = pts(:,[3 1 2]);
                     links(end).mesh = triangulation(mesh.ConnectivityList, pts);
                     
                     i = strfind(tline,'/link>');
@@ -120,6 +126,7 @@ while (~eof)
                     colloc = find(tline(idx:end)=='"',2,'first');
                     parent = tline(idx+colloc(1):idx+colloc(2)-2);
                     joints(end).parent = find(contains({links.name},parent), 1, 'first');
+                    links(joints(end).parent).childjoints(end+1) = length(joints);
                     
                     idx = strfind(tline, 'child');
                     colloc = find(tline(idx:end)=='"',2,'first');
@@ -129,13 +136,13 @@ while (~eof)
                     idx = strfind(tline, 'origin');
                     colloc = find(tline(idx:end)=='"',2,'first');
                     o = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
-                    o = o(:,[3 1 2]);
+                    %o = o(:,[3 1 2]);
                     joints(end).origin = o;
                     
                     idx = strfind(tline, 'axis');
                     colloc = find(tline(idx:end)=='"',2,'first');
                     a = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
-                    a = a(:,[3 1 2]);
+                    %a = a(:,[3 1 2]);
                     joints(end).axis = a;
                     
                     i = strfind(tline,'/joint>');
