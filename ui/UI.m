@@ -6,11 +6,13 @@ if flag
     close(fignum);
 end
 
-MainFigure = figure();
-set(MainFigure, 'NumberTitle','off', 'Name', 'ElecGen', ...
+% figure
+MainFigure = figure('NumberTitle','off', 'Name', 'ElecGen', ...
     'MenuBar', 'none', 'Toolbar', 'none', ...
-    'CloseRequestFcn', @checkquit, 'DeleteFcn', @quit);
+    'DeleteFcn', @quit,...
+    'ButtonDownFcn', @figureKeyboardCallback);
 
+% panels
 leftwidth = .3;
 LoadPanel = makePanel([0,.8,leftwidth,.2],'Load');
 OutputPanel = makePanel([0,0,leftwidth,.8], 'Output');
@@ -18,13 +20,21 @@ ButtonsPanel = makePanel([leftwidth,.8,1-leftwidth,.2],'Functionalities');
 RobotPanel = makePanel([leftwidth,.4,1-leftwidth,.4],'Robot');
 EnvPanel = makePanel([leftwidth,0,1-leftwidth,.4],'Environment');
 
-RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.7 0.9]);
-EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9]);
-
+% buttons
 robotload_button = makeButton(LoadPanel, [.1, .6, .8, .3], 'Load Robot', @loadrobot);
 envload_button = makeButton(LoadPanel, [.1, .1, .8, .3], 'Load Environment', @loadenvironment);
 run_button = makeButton(EnvPanel, [.85, .05, .1, .15], 'RUN', @run);
 
+ButtonFunctions = {'Force<br>sensing', 'Velocity<br>control', 'Remote<br>control', 'Line<br>tracking'};
+buttons = populateButtonsPanel(ButtonFunctions);
+buttonState = false(1,length(ButtonFunctions));
+
+% axes
+RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.7 0.9], 'robot');
+EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
+%rotateEnv = addRotate(EnvAxes);
+
+% data
 envSTL = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
 robotName = '';
 robotLinks = '';
@@ -32,13 +42,27 @@ robotJoints = '';
 
 redrawRobot;
 redrawEnv;
+rotateRobot = addRotate(RobotAxes);
 
 %% SIMULATION
     function run
     end
 
+%% STATE UPDATE CALLBACKS
+    function switchButtonState(i)
+        % toggle states of functionality buttons
+        buttonState(i) = ~buttonState(i);
+    end
+
+    function figureKeyboardCallback(src, event)
+        src
+        event
+    end
+
 %% DRAWING
     function redrawRobot
+        % update robot drawing (called upon loading a new robot)
+        
         cla(RobotAxes);
         
         if ~isempty(robotLinks)
@@ -65,7 +89,7 @@ redrawEnv;
                     'FaceColor', [.8, .8, 1], 'FaceAlpha', .7, ...
                     'EdgeColor', 'none',...
                     'SpecularStrength', .5, 'AmbientStrength', .5);
-                hold(RobotAxes, 'on');
+                
                 F = reduceEdges(mesh, pi/20)';
                 plot3(reshape(pts(F,1),[],2)',...
                     reshape(pts(F,2),[],2)',...
@@ -79,19 +103,22 @@ redrawEnv;
             end
         end
         
-        updateAxesProperties(RobotAxes);
+        updateLight(RobotAxes);
     end
 
     function redrawEnv
+        % redraw environment
+        cla(EnvAxes)
         trisurf(envSTL, 'Parent', EnvAxes, ...
             'FaceColor', [.8, .8, .8], 'EdgeColor', 'none',...
             'SpecularStrength', .5, 'AmbientStrength', .5);
-        updateAxesProperties(EnvAxes);
+        updateLight(EnvAxes);
     end
 
 %% LOAD FUNCTIONALITY
     function loadrobot(~,~)
         % load a URDF robot
+        
         [filename, pathname] = uigetfile( ...
             {'*.urdf','URDF (*.urdf)';
             '*.*',  'All Files (*.*)'}, ...
@@ -104,13 +131,12 @@ redrawEnv;
             [robotName, robotLinks, robotJoints] = loadURDF(fullfile(pathname, filename));
             
             redrawRobot;
-            
-            warning('not implemented')
         end
     end
 
     function loadenvironment(~,~)
         % load a STL environment
+        
         [filename, pathname] = uigetfile( ...
             {'*.stl','STL (*.stl)';
             '*.*',  'All Files (*.*)'}, ...
@@ -130,27 +156,35 @@ redrawEnv;
 
 %% FIGURE SETUP
     function panel = makePanel(position, title)
+        % make a new panel in the figure
         panel = uipanel(MainFigure, 'Units', 'Normalized', 'Position', position,...
             'Title', title, 'FontSize', 12, 'BackgroundColor', [1 1 1]);
     end
 
-    function ax = makeAxes(parent, position)
-        ax = axes(parent, 'FontSize', 10, 'Units', 'Normalized', 'Position', position);
-        updateAxesProperties(ax);
-    end
-
-    function updateAxesProperties(ax)
+    function ax = makeAxes(parent, position, name)
+        % add axes to a panel
+        ax = axes(parent, 'FontSize', 10, 'Units', 'Normalized', 'Position', position,'Tag',name);
+        
+        % update axes: square, 3d rotate on, camera light
         axis(ax,'equal');
         axis(ax,'tight');
         axis(ax,'off');
-        camup(ax,'manual')
-        R = rotate3d(ax);
-        R.Enable = 'on';
-        R.ActionPostCallback = @(~,~)updateLight(ax);
+        view(3);
+        set(ax,'NextPlot','add');
         updateLight(ax);
     end
 
+    function R = addRotate(ax)
+        R = rotate3d(ax);
+        R.Enable = 'on';
+        R.ActionPostCallback = @(~,~)updateLight; 
+    end
+
     function updateLight(ax)
+        % update light location so that it is always behind the camera
+        if ~exist('ax','var')
+            ax = gca;
+        end
         c = ax.Children;
         for i = 1:length(c)
             if isa(c(i), 'matlab.graphics.primitive.Light')
@@ -161,9 +195,28 @@ redrawEnv;
     end
 
     function button = makeButton(parent, position, buttonlbl, callback)
+        % add a button to the panel
         button = uicontrol(parent, 'Style', 'pushbutton', 'String', buttonlbl, ...
             'units', 'normalized', 'position', position, 'fontsize', 10, ...
             'Callback', callback);
+    end
+
+    function buttons = populateButtonsPanel(buttonnames)
+        % add all buttons to the buttons panel
+        % input is a cell of button names
+        Nbuttons = length(buttonnames);
+        xmargin = 0.05;
+        ymargin = 0.05;
+        width = (1-xmargin)/(Nbuttons+xmargin);
+        height = 1-2*ymargin;
+        
+        for ibutton = 1:Nbuttons
+            buttonlbl = ['<html><center>' buttonnames{ibutton} '</center></html>'];
+            
+            buttons(ibutton) = uicontrol(ButtonsPanel, 'Style', 'togglebutton', 'String', buttonlbl, ...
+                'units', 'normalized', 'position', [(xmargin+(ibutton-1)*(1+xmargin))*width, ymargin, width, height], ...
+                'fontsize', 10, 'callback', @(~,~)switchButtonState(ibutton));
+        end
     end
 
 %% QUIT FUNCTIONALITY

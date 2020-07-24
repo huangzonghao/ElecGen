@@ -147,6 +147,7 @@ while (~eof)
                     
                     i = strfind(tline,'/joint>');
                     tline = tline(i+7:end);
+                case {'?xml','/robot',0}
                 otherwise
                     disp(['Unknown object type ' type])
             end
