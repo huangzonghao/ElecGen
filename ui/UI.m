@@ -27,12 +27,12 @@ envload_button = makeButton(LoadPanel, [.1, .1, .8, .3], 'Load Environment', @lo
 run_button = makeButton(EnvPanel, [.85, .05, .1, .15], 'RUN', @run);
 
 ButtonFunctions = {'Force<br>sensing', 'Velocity<br>control', 'Remote<br>control', 'Line<br>tracking'};
-populateButtonsPanel(ButtonFunctions);
+buttons = populateButtonsPanel(ButtonFunctions);
 buttonState = false(1,length(ButtonFunctions));
 
 % axes
 mousedata = initializeMouseData;
-RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.7 0.9], 'robot');
+RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.9 0.9], 'robot');
 EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
 
 % data
@@ -40,6 +40,10 @@ envSTL = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
 robotName = '';
 robotLinks = '';
 robotJoints = '';
+
+selected = struct('type', 'none', 'id', [], 'handle', []);
+jointColor_deselect = [0, 0, 1]; jointColor_select = [1, 0, 0];
+faceColor_deselect = [.7, .7, 1]; faceColor_select = [1, .5, .5];
 
 % update drawings
 redrawRobot;
@@ -49,26 +53,77 @@ redrawEnv;
     function run
     end
 
-%% STATE UPDATE CALLBACKS
+%% BUTTON UPDATES
     function switchButtonState(i)
         % toggle states of functionality buttons
         buttonState(i) = ~buttonState(i);
     end
 
-    function axesButtonDownCallback(src, event)
+    function deactivateButtons
+        for ibutton = 1:length(buttons)
+            buttons(ibutton).Value = 0;
+            buttons(ibutton).Enable = 'off';
+        end
+    end
+
+    function activateButtons
+        for ibutton = 1:length(buttons)
+            buttons(ibutton).Enable = 'on';
+        end
+    end
+
+%% MOUSE CLICK CALLBACKS
+    function patchClick(src,event,ilink,igroup)
+        if strcmp(MainFigure.SelectionType, 'alt')
+            axesButtonDownCallback(src,event);
+            return;
+        end
+        
+        drawDeselect;
+        
+        if strcmp(selected.type, 'link') && all(selected.id == [ilink igroup])
+            selected.type = 'none';
+        else
+            selected.type = 'link';
+            selected.id = [ilink igroup];
+            selected.handle = src;
+            drawSelect;
+        end
+        
+    end
+
+    function jointClick(src,event,ijoint)
+        if strcmp(MainFigure.SelectionType, 'alt')
+            axesButtonDownCallback(src,event);
+            return;
+        end
+        
+        drawDeselect;
+        
+        if strcmp(selected.type, 'joint') && selected.id == ijoint
+            selected.type = 'none';
+        else
+            selected.type = 'joint';
+            selected.id = ijoint;
+            selected.handle = src;
+            drawSelect;
+        end
+    end
+
+    function axesButtonDownCallback(~, ~)
         mousedata.pressed = true;
         mousedata.mouse_button = get(MainFigure, 'SelectionType');
         
         switch (mousedata.mouse_button)
             case 'alt'    % right click
                 mousedata.mouse_button = 'rotate';
-                set(MainFigure, 'Pointer','circle')
+                MainFigure.Pointer = 'circle';
             case 'normal' % left click
-                set(MainFigure, 'Pointer','arrow')
+                MainFigure.Pointer = 'arrow';
         end
     end
 
-    function figureWindowButtonMoveCallback(src, event)
+    function figureWindowButtonMoveCallback(~, ~)
         mousedata.position_last = mousedata.position;
         mousedata.position = get(0, 'PointerLocation');
         
@@ -99,10 +154,18 @@ redrawEnv;
         end
     end
 
-    function figureWindowButtonUpCallback(src, event)
+    function figureWindowButtonUpCallback(~, ~)
         mousedata.mouse_pressed = false;
-        set(MainFigure, 'Pointer','arrow')
+        MainFigure.Pointer = 'arrow';
         mousedata.mouse_button = '';
+    end
+
+    function R = rotationMatrix(r)
+        % Determine the rotation matrix (View matrix) for rotation angles xyz ...
+        Rx = [1 0 0; 0 cosd(r(1)) -sind(r(1)); 0 sind(r(1)) cosd(r(1))];
+        Ry = [cosd(r(2)) 0 sind(r(2)); 0 1 0; -sind(r(2)) 0 cosd(r(2))];
+        Rz = [cosd(r(3)) -sind(r(3)) 0; sind(r(3)) cosd(r(3)) 0; 0 0 1];
+        R = Rx*Ry*Rz;
     end
 
     function mousedata = initializeMouseData
@@ -110,15 +173,6 @@ redrawEnv;
         mousedata.position_last = [0 0];
         mousedata.pressed = false;
         mousedata.mouse_button = '';
-    end
-
-%% CALLBACK HELPERS
-    function R = rotationMatrix(r)
-        % Determine the rotation matrix (View matrix) for rotation angles xyz ...
-        Rx = [1 0 0; 0 cosd(r(1)) -sind(r(1)); 0 sind(r(1)) cosd(r(1))];
-        Ry = [cosd(r(2)) 0 sind(r(2)); 0 1 0; -sind(r(2)) 0 cosd(r(2))];
-        Rz = [cosd(r(3)) -sind(r(3)) 0; sind(r(3)) cosd(r(3)) 0; 0 0 1];
-        R = Rx*Ry*Rz;
     end
 
 %% DRAWING
@@ -143,20 +197,26 @@ redrawEnv;
                     o = robotJoints(i(2)).origin;
                     a = robotJoints(i(2)).axis;
                     plot3([o(1)+.25*a(1) o(1)-.25*a(1)], [o(2)+.25*a(2) o(2)-.25*a(2)], [o(3)+.25*a(3) o(3)-.25*a(3)],...
-                        'r','LineWidth',3,'Parent',RobotAxes);
+                        '-', 'Color', jointColor_deselect,'LineWidth',3,'Parent',RobotAxes,...
+                        'ButtonDownFcn', @(s,e)jointClick(s,e,i(2)));
                 end
                 
                 % draw link
-                trisurf(mesh, 'Parent', RobotAxes, ...
-                    'FaceColor', [.8, .8, 1], 'FaceAlpha', .7, ...
-                    'EdgeColor', 'none',...
-                    'SpecularStrength', .5, 'AmbientStrength', .5);
+                [edges, grp_assign] = reduceEdges(mesh, pi/20);
+                for igroup = unique(grp_assign(:)')
+                    patch('Faces', mesh.ConnectivityList(grp_assign==igroup,:), 'Vertices', mesh.Points, ...
+                        'Parent', RobotAxes, ...
+                        'FaceColor', faceColor_deselect, 'FaceAlpha', .7, ...
+                        'EdgeColor', 'none',...
+                        'SpecularStrength', .5, 'AmbientStrength', .5, ...
+                        'ButtonDownFcn', @(s,e)patchClick(s,e,i(1),igroup));
+                end
+                robotLinks(i(1)).face_groups = grp_assign;
                 
-                F = reduceEdges(mesh, pi/20)';
-                plot3(reshape(pts(F,1),[],2)',...
-                    reshape(pts(F,2),[],2)',...
-                    reshape(pts(F,3),[],2)',...
-                    'k','LineWidth',1.5,'Parent',RobotAxes);
+                plot3(reshape(pts(edges,1),[],2)',...
+                    reshape(pts(edges,2),[],2)',...
+                    reshape(pts(edges,3),[],2)',...
+                    '-','Color',[0, 0, .5],'LineWidth',1.5,'Parent',RobotAxes);
                 
                 % get children
                 childjoints = robotLinks(i(1)).childjoints;
@@ -167,6 +227,32 @@ redrawEnv;
         
         updateCamera(RobotAxes)
         updateLight(RobotAxes);
+    end
+
+    function drawSelect
+        % highlight selected object
+        
+        if strcmp(selected.type,'joint')
+            % update plot
+            selected.handle.Color = jointColor_select;
+        elseif strcmp(selected.type, 'link')
+            selected.handle.FaceColor = faceColor_select;
+        end
+        
+        activateButtons
+    end
+
+    function drawDeselect
+        % unhighlight selected object
+        
+        if strcmp(selected.type,'joint')
+            % update plot
+            selected.handle.Color = jointColor_deselect;
+        elseif strcmp(selected.type, 'link')
+            selected.handle.FaceColor = faceColor_deselect;
+        end
+        
+        deactivateButtons;
     end
 
     function redrawEnv
@@ -183,7 +269,7 @@ redrawEnv;
         ylim = get(ax, 'ylim');
         zlim = get(ax, 'zlim');
         view(ax,3);
-        set(ax,'CameraTarget',[(xlim(1)+xlim(2))/2 (ylim(1)+ylim(2))/2 (zlim(1)+zlim(2))/2]);
+        ax.CameraTarget = [(xlim(1)+xlim(2))/2 (ylim(1)+ylim(2))/2 (zlim(1)+zlim(2))/2];
     end
 
     function updateLight(ax)
@@ -282,24 +368,11 @@ redrawEnv;
             
             buttons(ibutton) = uicontrol(ButtonsPanel, 'Style', 'togglebutton', 'String', buttonlbl, ...
                 'units', 'normalized', 'position', [(xmargin+(ibutton-1)*(1+xmargin))*width, ymargin, width, height], ...
-                'fontsize', 10, 'callback', @(~,~)switchButtonState(ibutton));
+                'enable','off','fontsize', 10, 'callback', @(~,~)switchButtonState(ibutton));
         end
     end
 
 %% QUIT FUNCTIONALITY
-    function checkquit(~,~)
-%         selection = questdlg('Are you sure you want to exit?',...
-%             'Exit?',...
-%             'Yes','No','Yes');
-%         switch selection
-%             case 'Yes'
-%                 delete(gcf)
-%             case 'No'
-%                 return
-%         end
-        delete(MainFigure);
-    end
-
     function quit(~,~)
         disp('BYE!')
     end
