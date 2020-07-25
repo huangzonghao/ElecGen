@@ -9,8 +9,9 @@ end
 % figure
 MainFigure = figure('NumberTitle','off', 'Name', 'ElecGen', ...
     'MenuBar', 'none', 'Toolbar', 'none', ...
-    'DeleteFcn', @quit,...
-    'ButtonDownFcn', @figureKeyboardCallback);
+    'WindowButtonMotionFcn', @figureWindowButtonMoveCallback,...
+    'WindowButtonUpFcn', @figureWindowButtonUpCallback,...
+    'DeleteFcn', @quit);
 
 % panels
 leftwidth = .3;
@@ -26,13 +27,13 @@ envload_button = makeButton(LoadPanel, [.1, .1, .8, .3], 'Load Environment', @lo
 run_button = makeButton(EnvPanel, [.85, .05, .1, .15], 'RUN', @run);
 
 ButtonFunctions = {'Force<br>sensing', 'Velocity<br>control', 'Remote<br>control', 'Line<br>tracking'};
-buttons = populateButtonsPanel(ButtonFunctions);
+populateButtonsPanel(ButtonFunctions);
 buttonState = false(1,length(ButtonFunctions));
 
 % axes
+mousedata = initializeMouseData;
 RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.7 0.9], 'robot');
 EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
-%rotateEnv = addRotate(EnvAxes);
 
 % data
 envSTL = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
@@ -40,9 +41,9 @@ robotName = '';
 robotLinks = '';
 robotJoints = '';
 
+% update drawings
 redrawRobot;
 redrawEnv;
-rotateRobot = addRotate(RobotAxes);
 
 %% SIMULATION
     function run
@@ -54,9 +55,70 @@ rotateRobot = addRotate(RobotAxes);
         buttonState(i) = ~buttonState(i);
     end
 
-    function figureKeyboardCallback(src, event)
-        src
-        event
+    function axesButtonDownCallback(src, event)
+        mousedata.pressed = true;
+        mousedata.mouse_button = get(MainFigure, 'SelectionType');
+        
+        switch (mousedata.mouse_button)
+            case 'alt'    % right click
+                mousedata.mouse_button = 'rotate';
+                set(MainFigure, 'Pointer','circle')
+            case 'normal' % left click
+                set(MainFigure, 'Pointer','arrow')
+        end
+    end
+
+    function figureWindowButtonMoveCallback(src, event)
+        mousedata.position_last = mousedata.position;
+        mousedata.position = get(0, 'PointerLocation');
+        
+        if mousedata.pressed
+            dp = mousedata.position_last - mousedata.position;
+            
+            switch mousedata.mouse_button
+                case 'rotate'
+                    UpVector = get(gca, 'CameraUpVector');
+                    XYZ = get(gca,'CameraPosition');
+                    Camtar = get(gca,'CameraTarget');
+                    Forward = (Camtar-XYZ) / norm(Camtar-XYZ);
+                    ViewAngle = get(gca,'CameraViewAngle');
+                    
+                    Mview = [UpVector; Forward; cross(UpVector, Forward)];
+                    R = rotationMatrix([dp(1) 0 dp(2)]);
+                    Mview = R'*Mview;
+                    
+                    UpVector = Mview(1,1:3);
+                    XYZ = Camtar - norm(Camtar-XYZ)*Mview(2,1:3);
+                    
+                    set(gca,'CameraUpVector', UpVector);
+                    set(gca,'CameraPosition', XYZ);
+                    set(gca,'CameraTarget', Camtar);
+                    set(gca,'CameraViewAngle', ViewAngle);
+                case 'normal'
+            end
+        end
+    end
+
+    function figureWindowButtonUpCallback(src, event)
+        mousedata.mouse_pressed = false;
+        set(MainFigure, 'Pointer','arrow')
+        mousedata.mouse_button = '';
+    end
+
+    function mousedata = initializeMouseData
+        mousedata.position = [0 0];
+        mousedata.position_last = [0 0];
+        mousedata.pressed = false;
+        mousedata.mouse_button = '';
+    end
+
+%% CALLBACK HELPERS
+    function R = rotationMatrix(r)
+        % Determine the rotation matrix (View matrix) for rotation angles xyz ...
+        Rx = [1 0 0; 0 cosd(r(1)) -sind(r(1)); 0 sind(r(1)) cosd(r(1))];
+        Ry = [cosd(r(2)) 0 sind(r(2)); 0 1 0; -sind(r(2)) 0 cosd(r(2))];
+        Rz = [cosd(r(3)) -sind(r(3)) 0; sind(r(3)) cosd(r(3)) 0; 0 0 1];
+        R = Rx*Ry*Rz;
     end
 
 %% DRAWING
@@ -103,6 +165,7 @@ rotateRobot = addRotate(RobotAxes);
             end
         end
         
+        updateCamera(RobotAxes)
         updateLight(RobotAxes);
     end
 
@@ -111,8 +174,30 @@ rotateRobot = addRotate(RobotAxes);
         cla(EnvAxes)
         trisurf(envSTL, 'Parent', EnvAxes, ...
             'FaceColor', [.8, .8, .8], 'EdgeColor', 'none',...
-            'SpecularStrength', .5, 'AmbientStrength', .5);
+            'SpecularStrength', .5, 'AmbientStrength', .5, 'HitTest', 'off');
         updateLight(EnvAxes);
+    end
+
+    function updateCamera(ax)
+        xlim = get(ax, 'xlim');
+        ylim = get(ax, 'ylim');
+        zlim = get(ax, 'zlim');
+        view(ax,3);
+        set(ax,'CameraTarget',[(xlim(1)+xlim(2))/2 (ylim(1)+ylim(2))/2 (zlim(1)+zlim(2))/2]);
+    end
+
+    function updateLight(ax)
+        % update light location so that it is always behind the camera
+        if ~exist('ax','var')
+            ax = gca;
+        end
+        c = ax.Children;
+        for i = 1:length(c)
+            if isa(c(i), 'matlab.graphics.primitive.Light')
+                delete(c(i));
+            end
+        end
+        camlight(ax);
     end
 
 %% LOAD FUNCTIONALITY
@@ -163,35 +248,17 @@ rotateRobot = addRotate(RobotAxes);
 
     function ax = makeAxes(parent, position, name)
         % add axes to a panel
-        ax = axes(parent, 'FontSize', 10, 'Units', 'Normalized', 'Position', position,'Tag',name);
+        ax = axes(parent, 'Tag',name, 'FontSize', 10, ...
+            'Units', 'Normalized', 'Position', position,...
+            'XColor','none', 'YColor','none', 'ZColor','none', ...
+            'ButtonDownFcn', @axesButtonDownCallback);
         
         % update axes: square, 3d rotate on, camera light
         axis(ax,'equal');
         axis(ax,'tight');
-        axis(ax,'off');
         view(3);
         set(ax,'NextPlot','add');
         updateLight(ax);
-    end
-
-    function R = addRotate(ax)
-        R = rotate3d(ax);
-        R.Enable = 'on';
-        R.ActionPostCallback = @(~,~)updateLight; 
-    end
-
-    function updateLight(ax)
-        % update light location so that it is always behind the camera
-        if ~exist('ax','var')
-            ax = gca;
-        end
-        c = ax.Children;
-        for i = 1:length(c)
-            if isa(c(i), 'matlab.graphics.primitive.Light')
-                delete(c(i));
-            end
-        end
-        camlight(ax);
     end
 
     function button = makeButton(parent, position, buttonlbl, callback)
