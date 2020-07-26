@@ -6,6 +6,14 @@ if flag
     close(fignum);
 end
 
+% IO file locations
+outputfile = '..\output.txt';
+
+% colors
+bckclr = [1 1 1];
+jointColor_deselect = [0, 0, 1]; jointColor_select = [1, 0, 0];
+faceColor_deselect = [.7, .7, 1]; faceColor_select = [1, .5, .5];
+
 % figure
 MainFigure = figure('NumberTitle','off', 'Name', 'ElecGen', ...
     'MenuBar', 'none', 'Toolbar', 'none', ...
@@ -17,22 +25,24 @@ MainFigure = figure('NumberTitle','off', 'Name', 'ElecGen', ...
 leftwidth = .3;
 LoadPanel = makePanel([0,.8,leftwidth,.2],'Load');
 OutputPanel = makePanel([0,0,leftwidth,.8], 'Output');
-ButtonsPanel = makePanel([leftwidth,.8,1-leftwidth,.2],'Functionalities');
-RobotPanel = makePanel([leftwidth,.4,1-leftwidth,.4],'Robot');
+outputText = uicontrol(OutputPanel, 'style', 'text', ...
+    'units', 'normalized', 'position', [.01 .01 .99 .99], ...
+    'horizontalalignment','left','backgroundcolor', bckclr);
+RobotPanel = makePanel([leftwidth,.4,1-leftwidth,.6],'Robot');
 EnvPanel = makePanel([leftwidth,0,1-leftwidth,.4],'Environment');
 
 % buttons
 robotload_button = makeButton(LoadPanel, [.1, .6, .8, .3], 'Load Robot', @loadrobot);
 envload_button = makeButton(LoadPanel, [.1, .1, .8, .3], 'Load Environment', @loadenvironment);
+clear_button = makeButton(OutputPanel, [.5, .01, .45, .08], 'Clear', @clearOutput);
 run_button = makeButton(EnvPanel, [.85, .05, .1, .15], 'RUN', @run);
 
 ButtonFunctions = {'Force<br>sensing', 'Velocity<br>control', 'Remote<br>control', 'Line<br>tracking'};
 buttons = populateButtonsPanel(ButtonFunctions);
-buttonState = false(1,length(ButtonFunctions));
 
 % axes
 mousedata = initializeMouseData;
-RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.9 0.9], 'robot');
+RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.7 0.9], 'robot');
 EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
 
 % data
@@ -42,33 +52,62 @@ robotLinks = '';
 robotJoints = '';
 
 selected = struct('type', 'none', 'id', [], 'handle', []);
-jointColor_deselect = [0, 0, 1]; jointColor_select = [1, 0, 0];
-faceColor_deselect = [.7, .7, 1]; faceColor_select = [1, .5, .5];
 
 % update drawings
 redrawRobot;
 redrawEnv;
 
 %% SIMULATION
-    function run
+    function run(~,~)
+        displayOutput;
     end
 
-%% BUTTON UPDATES
+%% OUTPUT
+    function displayOutput(~,~)
+        fid = fopen(outputfile);
+        % read in the whole file
+        tline = '';
+        while ~feof(fid)
+            tline = [tline fgets(fid)];
+        end
+        
+        outputText.String = tline;
+    end
+
+    function clearOutput(~,~)
+        outputText.String = '';
+    end
+
+%% FUNCTIONALITY BUTTON UPDATES
     function switchButtonState(i)
         % toggle states of functionality buttons
-        buttonState(i) = ~buttonState(i);
+        switch(selected.type)
+            case 'joint'
+                robotJoints(selected.id).buttonState(i) = ~robotJoints(selected.id).buttonState(i);
+            case 'link'
+                robotLinks(selected.id(1)).buttonState(selected.id(2),i) = ...
+                    ~robotLinks(selected.id(1)).buttonState(selected.id(2),i);
+        end
     end
 
     function deactivateButtons
         for ibutton = 1:length(buttons)
-            buttons(ibutton).Value = 0;
             buttons(ibutton).Enable = 'off';
+            buttons(ibutton).Value = 0;
         end
     end
 
     function activateButtons
+        switch(selected.type)
+            case 'joint'
+                values = robotJoints(selected.id).buttonState;
+            case 'link'
+                values = robotLinks(selected.id(1)).buttonState(selected.id(2),:);
+        end
+        
         for ibutton = 1:length(buttons)
             buttons(ibutton).Enable = 'on';
+            buttons(ibutton).Value = values(ibutton);
         end
     end
 
@@ -199,6 +238,8 @@ redrawEnv;
                     plot3([o(1)+.25*a(1) o(1)-.25*a(1)], [o(2)+.25*a(2) o(2)-.25*a(2)], [o(3)+.25*a(3) o(3)-.25*a(3)],...
                         '-', 'Color', jointColor_deselect,'LineWidth',3,'Parent',RobotAxes,...
                         'ButtonDownFcn', @(s,e)jointClick(s,e,i(2)));
+                    
+                    robotJoints(i(2)).buttonState = false(1,length(ButtonFunctions));
                 end
                 
                 % draw link
@@ -212,6 +253,7 @@ redrawEnv;
                         'ButtonDownFcn', @(s,e)patchClick(s,e,i(1),igroup));
                 end
                 robotLinks(i(1)).face_groups = grp_assign;
+                robotLinks(i(1)).buttonState = false(length(unique(grp_assign)),length(ButtonFunctions));
                 
                 plot3(reshape(pts(edges,1),[],2)',...
                     reshape(pts(edges,2),[],2)',...
@@ -303,6 +345,8 @@ redrawEnv;
             
             redrawRobot;
         end
+        
+        clearOutput
     end
 
     function loadenvironment(~,~)
@@ -323,13 +367,15 @@ redrawEnv;
             
             redrawEnv;
         end
+        
+        clearOutput
     end
 
 %% FIGURE SETUP
     function panel = makePanel(position, title)
         % make a new panel in the figure
         panel = uipanel(MainFigure, 'Units', 'Normalized', 'Position', position,...
-            'Title', title, 'FontSize', 12, 'BackgroundColor', [1 1 1]);
+            'Title', title, 'FontSize', 12, 'BackgroundColor', bckclr);
     end
 
     function ax = makeAxes(parent, position, name)
@@ -358,16 +404,16 @@ redrawEnv;
         % add all buttons to the buttons panel
         % input is a cell of button names
         Nbuttons = length(buttonnames);
-        xmargin = 0.05;
+        margin_left = 0.75;
+        margin_right = 0.02;
         ymargin = 0.05;
-        width = (1-xmargin)/(Nbuttons+xmargin);
-        height = 1-2*ymargin;
+        height = (1-ymargin)/(Nbuttons+ymargin);
         
         for ibutton = 1:Nbuttons
             buttonlbl = ['<html><center>' buttonnames{ibutton} '</center></html>'];
             
-            buttons(ibutton) = uicontrol(ButtonsPanel, 'Style', 'togglebutton', 'String', buttonlbl, ...
-                'units', 'normalized', 'position', [(xmargin+(ibutton-1)*(1+xmargin))*width, ymargin, width, height], ...
+            buttons(ibutton) = uicontrol(RobotPanel, 'Style', 'togglebutton', 'String', buttonlbl, ...
+                'units', 'normalized', 'position', [margin_left, 1-(ibutton*(1+ymargin))*height, 1-margin_left-margin_right, height], ...
                 'enable','off','fontsize', 10, 'callback', @(~,~)switchButtonState(ibutton));
         end
     end
