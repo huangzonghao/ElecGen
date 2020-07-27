@@ -6,8 +6,11 @@ if flag
     close(fignum);
 end
 
+urdf_filename = '';
+env_filename = '';
+
 % IO file locations
-outputfile = '..\output.txt';
+outputfile = fullfile('..', 'output.txt');
 
 % colors
 bckclr = [1 1 1];
@@ -59,6 +62,8 @@ redrawEnv;
 
 %% SIMULATION
     function run(~,~)
+        addpath('../build');
+        mexRun(0, 0, 10, 0, urdf_filename, env_filename);
         displayOutput;
     end
 
@@ -336,12 +341,13 @@ redrawEnv;
             {'*.urdf','URDF (*.urdf)';
             '*.*',  'All Files (*.*)'}, ...
             'Select a robot to load.',...
-            '..\robots\','MultiSelect', 'off');
+            fullfile('..', 'robots'),'MultiSelect', 'off');
         if isequal(filename,0)
             disp('No file selected')
         else
             disp(['Loading ' filename]);
-            [robotName, robotLinks, robotJoints] = loadURDF(fullfile(pathname, filename));
+            urdf_filename = fullfile(pathname, filename);
+            [robotName, robotLinks, robotJoints] = loadURDF(urdf_filename);
             
             redrawRobot;
         end
@@ -354,14 +360,17 @@ redrawEnv;
         
         [filename, pathname] = uigetfile( ...
             {'*.stl','STL (*.stl)';
+             '*.obj','OBJ (*.obj)';
+             '*.bmp','BMP (*.bmp)';
             '*.*',  'All Files (*.*)'}, ...
             'Select an environment to load.',...
-            '.\','MultiSelect', 'off');
+            fullfile('..', 'maps'),'MultiSelect', 'off');
         
         if isequal(filename,0)
             disp('No file selected')
         else
-            envSTL = stlread(fullfile(pathname, filename));
+            env_filename = fullfile(pathname, filename);
+            envSTL = stlread(env_filename);
             
             disp(['Loaded environment: ' filename]);
             
