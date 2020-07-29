@@ -6,21 +6,69 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 find_package(Chrono
              COMPONENTS Irrlicht Vehicle
-             CONFIG)
+             CONFIG QUIET)
+if (NOT Chrono_FOUND)
+    message(SEND_ERROR "Error: Could not find Chrono or one of its required modules.")
+    message("  Set Chrono_DIR in ${CMAKE_BINARY_DIR}/CMakeCache.txt to the path that contains ChronoConfig.cmake\n\n")
+    return()
+endif()
 
-find_package(urdfdom)
+find_package(urdfdom QUIET)
+if (NOT urdfdom_FOUND)
+    if( NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/.git" OR
+        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers/.git" OR
+        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/console_bridge/.git")
+
+        execute_process(COMMAND git submodule update --init --recursive)
+    endif()
+
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom
+                        ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers
+                        ${CMAKE_BINARY_DIR}/thirdparty/console_bridge
+                        ${CMAKE_BINARY_DIR}/thirdparty/Install)
+
+    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
+
+    execute_process(COMMAND make install
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
+
+    set(urdfdom_headers_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_headers/cmake
+        CACHE PATH "Path to CMake config files" FORCE)
+
+    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install ${CMAKE_SOURCE_DIR}/thirdparty/console_bridge
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
+
+    execute_process(COMMAND make install
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
+
+    set(console_bridge_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
+        CACHE PATH "Path to CMmake config files" FORCE)
+
+    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
+                                  -Durdfdom_headers_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_headers/cmake
+                                  -Dconsole_bridge_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
+                                  ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
+
+    execute_process(COMMAND make install
+                    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
+
+    set(urdfdom_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom/cmake
+        CACHE PATH "Path to CMake config files" FORCE)
+
+    find_package(urdfdom QUIET)
+endif()
+
 include_directories(${urdfdom_INCLUDE_DIRS})
+
 find_package(Matlab)
 
-if (NOT Chrono_FOUND)
-  message("Could not find Chrono or one of its required modules")
-  return()
+if (NOT Matlab_FOUND)
+    message(SEND_ERROR "Could not find Matlab.")
+    return()
 endif()
 
-if (NOT urdfdom_FOUND)
-  message("Could not find urdfdom or one of its required modules")
-  return()
-endif()
 
 #--------------------------------------------------------------
 # Enable creation of "application bundles" on MacOSX.
