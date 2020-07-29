@@ -52,7 +52,7 @@ int launch_simulation(double init_x, double init_y, double goal_x, double goal_y
     }
     else if (env_filename.find(".obj") != std::string::npos){
         vehicle::RigidTerrain terrain(my_system.get());
-        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0),
+        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0), QUNIT),
                                       env_filename, "ground_mesh");
         patch->SetColor(ChColor(0.2, 0.2, 0.2));
         terrain.Initialize();
