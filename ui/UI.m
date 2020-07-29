@@ -7,7 +7,6 @@ if flag
 end
 
 urdf_filename = '';
-env_filename = '';
 
 % IO file locations
 outputfile = fullfile('..', 'output.txt');
@@ -51,7 +50,8 @@ RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.7 0.9], 'robot');
 EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
 
 % data
-envSTL = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
+envFile = '';
+envMesh = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
 robotName = '';
 robotLinks = '';
 robotJoints = '';
@@ -65,7 +65,7 @@ redrawEnv;
 %% SIMULATION
     function run(~,~)
         addpath('../build');
-        mexRun(0, 0, 10, 0, urdf_filename, env_filename);
+        mexRun(0, 0, 10, 0, urdf_filename, envFile);
         writeURDF(urdffile, robotName, robotLinks, robotJoints, ButtonFunctions, FunctionType);
 
         displayOutput;
@@ -311,7 +311,7 @@ redrawEnv;
     function redrawEnv
         % redraw environment
         cla(EnvAxes)
-        trisurf(envSTL, 'Parent', EnvAxes, ...
+        trisurf(envMesh, 'Parent', EnvAxes, ...
             'FaceColor', [.8, .8, .8], 'EdgeColor', 'none',...
             'SpecularStrength', .5, 'AmbientStrength', .5, 'HitTest', 'off');
         updateLight(EnvAxes);
@@ -365,9 +365,9 @@ redrawEnv;
         % load a STL environment
         
         [filename, pathname] = uigetfile( ...
-            {'*.stl','STL (*.stl)';
-             '*.obj','OBJ (*.obj)';
-             '*.bmp','BMP (*.bmp)';
+            {'*.bmp', 'Bitmap (*.bmp)';
+            '*.stl','STL (*.stl)';
+            '*.obj', 'OBJ (*.obj)';
             '*.*',  'All Files (*.*)'}, ...
             'Select an environment to load.',...
             fullfile('..', 'maps'),'MultiSelect', 'off');
@@ -375,8 +375,24 @@ redrawEnv;
         if isequal(filename,0)
             disp('No file selected')
         else
-            env_filename = fullfile(pathname, filename);
-            envSTL = stlread(env_filename);
+            [~,~,ext] = fileparts(filename);
+            envFile = fullfile(pathname, filename);
+            switch (ext)
+                case '.stl'
+                    envMesh = stlread(envFile);
+                case '.obj'
+                    obj = readObj(envFile);
+                    envMesh = triangulation(obj.f.v, obj.v);
+                case '.bmp'
+                    heightmap = imread(envFile);
+                    if (size(heightmap,3) > 1)
+                        heightmap = rgb2gray(heightmap);
+                    end
+                    
+                    [X, Y] = meshgrid(linspace(0,1,size(heightmap,1)), linspace(0,1,size(heightmap,2)));
+                    faces = delaunay(X, Y);
+                    envMesh = triangulation(faces, X(:), Y(:), double(heightmap(:))/255);
+            end
             
             disp(['Loaded environment: ' filename]);
             
