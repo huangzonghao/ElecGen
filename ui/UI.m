@@ -48,7 +48,8 @@ RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.7 0.9], 'robot');
 EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
 
 % data
-envSTL = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
+envFile = '';
+envMesh = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
 robotName = '';
 robotLinks = '';
 robotJoints = '';
@@ -306,7 +307,7 @@ redrawEnv;
     function redrawEnv
         % redraw environment
         cla(EnvAxes)
-        trisurf(envSTL, 'Parent', EnvAxes, ...
+        trisurf(envMesh, 'Parent', EnvAxes, ...
             'FaceColor', [.8, .8, .8], 'EdgeColor', 'none',...
             'SpecularStrength', .5, 'AmbientStrength', .5, 'HitTest', 'off');
         updateLight(EnvAxes);
@@ -359,15 +360,34 @@ redrawEnv;
         % load a STL environment
         
         [filename, pathname] = uigetfile( ...
-            {'*.stl','STL (*.stl)';
+            {'*.bmp', 'Bitmap (*.bmp)';
+            '*.stl','STL (*.stl)';
+            '*.obj', 'OBJ (*.obj)';
             '*.*',  'All Files (*.*)'}, ...
             'Select an environment to load.',...
-            '.\','MultiSelect', 'off');
+            '..\maps\','MultiSelect', 'off');
         
         if isequal(filename,0)
             disp('No file selected')
         else
-            envSTL = stlread(fullfile(pathname, filename));
+            [~,~,ext] = fileparts(filename);
+            envFile = fullfile(pathname, filename);
+            switch (ext)
+                case '.stl'
+                    envMesh = stlread(fullfile(pathname, filename));
+                case '.obj'
+                    obj = readObj(fullfile(pathname, filename));
+                    envMesh = triangulation(obj.f.v, obj.v);
+                case '.bmp'
+                    heightmap = imread(fullfile(pathname, filename));
+                    if (size(heightmap,3) > 1)
+                        heightmap = rgb2gray(heightmap);
+                    end
+                    
+                    [X, Y] = meshgrid(linspace(0,1,size(heightmap,1)), linspace(0,1,size(heightmap,2)));
+                    faces = delaunay(X, Y);
+                    envMesh = triangulation(faces, X(:), Y(:), double(heightmap(:))/255);
+            end
             
             disp(['Loaded environment: ' filename]);
             
