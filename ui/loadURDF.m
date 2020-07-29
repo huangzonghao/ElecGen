@@ -15,12 +15,12 @@ function [name, links, joints] = loadURDF(filename)
 
 filepath = fileparts(filename);
 
-ignore = {};
+ignore = {'motor', 'extra_mass'};
 inignore = false; ignoreword = [];
 
 name = '';
-links = struct('name', {}, 'mesh', {}, 'origin', {}, 'childjoints', {});
-joints = struct('name', {}, 'parent', {}, 'child', {}, 'origin', {}, 'axis', {});
+links = struct('name', {}, 'mesh', {}, 'origin', {}, 'childjoints', {}, 'text', {});
+joints = struct('name', {}, 'parent', {}, 'child', {}, 'origin', {}, 'axis', {}, 'text', {});
 
 fid = fopen(filename);
 
@@ -72,32 +72,18 @@ while (~eof)
             
             switch(type)
                 case 'robot'
-                    idx = strfind(toanalyze, 'name');
-                    colloc = find(toanalyze(idx:end)=='"',2,'first');
-                    name = toanalyze(idx+colloc(1):idx+colloc(2)-2);
+                    name = getvalue(toanalyze, 'name');
                 case 'link'
-                    idx = strfind(toanalyze, 'name');
-                    colloc = find(toanalyze(idx:end)=='"',2,'first');
-                    links(end+1).name = toanalyze(idx+colloc(1):idx+colloc(2)-2);
+                    links(end+1).name = getvalue(toanalyze, 'name');
                     
                     [tline_new, eof] = getUntil(fid, '/link');
-                    tline = [tline tline_new];
+                    tline = ['<' toanalyze tline tline_new];
                     
-                    idx = strfind(tline, 'rpy');
-                    colloc = find(tline(idx:end)=='"',2,'first');
-                    rpy = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
+                    rpy = str2num(getvalue(tline, 'rpy'));
+                    links(end).origin = str2num(getvalue(tline, 'xyz'));
+                    scale = str2num(getvalue(tline, 'scale'));
                     
-                    idx = strfind(tline, 'xyz');
-                    colloc = find(tline(idx:end)=='"',2,'first');
-                    links(end).origin = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
-                    
-                    idx = strfind(tline, 'filename');
-                    colloc = find(tline(idx:end)=='"',2,'first');
-                    stlname = tline(idx+colloc(1):idx+colloc(2)-2);
-                    
-                    idx = strfind(tline, 'scale');
-                    colloc = find(tline(idx:end)=='"',2,'first');
-                    scale = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
+                    stlname = getvalue(tline, 'filename');
                     
                     [~,~,ext] = fileparts(stlname);
                     switch (ext)
@@ -113,39 +99,31 @@ while (~eof)
                     links(end).mesh = triangulation(mesh.ConnectivityList, pts);
                     
                     i = strfind(tline,'/link>');
+                    links(end).text = tline(1:i+5);
                     tline = tline(i+6:end);
                 case 'joint'
-                    idx = strfind(toanalyze, 'name');
-                    colloc = find(toanalyze(idx:end)=='"',2,'first');
-                    joints(end+1).name = toanalyze(idx+colloc(1):idx+colloc(2)-2);
+                    joints(end+1).name = getvalue(toanalyze, 'name');
                     
                     [tline_new, eof] = getUntil(fid, '/joint');
-                    tline = [tline tline_new];
+                    tline = ['<' toanalyze tline tline_new];
                     
-                    idx = strfind(tline, 'parent');
-                    colloc = find(tline(idx:end)=='"',2,'first');
-                    parent = tline(idx+colloc(1):idx+colloc(2)-2);
+                    parent = getvalue(tline, 'parent');
                     joints(end).parent = find(contains({links.name},parent), 1, 'first');
                     links(joints(end).parent).childjoints(end+1) = length(joints);
                     
-                    idx = strfind(tline, 'child');
-                    colloc = find(tline(idx:end)=='"',2,'first');
-                    child = tline(idx+colloc(1):idx+colloc(2)-2);
+                    child = getvalue(tline, 'child');
                     joints(end).child = find(contains({links.name},child), 1, 'first');
                     
-                    idx = strfind(tline, 'origin');
-                    colloc = find(tline(idx:end)=='"',2,'first');
-                    o = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
+                    o = str2num(getvalue(tline, 'origin'));
                     %o = o(:,[3 1 2]);
                     joints(end).origin = o;
                     
-                    idx = strfind(tline, 'axis');
-                    colloc = find(tline(idx:end)=='"',2,'first');
-                    a = str2num(tline(idx+colloc(1):idx+colloc(2)-2));
+                    a = str2num(getvalue(tline, 'axis'));
                     %a = a(:,[3 1 2]);
                     joints(end).axis = a;
                     
                     i = strfind(tline,'/joint>');
+                    joints(end).text = tline(1:i+6);
                     tline = tline(i+7:end);
                 case {'?xml','/robot',0}
                 otherwise
@@ -160,13 +138,22 @@ fclose(fid);
 return
 
 
+function txt = getvalue(toanalyze, key)
+
+idx = strfind(toanalyze, key);
+colloc = find(toanalyze(idx:end)=='"',2,'first');
+txt = toanalyze(idx+colloc(1):idx+colloc(2)-2);
+
+return
+
+
 function [tline, eof] = getUntil(fid, substr)
 
 eof = false;
-tline = fgetl(fid);
+tline = fgets(fid);
 i = strfind(tline,substr);
 while (isempty(i) && ~eof)
-    toadd = fgetl(fid);
+    toadd = fgets(fid);
     if (ischar(toadd))
         tline = [tline toadd];
     else

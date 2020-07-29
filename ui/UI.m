@@ -11,6 +11,7 @@ env_filename = '';
 
 % IO file locations
 outputfile = fullfile('..', 'output.txt');
+urdffile = fullfile('..', 'robots', 'robot.urdf');
 
 % colors
 bckclr = [1 1 1];
@@ -40,7 +41,8 @@ envload_button = makeButton(LoadPanel, [.1, .1, .8, .3], 'Load Environment', @lo
 clear_button = makeButton(OutputPanel, [.5, .01, .45, .08], 'Clear', @clearOutput);
 run_button = makeButton(EnvPanel, [.85, .05, .1, .15], 'RUN', @run);
 
-ButtonFunctions = {'Force<br>sensing', 'Velocity<br>control', 'Remote<br>control', 'Line<br>tracking'};
+ButtonFunctions = {'DC motor', 'Servomotor', 'Force<br>sensing', 'Velocity<br>control', 'Remote<br>control', 'Line<br>tracking'};
+FunctionType = [1, 1, 0, 0, 0, 0];  % 1 = actuator, 0 = sensor
 buttons = populateButtonsPanel(ButtonFunctions);
 
 % axes
@@ -64,6 +66,8 @@ redrawEnv;
     function run(~,~)
         addpath('../build');
         mexRun(0, 0, 10, 0, urdf_filename, env_filename);
+        writeURDF(urdffile, robotName, robotLinks, robotJoints, ButtonFunctions, FunctionType);
+
         displayOutput;
     end
 
@@ -111,7 +115,9 @@ redrawEnv;
         end
         
         for ibutton = 1:length(buttons)
-            buttons(ibutton).Enable = 'on';
+            if strcmp(selected.type, 'joint') || ~FunctionType(ibutton)
+                buttons(ibutton).Enable = 'on';
+            end
             buttons(ibutton).Value = values(ibutton);
         end
     end
