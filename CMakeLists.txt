@@ -25,6 +25,7 @@ if (NOT urdfdom_FOUND)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom
                         ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers
                         ${CMAKE_BINARY_DIR}/thirdparty/console_bridge
+                        ${CMAKE_BINARY_DIR}/thirdparty/tinyxml
                         ${CMAKE_BINARY_DIR}/thirdparty/Install)
 
     execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers
@@ -43,11 +44,18 @@ if (NOT urdfdom_FOUND)
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
 
     set(console_bridge_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
-        CACHE PATH "Path to CMmake config files" FORCE)
+        CACHE PATH "Path to CMake config files" FORCE)
+
+    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install ${CMAKE_SOURCE_DIR}/thirdparty/tinyxml
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
+
+    execute_process(COMMAND make install
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
 
     execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
                                   -Durdfdom_headers_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_headers/cmake
                                   -Dconsole_bridge_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
+                                  -DTinyXML_ROOT_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
                                   ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
 
