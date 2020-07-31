@@ -52,8 +52,8 @@ EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
 envFile = '';
 envMesh = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
 trajectory = zeros(0,3);
-traj_handle = [];
-dist_thresh = 0.05;
+traj_handle = []; traj_proj_handle = [];
+dist_thresh = 0.05; traj_zoffset = 0.01;
 
 robotName = '';
 robotLinks = '';
@@ -176,16 +176,20 @@ redrawEnv;
     function clearTrajectory(~,~)
         trajectory = zeros(0,3);
         delete(traj_handle);
+        delete(traj_proj_handle);
         traj_handle = [];
+        traj_proj_handle = [];
     end
 
-    function clickTrajectoryCallback(~,evt)
+    function clickTrajectoryLineCallback(~,evt)
         % modify the trajectory
         pt = evt.IntersectionPoint;
+        pt(3) = pt(3) - traj_zoffset;
         
-        dir = trajectory(2:end,:)-trajectory(1:end-1,:);
+        % find segment based on xy projection
+        dir = trajectory(2:end,1:2)-trajectory(1:end-1,1:2);
         dist = sqrt(sum(dir.^2,2));
-        diff = pt - trajectory(1:end,:);
+        diff = pt(1:2) - trajectory(1:end,1:2);
         proj = dot(diff(1:end-1,:), dir, 2)./dist.^2;
         proj(proj < 0) = 0; proj(proj > 1) = 1;
         perp = diff(1:end-1,:) - bsxfun(@times,proj,dir);
@@ -203,20 +207,26 @@ redrawEnv;
                 otherwise
                     trajectory = [trajectory(1:idx,:); pt; trajectory(idx+1:end,:)];
             end
-        else
-            % clicked on a point
-            if (dist(1) > dist(2))
-                idx = idx + 1;
-            end
-            
-            switch (evt.Button)
-                case 1 % normal
-                    mousedata.pressed = true;
-                    mousedata.mouse_button = 'trajectory';
-                    mousedata.traj_idx = idx;
-                case 3 % right click
-                    trajectory(idx,:) = [];
-            end
+        end
+        
+        redrawTrajectory;
+    end
+
+    function clickTrajectoryPointCallback(~,evt)
+        % modify the trajectory
+        pt = evt.IntersectionPoint;
+        pt(3) = pt(3) - traj_zoffset;
+        
+        dist = sum((pt - trajectory(1:end,:)).^2,2);
+        [~,idx] = min(dist);
+        
+        switch (evt.Button)
+            case 1 % normal
+                mousedata.pressed = true;
+                mousedata.mouse_button = 'trajectory';
+                mousedata.traj_idx = idx;
+            case 3 % right click
+                trajectory(idx,:) = [];
         end
         
         redrawTrajectory;
@@ -391,13 +401,25 @@ redrawEnv;
     end
 
     function redrawTrajectory
+        if size(trajectory,1) > 1
+            traj_proj = projectOnHeightMap(trajectory, envMesh);
+        else
+            traj_proj = zeros(0,3);
+        end
+        if isempty(traj_proj_handle)
+            traj_proj_handle = plot3(traj_proj(:,1),traj_proj(:,2),traj_proj(:,3)+traj_zoffset,...
+                '-r', 'linewidth', 2, ...
+                'buttondownfcn', @clickTrajectoryLineCallback);
+        else
+            set(traj_proj_handle , 'xdata', traj_proj(:,1), 'ydata', traj_proj(:,2), 'zdata', traj_proj(:,3)+traj_zoffset);
+        end
         
         if isempty(traj_handle)
-            traj_handle = plot3(trajectory(:,1), trajectory(:,2), trajectory(:,3), ...
-                '.-r','markersize', 15, 'linewidth', 2, ...
-                'buttondownfcn', @clickTrajectoryCallback);
+            traj_handle = plot3(trajectory(:,1), trajectory(:,2), trajectory(:,3)+traj_zoffset, ...
+                '.r','markersize', 20, 'linewidth', 2, ...
+                'buttondownfcn', @clickTrajectoryPointCallback);
         else
-            set(traj_handle, 'xdata', trajectory(:,1), 'ydata', trajectory(:,2), 'zdata', trajectory(:,3));
+            set(traj_handle, 'xdata', trajectory(:,1), 'ydata', trajectory(:,2), 'zdata', trajectory(:,3)+traj_zoffset);
         end
     end
 
@@ -475,7 +497,7 @@ redrawEnv;
                     
                     [X, Y] = meshgrid(linspace(0,1,size(heightmap,1)), linspace(0,1,size(heightmap,2)));
                     faces = delaunay(X, Y);
-                    envMesh = triangulation(faces, X(:), Y(:), double(heightmap(:))/255);
+                    envMesh = triangulation(faces, X(:), Y(:), double(heightmap(:))/255*0.2);
             end
             
             V = envMesh.Points;
