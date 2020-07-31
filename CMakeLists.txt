@@ -56,6 +56,7 @@ if (NOT urdfdom_FOUND)
                                   -Durdfdom_headers_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_headers/cmake
                                   -Dconsole_bridge_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
                                   -DTinyXML_ROOT_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
+                                  -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=True
                                   ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
 
