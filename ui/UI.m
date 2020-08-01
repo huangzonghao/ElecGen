@@ -10,7 +10,7 @@ urdf_filename = '';
 
 % IO file locations
 outputfile = fullfile('..', 'output.txt');
-urdffile = fullfile('..', 'robots', 'robot.urdf');
+output_urdffile = fullfile('..', 'robots', 'robot.urdf.tmp');
 
 % colors
 bckclr = [1 1 1];
@@ -71,7 +71,7 @@ redrawEnv;
     function run(~,~)
         addpath('../build');
         mexRun(0, 0, 10, 0, urdf_filename, envFile);
-        writeURDF(urdffile, robotName, robotLinks, robotJoints, ButtonFunctions, FunctionType);
+        writeURDF(output_urdffile, robotName, robotLinks, robotJoints, ButtonFunctions, FunctionType);
 
         displayOutput;
     end

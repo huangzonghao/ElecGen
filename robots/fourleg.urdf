@@ -5,13 +5,13 @@
     <visual>
         <origin rpy = "0 0 0" xyz = "0 0 0" />
         <geometry>
-            <mesh filename = "./fourleg/chassis.obj" scale = "0.01 0.01 0.01" />
+            <mesh filename = "./fourleg/chassis.obj" scale = "0.03 0.03 0.03" />
         </geometry>
     </visual>
     <collision>
         <origin rpy = "0 0 0" xyz = "0 0 0" />
         <geometry>
-            <box size="1.45 1 0.4 "/>
+            <box size="4.35 3 1.2"/>
         </geometry>
     </collision>
     <inertial>
@@ -22,15 +22,15 @@
 
 <link name = "link4">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.1" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.3" />
         <geometry>
-            <mesh filename = "./fourleg/leg.obj" scale = "0.01 0.01 0.01" />
+            <mesh filename = "./fourleg/leg.obj" scale = "0.03 0.03 0.03" />
         </geometry>
     </visual>
     <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.1" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.3" />
         <geometry>
-            <box size=" 0.1 0.1 0.35"/>
+            <box size=" 0.3 0.3 1.05"/>
         </geometry>
     </collision>
     <inertial>
@@ -42,21 +42,21 @@
 <joint name = "base_link_link4" type = "continuous">
     <parent link = "base_link"/>
     <child link = "link4"/>
-    <origin xyz = "0.35 -0.75 0" rpy = "0 0 0" />
+    <origin xyz = "1.05 -2.25 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "link3">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.1" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.3" />
         <geometry>
-            <mesh filename = "./fourleg/leg.obj" scale = "0.01 0.01 0.01" />
+            <mesh filename = "./fourleg/leg.obj" scale = "0.03 0.03 0.03" />
         </geometry>
     </visual>
     <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.1" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.3" />
         <geometry>
-            <box size="0.1 0.1 0.35"/>
+            <box size="0.3 0.3 1.05"/>
         </geometry>
     </collision>
     <inertial>
@@ -68,21 +68,21 @@
 <joint name = "base_link_link3" type = "continuous">
     <parent link = "base_link"/>
     <child link = "link3"/>
-    <origin xyz = "-0.35 -0.75 0" rpy = "0 0 0" />
+    <origin xyz = "-1.05 -2.25 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "link2">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.1" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.3" />
         <geometry>
-            <mesh filename = "./fourleg/leg.obj" scale = "0.01 0.01 0.01" />
+            <mesh filename = "./fourleg/leg.obj" scale = "0.03 0.03 0.03" />
         </geometry>
     </visual>
     <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.1" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.3" />
         <geometry>
-            <box size="0.1 0.1 0.35"/>
+            <box size="0.3 0.3 1.05"/>
         </geometry>
     </collision>
     <inertial>
@@ -94,21 +94,21 @@
 <joint name = "base_link_link2" type = "continuous">
     <parent link = "base_link"/>
     <child link = "link2"/>
-    <origin xyz = "-0.35 0.75 0" rpy = "0 0 0" />
+    <origin xyz = "-1.05 2.25 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "link1">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.1" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.3" />
         <geometry>
-            <mesh filename = "./fourleg/leg.obj" scale = "0.01 0.01 0.01" />
+            <mesh filename = "./fourleg/leg.obj" scale = "0.03 0.03 0.03" />
         </geometry>
     </visual>
     <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.1" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.3" />
         <geometry>
-            <box size="0.1 0.1 0.35"/>
+            <box size="0.3 0.3 1.05"/>
         </geometry>
     </collision>
     <inertial>
@@ -120,7 +120,7 @@
 <joint name = "base_link_link1" type = "continuous">
     <parent link = "base_link"/>
     <child link = "link1"/>
-    <origin xyz = "0.35 0.75 0" rpy = "0 0 0" />
+    <origin xyz = "1.05 2.25 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 

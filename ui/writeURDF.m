@@ -13,7 +13,7 @@ end
 fid = fopen(filename, 'w');
 
 %% initialize robot
-fprintf(fid, '<robot name = "%s">\n\n', name);
+fprintf(fid, '<?xml verison="1.0"?>\n<robot name = "%s">\n\n', name);
 
 %% write all the links
 for i = 1:length(links)
