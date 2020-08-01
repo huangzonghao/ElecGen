@@ -37,8 +37,9 @@ EnvPanel = makePanel([leftwidth,0,1-leftwidth,.4],'Environment');
 % buttons
 robotload_button = makeButton(LoadPanel, [.1, .6, .8, .3], 'Load Robot', @loadrobot);
 envload_button = makeButton(LoadPanel, [.1, .1, .8, .3], 'Load Environment', @loadenvironment);
-clear_button = makeButton(OutputPanel, [.5, .01, .45, .08], 'Clear', @clearOutput);
+clear_output_button = makeButton(OutputPanel, [.5, .01, .45, .08], 'Clear', @clearOutput);
 run_button = makeButton(EnvPanel, [.85, .05, .1, .15], 'RUN', @run);
+clear_traj_button = makeButton(EnvPanel, [.05, .05, .1, .15], 'Clear', @clearTrajectory);
 
 ButtonFunctions = {'DC motor', 'Servomotor', 'Force<br>sensing', 'Velocity<br>control', 'Remote<br>control', 'Line<br>tracking'};
 FunctionType = [1, 1, 0, 0, 0, 0];  % 1 = actuator, 0 = sensor
@@ -52,6 +53,10 @@ EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
 % data
 envFile = '';
 envMesh = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
+trajectory = zeros(0,3);
+traj_handle = []; traj_proj_handle = [];
+dist_thresh = 0.05; traj_zoffset = 0.01;
+
 robotName = '';
 robotLinks = '';
 robotJoints = '';
@@ -92,7 +97,8 @@ redrawEnv;
         % toggle states of functionality buttons
         switch(selected.type)
             case 'joint'
-                robotJoints(selected.id).buttonState(i) = ~robotJoints(selected.id).buttonState(i);
+                robotJoints(selected.id).buttonState(i) = ...
+                    ~robotJoints(selected.id).buttonState(i);
             case 'link'
                 robotLinks(selected.id(1)).buttonState(selected.id(2),i) = ...
                     ~robotLinks(selected.id(1)).buttonState(selected.id(2),i);
@@ -122,7 +128,7 @@ redrawEnv;
         end
     end
 
-%% MOUSE CLICK CALLBACKS
+%% ROBOT PART SELECTION
     function patchClick(src,event,ilink,igroup)
         if strcmp(MainFigure.SelectionType, 'alt')
             axesButtonDownCallback(src,event);
@@ -139,7 +145,6 @@ redrawEnv;
             selected.handle = src;
             drawSelect;
         end
-        
     end
 
     function jointClick(src,event,ijoint)
@@ -160,9 +165,82 @@ redrawEnv;
         end
     end
 
+%% ENVIRONMENT TRAJECTORY UPDATES
+    function envClick(src,event)
+        if strcmp(MainFigure.SelectionType, 'alt')
+            axesButtonDownCallback(src,event);
+            return;
+        end
+        
+        pt = findIntersection(EnvAxes.CurrentPoint, envMesh);
+        trajectory(end+1,:) = pt;
+        redrawTrajectory;
+    end
+
+    function clearTrajectory(~,~)
+        trajectory = zeros(0,3);
+        delete(traj_handle);
+        delete(traj_proj_handle);
+        traj_handle = [];
+        traj_proj_handle = [];
+    end
+
+    function clickTrajectoryLineCallback(~,evt)
+        % modify the trajectory
+        pt = evt.IntersectionPoint;
+        pt(3) = pt(3) - traj_zoffset;
+        
+        % find segment based on xy projection
+        dir = trajectory(2:end,1:2)-trajectory(1:end-1,1:2);
+        dist = sqrt(sum(dir.^2,2));
+        diff = pt(1:2) - trajectory(1:end,1:2);
+        proj = dot(diff(1:end-1,:), dir, 2)./dist.^2;
+        proj(proj < 0) = 0; proj(proj > 1) = 1;
+        perp = diff(1:end-1,:) - bsxfun(@times,proj,dir);
+        [~,idx] = min(sum(perp.^2,2));
+        
+        dist = sum(diff(idx:idx+1,:).^2,2);
+        
+        if dist(1) > dist_thresh^2 && dist(2) > dist_thresh^2 && evt.Button == 1
+            % where on the line is the point located?
+            switch (idx)
+                case 1
+                    trajectory = [trajectory(1,:); pt; trajectory(2:end,:)];
+                case size(trajectory,1)
+                    trajectory = [trajectory(1:end-1,:); pt; trajectory(end,:)];
+                otherwise
+                    trajectory = [trajectory(1:idx,:); pt; trajectory(idx+1:end,:)];
+            end
+        end
+        
+        redrawTrajectory;
+    end
+
+    function clickTrajectoryPointCallback(~,evt)
+        % modify the trajectory
+        pt = evt.IntersectionPoint;
+        pt(3) = pt(3) - traj_zoffset;
+        
+        dist = sum((pt - trajectory(1:end,:)).^2,2);
+        [~,idx] = min(dist);
+        
+        switch (evt.Button)
+            case 1 % normal
+                mousedata.pressed = true;
+                mousedata.mouse_button = 'trajectory';
+                mousedata.traj_idx = idx;
+            case 3 % right click
+                trajectory(idx,:) = [];
+        end
+        
+        redrawTrajectory;
+    end
+
+%% AXES ROTATION MOUSE CLICK CALLBACKS
     function axesButtonDownCallback(~, ~)
         mousedata.pressed = true;
         mousedata.mouse_button = get(MainFigure, 'SelectionType');
+        mousedata.position = get(0, 'PointerLocation');
         
         switch (mousedata.mouse_button)
             case 'alt'    % right click
@@ -205,6 +283,12 @@ redrawEnv;
     end
 
     function figureWindowButtonUpCallback(~, ~)
+        if (mousedata.pressed && strcmp(mousedata.mouse_button, 'trajectory'))
+            pt = findIntersection(EnvAxes.CurrentPoint, envMesh);
+            trajectory(mousedata.traj_idx,:) = pt;
+            redrawTrajectory;
+        end
+        
         mousedata.mouse_pressed = false;
         MainFigure.Pointer = 'arrow';
         mousedata.mouse_button = '';
@@ -223,9 +307,10 @@ redrawEnv;
         mousedata.position_last = [0 0];
         mousedata.pressed = false;
         mousedata.mouse_button = '';
+        mousedata.traj_idx = 0;
     end
 
-%% DRAWING
+%% DRAWING ROBOT
     function redrawRobot
         % update robot drawing (called upon loading a new robot)
         
@@ -308,15 +393,41 @@ redrawEnv;
         deactivateButtons;
     end
 
+%% DRAWING ENVIRONMENT
     function redrawEnv
         % redraw environment
         cla(EnvAxes)
         trisurf(envMesh, 'Parent', EnvAxes, ...
             'FaceColor', [.8, .8, .8], 'EdgeColor', 'none',...
-            'SpecularStrength', .5, 'AmbientStrength', .5, 'HitTest', 'off');
+            'SpecularStrength', .5, 'AmbientStrength', .5, 'ButtonDownFcn', @envClick);
+        updateCamera(EnvAxes)
         updateLight(EnvAxes);
     end
 
+    function redrawTrajectory
+        if size(trajectory,1) > 1
+            traj_proj = projectOnHeightMap(trajectory, envMesh);
+        else
+            traj_proj = zeros(0,3);
+        end
+        if isempty(traj_proj_handle)
+            traj_proj_handle = plot3(traj_proj(:,1),traj_proj(:,2),traj_proj(:,3)+traj_zoffset,...
+                '-r', 'linewidth', 2, ...
+                'buttondownfcn', @clickTrajectoryLineCallback);
+        else
+            set(traj_proj_handle , 'xdata', traj_proj(:,1), 'ydata', traj_proj(:,2), 'zdata', traj_proj(:,3)+traj_zoffset);
+        end
+        
+        if isempty(traj_handle)
+            traj_handle = plot3(trajectory(:,1), trajectory(:,2), trajectory(:,3)+traj_zoffset, ...
+                '.r','markersize', 20, 'linewidth', 2, ...
+                'buttondownfcn', @clickTrajectoryPointCallback);
+        else
+            set(traj_handle, 'xdata', trajectory(:,1), 'ydata', trajectory(:,2), 'zdata', trajectory(:,3)+traj_zoffset);
+        end
+    end
+
+%% GENERAL DRAWING
     function updateCamera(ax)
         xlim = get(ax, 'xlim');
         ylim = get(ax, 'ylim');
@@ -391,14 +502,19 @@ redrawEnv;
                     
                     [X, Y] = meshgrid(linspace(0,1,size(heightmap,1)), linspace(0,1,size(heightmap,2)));
                     faces = delaunay(X, Y);
-                    envMesh = triangulation(faces, X(:), Y(:), double(heightmap(:))/255);
+                    envMesh = triangulation(faces, X(:), Y(:), double(heightmap(:))/255*0.2);
             end
+            
+            V = envMesh.Points;
+            dist = max(V,[],1)-min(V,[],1);
+            dist_thresh = min(dist) / 20;
             
             disp(['Loaded environment: ' filename]);
             
             redrawEnv;
         end
         
+        clearTrajectory
         clearOutput
     end
 
