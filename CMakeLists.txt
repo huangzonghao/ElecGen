@@ -140,5 +140,23 @@ set_target_properties(mexRun PROPERTIES
 
 target_link_libraries(mexRun ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES})
 
+# add_executable(executable src/testcpp.cpp src/ChUrdfDoc.cpp src/launch_simulation.cpp)
+
+# set_target_properties(executable PROPERTIES
+        # COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+        # COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+        # LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+
+# target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES})
+
+add_executable(executable src/test_iteration.cpp src/ChUrdfDoc.cpp src/RobotController.cpp src/SimMotor.cpp src/SimulationManager.cpp)
+
+set_target_properties(executable PROPERTIES
+        COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+        COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+        LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+
+target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES})
+
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 add_DLL_copy_command("${CHRONO_DLLS}")
