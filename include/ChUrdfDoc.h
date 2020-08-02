@@ -11,29 +11,26 @@
 
 namespace chrono {
 
+// ChLink stores only the raw pointer of ChBodyFrame
+// causing issues when fetching bodies from links
+struct ChLinkBodies{
+    std::shared_ptr<ChBody> body1;
+    std::shared_ptr<ChBody> body2;
+    std::shared_ptr<ChLink> link;
+};
+
 class ChUrdfDoc {
   public:
-    enum SystemType{NSC, SMC};
-    SystemType system_type;
-
-    ChUrdfDoc(std::shared_ptr<ChSystem> sys){ robot_system = sys; };
-
-    ChUrdfDoc(SystemType sys_type = NSC){ system_type = sys_type; };
+    ChUrdfDoc(std::shared_ptr<ChSystem> sys){ robot_system = sys; }
 
     virtual ~ChUrdfDoc(){
         ch_materials_.clear();
         ch_link_bodies_.clear();
     };
 
-    void SetSystemType(SystemType sys_type){ system_type = sys_type; }
-
-    SystemType GetSystemType(){ return system_type; }
-
     void SetSystem(std::shared_ptr<ChSystem>& sys){ robot_system = sys; }
 
     std::shared_ptr<chrono::ChSystem> GetSystem(){ return robot_system; }
-
-    void ResetSystem();
 
     void SetUrdfFile(std::string& filepath){ urdf_file_ = filepath; }
 
@@ -42,19 +39,14 @@ class ChUrdfDoc {
     urdf::ModelInterfaceSharedPtr GetUrdf(){ return urdf_robot; }
 
     bool Load_URDF(const std::string& filename, double x=0, double y=0, double z=0, double rx=0, double ry=0, double rz=0);
+    bool Load_URDF(const std::string& filename, const ChVector<>& init_pos);
+    bool Load_URDF(const std::string& filename, const ChCoordsys<>& init_coord);
     bool Load_URDF(const std::string& filename, const std::shared_ptr<ChBody>& init_pos_body);
-    bool Load_URDF(const std::string& filename, const ChCoordsys<>& init_pos);
 
     std::shared_ptr<chrono::ChSystem> robot_system;
     urdf::ModelInterfaceSharedPtr urdf_robot;
 
-    // ChLink stores only the raw pointer of ChBodyFrame
-    // causing issues when fetching bodies from links
-    struct ChLinkBodies{
-        std::shared_ptr<ChBody> body1;
-        std::shared_ptr<ChBody> body2;
-        std::shared_ptr<ChLink> link;
-    };
+    const std::string& GetRobotName(){ return urdf_robot->getName(); }
 
     const ChLinkBodies& GetLinkBodies(const std::string& name) {
         return ch_link_bodies_.find(name)->second;
