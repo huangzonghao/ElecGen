@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Study\Programs\VS\gurobitest\gurobitest\header;C:\Study\Programs\VS\discreture\include;C:\Study\Robogami\code\cplusplus\protobuf\src;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Study\Programs\ElecGen\Auto_electronics\gurobitest\header;C:\Study\Programs\VS\discreture\include;C:\Study\Robogami\code\cplusplus\protobuf\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -155,38 +155,26 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="header\actuator.h" />
-    <ClInclude Include="header\battery_template.pb.h" />
     <ClInclude Include="header\Circuit.h" />
-    <ClInclude Include="header\connection_structure.pb.h" />
-    <ClInclude Include="header\h_bridge_template.pb.h" />
+    <ClInclude Include="header\component_structure.pb.h" />
     <ClInclude Include="header\Inference.h" />
     <ClInclude Include="header\Matching.h" />
-    <ClInclude Include="header\micro_controller_template.pb.h" />
-    <ClInclude Include="header\motor_template.pb.h" />
-    <ClInclude Include="header\readin.h" />
     <ClInclude Include="header\stdafx.h" />
     <ClInclude Include="header\targetver.h" />
     <ClInclude Include="header\testfile.h" />
     <ClInclude Include="header\typefile.h" />
     <ClInclude Include="header\utility_functions.h" />
-    <ClInclude Include="header\voltage_regulator_template.pb.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\actuator.cpp" />
-    <ClCompile Include="src\battery_template.pb.cc" />
     <ClCompile Include="src\Circuit.cpp" />
-    <ClCompile Include="src\connection_structure.pb.cc" />
-    <ClCompile Include="src\h_bridge_template.pb.cc" />
+    <ClCompile Include="src\component_structure.pb.cc" />
     <ClCompile Include="src\Inference.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Matching.cpp" />
-    <ClCompile Include="src\micro_controller_template.pb.cc" />
-    <ClCompile Include="src\motor_template.pb.cc" />
-    <ClCompile Include="src\readin.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\testfile.cpp" />
     <ClCompile Include="src\utility_functions.cpp" />
-    <ClCompile Include="src\voltage_regulator_template.pb.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

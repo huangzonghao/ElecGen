@@ -13,11 +13,11 @@ int main() {
 	h_bridge_read();
 	battery_read();
 	micro_controller_read();
-	force_sensor_read();
-	voltage_regulator_read();
-	servo_read();
-	camera_read();
-	bluetooth_read();
+//	force_sensor_read();
+//	voltage_regulator_read();
+//	servo_read();
+//	camera_read();
+//	bluetooth_read();
 
 	// SOLVE TEST
 //	motor_solve();
@@ -35,11 +35,11 @@ int main() {
 //	servo_micro_controller_voltage_regulator_battery_connect();
 //	force_sensor_battery_micro_controller_connect();
 //	camera_voltage_regulator_micro_controller_battery_connect();
-	bluetooth_battery_micro_controller_connect();
+//	bluetooth_battery_micro_controller_connect();
 
 
 	// SYSTEM TEST
-//	system_test();
+	system_test();
 
 	int a = 1;
 	// For generated voltage vector

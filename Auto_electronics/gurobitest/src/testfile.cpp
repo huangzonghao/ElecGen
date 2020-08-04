@@ -12,7 +12,7 @@ void motor_read()
 void h_bridge_read()
 {
 	initializeAllHBridges(h_bridge_path);
-	H_Bridge h_bridge(h_bridge_path + "MTD-01.txt");
+	H_Bridge h_bridge(h_bridge_path + "DRV8838.txt");
 //	h_bridge.parameters();
 }
 

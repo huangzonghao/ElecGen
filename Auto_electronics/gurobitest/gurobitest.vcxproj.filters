@@ -24,31 +24,13 @@
     <ClInclude Include="header\actuator.h">
       <Filter>Header Files\header</Filter>
     </ClInclude>
-    <ClInclude Include="header\battery_template.pb.h">
-      <Filter>Header Files\header</Filter>
-    </ClInclude>
     <ClInclude Include="header\Circuit.h">
-      <Filter>Header Files\header</Filter>
-    </ClInclude>
-    <ClInclude Include="header\connection_structure.pb.h">
-      <Filter>Header Files\header</Filter>
-    </ClInclude>
-    <ClInclude Include="header\h_bridge_template.pb.h">
       <Filter>Header Files\header</Filter>
     </ClInclude>
     <ClInclude Include="header\Inference.h">
       <Filter>Header Files\header</Filter>
     </ClInclude>
     <ClInclude Include="header\Matching.h">
-      <Filter>Header Files\header</Filter>
-    </ClInclude>
-    <ClInclude Include="header\micro_controller_template.pb.h">
-      <Filter>Header Files\header</Filter>
-    </ClInclude>
-    <ClInclude Include="header\motor_template.pb.h">
-      <Filter>Header Files\header</Filter>
-    </ClInclude>
-    <ClInclude Include="header\readin.h">
       <Filter>Header Files\header</Filter>
     </ClInclude>
     <ClInclude Include="header\stdafx.h">
@@ -66,7 +48,7 @@
     <ClInclude Include="header\utility_functions.h">
       <Filter>Header Files\header</Filter>
     </ClInclude>
-    <ClInclude Include="header\voltage_regulator_template.pb.h">
+    <ClInclude Include="header\component_structure.pb.h">
       <Filter>Header Files\header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -74,16 +56,7 @@
     <ClCompile Include="src\actuator.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\battery_template.pb.cc">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Circuit.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\connection_structure.pb.cc">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\h_bridge_template.pb.cc">
       <Filter>Source Files\src</Filter>
     </ClCompile>
     <ClCompile Include="src\Inference.cpp">
@@ -95,15 +68,6 @@
     <ClCompile Include="src\Matching.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\micro_controller_template.pb.cc">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\motor_template.pb.cc">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\readin.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
     <ClCompile Include="src\stdafx.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
@@ -113,7 +77,7 @@
     <ClCompile Include="src\utility_functions.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\voltage_regulator_template.pb.cc">
+    <ClCompile Include="src\component_structure.pb.cc">
       <Filter>Source Files\src</Filter>
     </ClCompile>
   </ItemGroup>
