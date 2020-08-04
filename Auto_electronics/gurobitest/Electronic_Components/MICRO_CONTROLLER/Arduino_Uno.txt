@@ -1,0 +1,685 @@
+component_name: "Arduino_Uno"
+component_type: "MICRO_CONTROLLER"
+component_class: "OTHER"
+pin {
+  name: "Vin"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 7
+    ub: 12
+  }
+  i_bound {
+    lb: 0
+	ub: 1
+  }
+  dependents {
+    others: "GND"
+  }
+}
+pin {
+  name: "5V"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 5
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.05
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "3.3V"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 3.3
+    ub: 3.3
+  }
+  i_bound {
+    lb: 0
+	ub: 0.05
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "0"
+  pin_class: FUNCTION
+  func_type: DIGITAL_UART_RX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "1"
+	others: "GND"
+  }
+}
+pin {
+  name: "1" 
+  pin_class: FUNCTION
+  func_type: DIGITAL_UART_TX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "0"
+	others: "GND"
+  }
+}
+pin {
+  name: "2"
+  pin_class: FUNCTION
+  func_type: DIGITAL_EXTERNAL_INTERRUPT
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "3"
+  pin_class: FUNCTION
+  func_type: PWM_EXTERNAL_INTERRUPT
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "4"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "5"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "6"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "7"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "8"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "9"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "10"
+  pin_class: FUNCTION
+  func_type: PWM_SPI_SS
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "11"
+	others: "12"
+	others: "13"
+	others: "GND"
+  }
+}
+pin {
+  name: "11"
+  pin_class: FUNCTION
+  func_type: PWM_SPI_MOSI
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "10"
+	others: "12"
+	others: "13"
+	others: "GND"
+  }
+}
+pin {
+  name: "12"
+  pin_class: FUNCTION
+  func_type: DIGITAL_SPI_MISO
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "RAW"
+	others: "10"
+	others: "11"
+	others: "13"
+	others: "GND"
+  }
+}
+pin {
+  name: "13"
+  pin_class: FUNCTION
+  func_type: DIGITAL_SPI_SCK
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "RAW"
+	others: "10"
+	others: "11"
+	others: "12"
+	others: "GND"
+  }
+}
+pin {
+  name: "AREF"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "SDA"
+  pin_class: FUNCTION
+  func_type: I2C_SDA
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "SCL"
+	others: "GND"
+  }
+}
+pin {
+  name: "SCL"
+  pin_class: FUNCTION
+  func_type: I2C_SCL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "SDA"
+	others: "GND"
+  }
+}
+pin {
+  name: "A0"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "A1"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "A2"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "A3"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "A4"
+  pin_class: FUNCTION
+  func_type: ANALOG_I2C_SDA
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "A5"
+	others: "GND"
+  }
+}
+pin {
+  name: "A5"
+  pin_class: FUNCTION
+  func_type: ANALOG_I2C_SCL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "A4"
+	others: "GND"
+  }
+}
+pin {
+  name: "RESET"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+pin {
+  name: "IOREF"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "RAW"
+	others: "GND"
+  }
+}
+nonlin: 0
+size {
+  length: 10
+  width: 10
+  height: 10
+}
+weight: 25
+price: 22
+[Electronics.Micro_Controller.micro_controller] {
+logic_level 
+{
+  lb: 0.8
+  ub: 3.3
+}
+}

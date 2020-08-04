@@ -1,0 +1,220 @@
+component_name: "Bluefruit_SPI"
+component_type: "BLUETOOTH"
+component_class: "SENSOR"
+pin {
+  name: "VIN"
+  pin_class: POWER
+  func_type: ELECTRICAL	
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 16
+  }
+  i_bound {
+	lb: 0
+	ub: 0.03
+  }
+  dependents {
+	others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+	lb: 0
+	ub: 0
+  }
+  dependents {
+	others: "VIN"
+  }
+}
+pin {
+  name: "SCK"
+  pin_class: FUNCTION
+  func_type: SPI_SCK
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VIN"
+	others: "MISO"
+	others: "MOSI"
+	others: "CS"
+	others: "GND"
+  }
+}
+pin {
+  name: "MISO"
+  pin_class: FUNCTION
+  func_type: SPI_MISO
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.0001
+  }
+  dependents {
+	others: "VIN"
+	others: "MOSI"
+	others: "SCK"
+	others: "CS"
+	others: "GND"
+  }
+}
+pin {
+  name: "MOSI"
+  pin_class: FUNCTION
+  func_type: SPI_MOSI
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+    lb: 0
+	ub: 0.0001
+  }
+  dependents {
+	others: "VIN"
+	others: "MISO"
+	others: "SCK"
+	others: "CS"
+	others: "GND"
+  }
+}
+pin {
+  name: "CS"
+  pin_class: FUNCTION
+  func_type: SPI_SS
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.0001
+  }
+  dependents {
+	others: "VIN"
+	others: "MOSI"
+	others: "MISO"
+	others: "SCK"
+	others: "GND"
+  }
+}
+pin {
+  name: "IRQ"
+  pin_class: FUNCTION
+  func_type: EXTERNAL_INTERRUPT
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.0001
+  }
+  dependents {
+	others: "VIN"
+	others: "MOSI"
+	others: "MISO"
+	others: "SCK"
+	others: "CS"
+	others: "GND"
+  }
+}
+pin {
+  name: "DFU"
+  pin_class: FUNCTION
+  func_type: OTHER	
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0 
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.0001
+  }
+  dependents {
+	others: "VIN"
+	others: "GND"
+  }
+}
+pin {
+  name: "RST"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.0001
+  }
+  dependents {
+	others: "VIN"
+	others: "GND"
+  }
+}
+nonlin: 0
+size {
+  length: 23
+  width: 26
+  height: 5
+}
+weight: 3
+price: 17.5
+[Electronics.Bluetooth.bluetooth] {
+  frequency: 4000000
+}
+
+
+

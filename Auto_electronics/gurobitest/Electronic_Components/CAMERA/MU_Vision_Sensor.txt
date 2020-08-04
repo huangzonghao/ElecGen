@@ -1,0 +1,102 @@
+component_name: "MU_Vision_Sensor"
+component_type: "CAMERA"
+component_class: "SENSOR"
+pin {
+  name: "V"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.05
+  }
+  dependents {
+	others: "G"
+  }
+}
+pin {
+  name: "G"
+  pin_class: POWER
+  func_type: GND 
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+	lb: 0
+	ub: 0
+  }
+  dependents {
+	others: "V"
+  }
+}
+pin {
+  name: "RX/SDA"
+  pin_class: FUNCTION
+  func_type: UART_RX_I2C_SDA
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "V"
+	others: "TX/SCL"
+	others: "GS"
+  }
+}
+pin {
+  name: "TX/SCL"
+  pin_class: FUNCTION
+  func_type: UART_TX_I2C_SCL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "V"
+	others: "RX/SDA"
+	others: "G"
+  }
+}
+nonlin: 0
+size {
+  length: 32
+  width: 32
+  height: 12
+}
+weight: 7
+price: 59
+[Electronics.Camera.camera] {
+  frequency: 9600
+}
+
+
+
+

@@ -1,0 +1,1779 @@
+component_name: "Arduino_Mega"
+component_type: "MICRO_CONTROLLER"
+component_class: "OTHER"
+pin {
+  name: "Vin"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 7
+    ub: 12
+  }
+  i_bound {
+    lb: 0
+	ub: 3
+  }
+  dependents {
+    others: "GND"
+  }
+}
+pin {
+  name: "5V"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 5
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.05
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "3.3V"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 3.3
+    ub: 3.3
+  }
+  i_bound {
+    lb: 0
+	ub: 0.05
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "0"
+  pin_class: FUNCTION
+  func_type: DIGITAL_UART_RX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "1"
+	others: "GND"
+  }
+}
+pin {
+  name: "1"
+  pin_class: FUNCTION
+  func_type: DIGITAL_UART_TX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "0"
+	others: "GND"
+  }
+}
+pin {
+  name: "2"
+  pin_class: FUNCTION
+  func_type: PWM_EXTERNAL_INTERRUPT
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "3"
+  pin_class: FUNCTION
+  func_type: PWM_EXTERNAL_INTERRUPT
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "4"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "5"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "6"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }  
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "7"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "8"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "9"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "10"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "11"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "12"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "13"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "14"
+  pin_class: FUNCTION
+  func_type: DIGITAL_UART_TX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "15"
+	others: "GND"
+  }
+}
+pin {
+  name: "15"
+  pin_class: FUNCTION
+  func_type: DIGITAL_UART_RX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "14"
+	others: "GND"
+  }
+}
+pin {
+  name: "16"
+  pin_class: FUNCTION
+  func_type: DIGITAL_UART_TX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "17"
+	others: "GND"
+  }
+}
+pin {
+  name: "17"
+  pin_class: FUNCTION
+  func_type: DIGITAL_UART_RX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "16"
+	others: "GND"
+  }
+}
+pin {
+  name: "18"
+  pin_class: FUNCTION
+  func_type: DIGITAL_EXTERNAL_INTERRUPT_UART_TX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "19"
+	others: "GND"
+  }
+}
+pin {
+  name: "19"
+  pin_class: FUNCTION
+  func_type: DIGITAL_EXTERNAL_INTERRUPT_UART_RX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "18"
+	others: "GND"
+  }
+}
+pin {
+  name: "20"
+  pin_class: FUNCTION
+  func_type: DIGITAL_EXTERNAL_INTERRUPT_I2C_SDA
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "21"
+	others: "GND"
+  }
+}
+pin {
+  name: "21"
+  pin_class: FUNCTION
+  func_type: DIGITAL_EXTERNAL_INTERRUPT_I2C_SCL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "20"
+	others: "GND"
+  }
+}
+pin {
+  name: "22"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "23"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "24"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "25"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "26"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "27"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "28"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "29"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "30"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "31"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "32"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "33"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "34"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "35"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "36"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "37"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "38"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "39"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "40"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "41"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "42"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "43"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "44"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "45"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "46"
+  pin_class: FUNCTION
+  func_type: PWM
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "47"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "48"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "49"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "50"
+  pin_class: FUNCTION
+  func_type: DIGITAL_SPI_MISO
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "51"
+	others: "52"
+	others: "53"
+	others: "GND"
+  }
+}
+pin {
+  name: "51"
+  pin_class: FUNCTION
+  func_type: DIGITAL_SPI_MOSI
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "50"
+	others: "52"
+	others: "53"
+	others: "GND"
+  }
+}
+pin {
+  name: "52"
+  pin_class: FUNCTION
+  func_type: DIGITAL_SPI_SCK
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "50"
+	others: "51"
+	others: "53"
+	others: "GND"
+  }
+}
+pin {
+  name: "53"
+  pin_class: FUNCTION
+  func_type: DIGITAL_SPI_SS
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "50"
+	others: "51"
+	others: "52"
+	others: "GND"
+  }
+}
+pin {
+  name: "AREF"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "SDA"
+  pin_class: FUNCTION
+  func_type: I2C_SDA
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "SCL"
+	others: "GND"
+  }
+}
+pin {
+  name: "SCL"
+  pin_class: FUNCTION
+  func_type: I2C_SCL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "SDA"
+	others: "GND"
+  }
+}
+pin {
+  name: "A0"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A1"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A2"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A3"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A4"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A5"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A6"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A7"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A8"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A9"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A10"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A11"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A12"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A13"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A14"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "A15"
+  pin_class: FUNCTION
+  func_type: ANALOG
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "RESET"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+pin {
+  name: "IOREF"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.02
+  }
+  dependents {
+    others: "Vin"
+	others: "GND"
+  }
+}
+nonlin: 0
+size {
+  length: 10
+  width: 10
+  height: 10
+}
+weight: 37
+price: 38.50
+[Electronics.Micro_Controller.micro_controller] {
+logic_level 
+{
+  lb: 0.8
+  ub: 3.3
+}
+}

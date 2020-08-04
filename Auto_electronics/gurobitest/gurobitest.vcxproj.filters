@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\header">
+      <UniqueIdentifier>{f22b390a-992f-4085-a47b-4c1b77b0f252}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{74f0b82c-466e-4121-ba77-ed2b62c96d9d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="header\actuator.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\battery_template.pb.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Circuit.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\connection_structure.pb.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\h_bridge_template.pb.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Inference.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Matching.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\micro_controller_template.pb.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\motor_template.pb.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\readin.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\stdafx.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\targetver.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\testfile.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\typefile.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\utility_functions.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+    <ClInclude Include="header\voltage_regulator_template.pb.h">
+      <Filter>Header Files\header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\actuator.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\battery_template.pb.cc">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Circuit.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connection_structure.pb.cc">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\h_bridge_template.pb.cc">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Inference.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Matching.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\micro_controller_template.pb.cc">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\motor_template.pb.cc">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\readin.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdafx.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\testfile.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility_functions.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\voltage_regulator_template.pb.cc">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
