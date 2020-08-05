@@ -1,11 +1,13 @@
 #include "RobotController.h"
 
+RobotController::~RobotController(){}
+
 bool ManipulatorController::Update(){
     return true;
 }
 
 WheelController::WheelController(SimulationManager *sm,
-                std::shared_ptr<chrono::ChBody> ch_body):
+                                 const std::shared_ptr<chrono::ChBody>& ch_body):
     RobotController(sm, WHEEL),
     robot_body(ch_body.get())
 {
@@ -41,7 +43,7 @@ bool WheelController::Update(){
 }
 
 LeggedController::LeggedController(SimulationManager *sm,
-                                   std::shared_ptr<chrono::ChBody> ch_body):
+                                   const std::shared_ptr<chrono::ChBody>& ch_body):
     RobotController(sm, LEGGED),
     robot_body(ch_body.get())
 {}

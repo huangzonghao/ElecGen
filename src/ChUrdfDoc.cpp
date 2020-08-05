@@ -43,7 +43,8 @@ void ChUrdfDoc::convert_materials(){
     }
 }
 
-void ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr& u_link, const std::shared_ptr<ChBody>& ch_parent_body){
+std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr& u_link,
+                                                 const std::shared_ptr<ChBody>& ch_parent_body){
 
     // first make the chbody for yourself
     urdf::JointSharedPtr u_parent_joint = u_link->parent_joint;
@@ -278,7 +279,7 @@ void ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr& u_link, const std:
 
         convert_links(*link_iter, ch_body);
     }
-
+    return ch_body;
 }
 
 bool ChUrdfDoc::Load_URDF(const std::string& filename, double x, double y, double z, double rx, double ry, double rz) {
@@ -317,7 +318,7 @@ bool ChUrdfDoc::Load_URDF(const std::string& filename, const std::shared_ptr<ChB
     urdf::LinkConstSharedPtr root_link = urdf_robot->getRoot();
     if (root_link){
         link_idx_ = 0;
-        convert_links(root_link, init_pos_body);
+        ch_root_link_ = convert_links(root_link, init_pos_body);
     }
     else{
         return false;

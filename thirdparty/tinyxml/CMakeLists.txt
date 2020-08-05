@@ -25,20 +25,21 @@ set(CMAKE_CONFIGURATION_TYPES
     CACHE STRING "" FORCE
 )
 
+if(MSVC)
 ################################################################################
 # Global compiler options
 ################################################################################
-if(MSVC)
+
     # remove default flags provided with CMake for MSVC
     set(CMAKE_CXX_FLAGS "")
     set(CMAKE_CXX_FLAGS_DEBUG "")
     set(CMAKE_CXX_FLAGS_RELEASE "")
-endif()
+
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
 ################################################################################
 # Global linker options
 ################################################################################
-if(MSVC)
     # remove default flags provided with CMake for MSVC
     set(CMAKE_EXE_LINKER_FLAGS "")
     set(CMAKE_MODULE_LINKER_FLAGS "")

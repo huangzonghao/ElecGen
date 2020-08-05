@@ -52,6 +52,8 @@ class ChUrdfDoc {
         return ch_link_bodies_.find(name)->second;
     }
 
+    std::shared_ptr<ChBody> GetRootLink(){ return ch_root_link_; }
+
   private:
     struct ChMatPair{
         std::shared_ptr<ChColorAsset> color;
@@ -64,13 +66,15 @@ class ChUrdfDoc {
 
     bool color_empty(const urdf::Color& test_color);
     std::string urdf_abs_path(const std::string& relative_path);
-    void convert_links(const urdf::LinkConstSharedPtr& u_link, const std::shared_ptr<ChBody>& ch_parent_body);
+    std::shared_ptr<ChBody> convert_links(const urdf::LinkConstSharedPtr& u_link,
+                                          const std::shared_ptr<ChBody>& ch_parent_body);
     void convert_materials();
     // concatenates the urdf flie path and the relative path to the urdf file
     int link_idx_;
     std::string urdf_file_;
     std::map<std::string, ChMatPair> ch_materials_;
     std::map<std::string, ChLinkBodies> ch_link_bodies_;
+    std::shared_ptr<ChBody> ch_root_link_;
 
 };
 

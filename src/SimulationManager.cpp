@@ -33,7 +33,7 @@ void SimulationManager::AddServo(const std::string& link_name, double mass,
 
 }
 void SimulationManager::AddMotor(const std::string& link_name, double mass,
-                                 double size_x, double size_y, double size_z, int type,
+                                 double size_x, double size_y, double size_z, SimMotor::MotorType type,
                                  double coord_x, double coord_y, double coord_z){
     motors.push_back(std::make_shared<SimMotor>(link_name, mass,
                                                 size_x, size_y, size_z,
@@ -69,11 +69,18 @@ bool SimulationManager::RunSimulation(bool do_viz){
     ground_mat->SetRestitution(0.01f);
 
     if (env_file.empty()){
-        std::cerr << "Map file not initialized" << std::endl;
-        return 1;
+        std::cout << "Map file not initialized, building default ground" << std::endl;
+        // ground body
+        auto my_ground = chrono_types::make_shared<ChBodyEasyBox>(50, 50, 0.9, 1.0, true, true, ground_mat);
+        my_ground->SetPos(ChVector<>(0, 0., -0.5));
+        // my_ground->SetRot(Q_from_AngAxis(0.1, VECT_Y));
+        my_ground->SetBodyFixed(true);
+        auto ground_texture = chrono_types::make_shared<ChColorAsset>();
+        ground_texture->SetColor(ChColor(0.2f, 0.2f, 0.2f));
+        my_ground->AddAsset(ground_texture);
+        sim_system->AddBody(my_ground);
     }
-
-    if (env_file.find(".bmp") != std::string::npos){
+    else if (env_file.find(".bmp") != std::string::npos){
         vehicle::RigidTerrain terrain(sim_system.get());
         auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0), QUNIT),
                                       env_file, "ground_mesh", 50, 50, 0, 2);
@@ -88,15 +95,8 @@ bool SimulationManager::RunSimulation(bool do_viz){
         terrain.Initialize();
     }
     else {
-        // ground body
-        auto my_ground = chrono_types::make_shared<ChBodyEasyBox>(50, 50, 0.9, 1.0, true, true, ground_mat);
-        my_ground->SetPos(ChVector<>(0, 0., -0.5));
-        // my_ground->SetRot(Q_from_AngAxis(0.1, VECT_Y));
-        my_ground->SetBodyFixed(true);
-        auto ground_texture = chrono_types::make_shared<ChColorAsset>();
-        ground_texture->SetColor(ChColor(0.2f, 0.2f, 0.2f));
-        my_ground->AddAsset(ground_texture);
-        sim_system->AddBody(my_ground);
+        std::cerr << "Map file " << env_file << " not recognized, exiting" << std::endl;
+        return 1;
     }
 
     // Load URDF file and add to the system
@@ -125,10 +125,10 @@ bool SimulationManager::RunSimulation(bool do_viz){
         controller = std::make_shared<ManipulatorController>(this);
     }
     else if (urdf_doc.GetRobotName().find("leg") != std::string::npos) {
-        controller = std::make_shared<LeggedController>(this);
+        controller = std::make_shared<LeggedController>(this, urdf_doc.GetRootLink());
     }
     else if (urdf_doc.GetRobotName().find("wheel") != std::string::npos) {
-        controller = std::make_shared<WheelController>(this);
+        controller = std::make_shared<WheelController>(this, urdf_doc.GetRootLink());
     }
     else {
         std::cerr << "Need to specify controller type in robot name" << std::endl;

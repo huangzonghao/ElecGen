@@ -40,6 +40,8 @@ SimMotorBase::SimMotorBase(const std::string& link_name, double mass,
      link_name(link_name)
 {}
 
+SimMotorBase::~SimMotorBase(){}
+
 void SimMotorBase::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
                                chrono::ChUrdfDoc& urdf_doc){
     chlinkbody = &(urdf_doc.GetLinkBodies(link_name));

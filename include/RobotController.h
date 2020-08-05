@@ -36,7 +36,7 @@ class WheelController : public RobotController {
   public:
 
     WheelController(SimulationManager *sm,
-                    std::shared_ptr<chrono::ChBody> ch_body);
+                    const std::shared_ptr<chrono::ChBody>& ch_body);
     ~WheelController(){};
     chrono::ChBody *robot_body;
 
@@ -56,7 +56,7 @@ class WheelController : public RobotController {
 class LeggedController : public RobotController {
   public:
     LeggedController(SimulationManager *sm,
-                     std::shared_ptr<chrono::ChBody> ch_body);
+                     const std::shared_ptr<chrono::ChBody>& ch_body);
     ~LeggedController(){};
 
     chrono::ChBody *robot_body;

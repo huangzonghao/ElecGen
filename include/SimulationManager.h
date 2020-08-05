@@ -59,7 +59,7 @@ class  SimulationManager {
                   double upper_limit, double lower_limit,
                   double coord_x=0, double coord_y=0, double coord_z=0);
     void AddMotor(const std::string& link_name, double mass,
-                  double size_x, double size_y, double size_z, int type=SimMotor::SPEED,
+                  double size_x, double size_y, double size_z, SimMotor::MotorType type=SimMotor::SPEED,
                   double coord_x=0, double coord_y=0, double coord_z=0);
     void AddWaypoint(double x, double y, double z){ waypoints.push_back(chrono::ChVector<>(x,y,z)); };
     void SetStartJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {start_joint_pos = jointpos;};

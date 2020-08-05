@@ -31,40 +31,65 @@ if (NOT urdfdom_FOUND)
     execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
 
-    execute_process(COMMAND make install
+    execute_process(COMMAND cmake --build . --config Release --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
-
-    set(urdfdom_headers_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_headers/cmake
-        CACHE PATH "Path to CMake config files" FORCE)
 
     execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install ${CMAKE_SOURCE_DIR}/thirdparty/console_bridge
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
 
-    execute_process(COMMAND make install
+    execute_process(COMMAND cmake --build . --config Release --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
-
-    set(console_bridge_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
-        CACHE PATH "Path to CMake config files" FORCE)
 
     execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install ${CMAKE_SOURCE_DIR}/thirdparty/tinyxml
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
 
-    execute_process(COMMAND make install
+    execute_process(COMMAND cmake --build . --config Release --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
 
-    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
-                                  -Durdfdom_headers_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_headers/cmake
-                                  -Dconsole_bridge_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
-                                  -DTinyXML_ROOT_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
-                                  -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=True
-                                  ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
+    if (UNIX) # Linux & MacOS
+        execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
+                                      -Durdfdom_headers_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_headers/cmake
+                                      -Dconsole_bridge_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
+                                      -DTinyXML_ROOT_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
+                                      -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=True
+                                      ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
 
-    execute_process(COMMAND make install
-                    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
+        execute_process(COMMAND cmake --build . --config Release --target install
+                        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
 
-    set(urdfdom_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom/cmake
-        CACHE PATH "Path to CMake config files" FORCE)
+        set(urdfdom_headers_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_headers/cmake
+            CACHE PATH "Path to CMake config files" FORCE)
+
+        set(console_bridge_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/console_bridge/cmake
+            CACHE PATH "Path to CMake config files" FORCE)
+
+        set(urdfdom_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom/cmake
+            CACHE PATH "Path to CMake config files" FORCE)
+
+    elseif (WIN32) # Windows
+        set(ENV{CL} /D_USE_MATH_DEFINES $ENV{CL})
+        execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
+                                      -Durdfdom_headers_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/CMake
+                                      -Dconsole_bridge_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/CMake
+                                      -DTinyXML_ROOT_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
+                                      -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=True
+                                      ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
+
+        execute_process(COMMAND cmake --build . --config Release --target install
+                        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
+        set(urdfdom_headers_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/CMake
+            CACHE PATH "Path to CMake config files" FORCE)
+
+        set(console_bridge_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/CMake
+            CACHE PATH "Path to CMake config files" FORCE)
+
+        set(urdfdom_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/CMake
+            CACHE PATH "Path to CMake config files" FORCE)
+        # Need to do this due to a flaw of upstream library -- https://github.com/ros/urdfdom/issues/42
+        file(TOUCH ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_sensor.lib ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_model_state.lib)
+    endif()
 
     find_package(urdfdom QUIET)
 endif()
@@ -126,7 +151,7 @@ else()
 endif()
 
 # debug flag
-add_definitions(-DDEBUG)
+# add_definitions(-DDEBUG)
 
 # Need to use the filesystem of C++17
 set (CMAKE_CXX_STANDARD 17)
