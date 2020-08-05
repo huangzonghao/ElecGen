@@ -87,7 +87,7 @@
 </link>
 
 <joint name = "chassis_wheel_front" type = "fixed">
-    <parent link = "steer_plate"/>
+    <parent link = "chassis"/>
     <child link = "wheel_front"/>
     <origin xyz = "1.2 0 -0.45" rpy = "1.57 0 0" />
     <axis xyz = "0 0 1" />

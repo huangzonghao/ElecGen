@@ -325,12 +325,19 @@ redrawEnv;
                 mesh = robotLinks(i(1)).mesh;
                 pts = mesh.Points;
                 if i(2)>0
-                    pts = bsxfun(@plus, pts, robotJoints(i(2)).origin+robotLinks(i(1)).origin);
+                    % FIXME: won't work with tree depth > 1
+                    o = robotJoints(i(2)).origin;
+                    rpy = robotJoints(i(2)).rpy;
+                    rotm = eul2rotm(rpy, 'XYZ');
+                    
+                    % draw link
+                    pts = (rotm*pts')';
+                    pts = bsxfun(@plus, pts, o+robotLinks(i(1)).origin);
                     mesh = triangulation(mesh.ConnectivityList, pts);
                     
                     % draw joint
-                    o = robotJoints(i(2)).origin;
                     a = robotJoints(i(2)).axis;
+                    a = (rotm*a')';
                     plot3([o(1)+.25*a(1) o(1)-.25*a(1)], [o(2)+.25*a(2) o(2)-.25*a(2)], [o(3)+.25*a(3) o(3)-.25*a(3)],...
                         '-', 'Color', jointColor_deselect,'LineWidth',3,'Parent',RobotAxes,...
                         'ButtonDownFcn', @(s,e)jointClick(s,e,i(2)));
@@ -339,7 +346,7 @@ redrawEnv;
                 end
                 
                 % draw link
-                [edges, grp_assign] = reduceEdges(mesh, pi/20);
+                [edges, grp_assign] = reduceEdges(mesh, pi/8);
                 for igroup = unique(grp_assign(:)')
                     patch('Faces', mesh.ConnectivityList(grp_assign==igroup,:), 'Vertices', mesh.Points, ...
                         'Parent', RobotAxes, ...
@@ -469,6 +476,7 @@ redrawEnv;
             redrawRobot;
         end
         
+        selected.type = 'none';
         clearOutput
     end
 
