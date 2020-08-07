@@ -22,6 +22,7 @@ class  SimulationManager {
     std::vector<std::shared_ptr<SimMotor> > motors;
 
     std::vector<chrono::ChVector<> > waypoints;
+
     // for manipulator
     std::shared_ptr<std::vector<double> > start_joint_pos;
     std::shared_ptr<std::vector<double> > goal_joint_pos;

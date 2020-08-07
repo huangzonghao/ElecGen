@@ -36,9 +36,12 @@ bool WheelController::Update(){
 
     auto& motors = sim_magr->motors;
 
-    sim_magr->motors[0]->Set(speed[0]);
-    sim_magr->motors[1]->Set(speed[1]);
+    // sim_magr->motors[0]->Set(speed[0]);
+    // sim_magr->motors[1]->Set(speed[1]);
 
+    std::cout << "current idx: " << waypoint_idx << ", distance: " << (robot_body->GetPos() - waypoints[waypoint_idx]).Length() << ", current location: " << robot_body->GetPos() << std::endl;
+    sim_magr->motors[0]->Set(10);
+    sim_magr->motors[1]->Set(10);
     return false;
 }
 
@@ -69,10 +72,15 @@ bool LeggedController::Update(){
 
     auto& motors = sim_magr->motors;
 
-    sim_magr->motors[0]->Set(speed[0]);
-    sim_magr->motors[1]->Set(speed[1]);
-    sim_magr->motors[2]->Set(speed[2]);
-    sim_magr->motors[3]->Set(speed[3]);
+    // sim_magr->motors[0]->Set(speed[0]);
+    // sim_magr->motors[1]->Set(speed[1]);
+    // sim_magr->motors[2]->Set(speed[2]);
+    // sim_magr->motors[3]->Set(speed[3]);
+    std::cout << "current idx: " << waypoint_idx << ", distance: " << (robot_body->GetPos() - waypoints[waypoint_idx]).Length() << ", current location: " << robot_body->GetPos() << std::endl;
+    sim_magr->motors[0]->Set(5);
+    sim_magr->motors[1]->Set(5);
+    sim_magr->motors[2]->Set(5);
+    sim_magr->motors[3]->Set(5);
 
     return false;
 }

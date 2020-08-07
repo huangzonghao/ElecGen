@@ -40,7 +40,7 @@ class SimMotorBase : public SimPayload {
     virtual void Set(double value){ ch_func->Set_yconst(value); };
     virtual void UpdateMaxTorque(){ max_torque = chrono::ChMax(max_torque, ch_motor->GetMotorTorque()); };
 
-    chrono::ChLinkBodies const *chlinkbody;
+    const chrono::ChLinkBodies *chlinkbody;
     std::shared_ptr<chrono::ChLinkMotorRotation> ch_motor;
     std::shared_ptr<chrono::ChFunction_Const> ch_func;
 };

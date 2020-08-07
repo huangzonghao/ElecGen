@@ -58,6 +58,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
     }
     else{
         std::cerr << "Wrong system type: " << system_type << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     sim_system->Set_G_acc(ChVector<>(0, 0, -9.81));
@@ -119,16 +120,15 @@ bool SimulationManager::RunSimulation(bool do_viz){
     for (auto servo : servos) servo->AddtoSystem(sim_system, urdf_doc);
     for (auto motor : motors) motor->AddtoSystem(sim_system, urdf_doc);
 
-
     // init controller
     if (urdf_doc.GetRobotName().find("manipulator") != std::string::npos) {
         controller = std::make_shared<ManipulatorController>(this);
     }
     else if (urdf_doc.GetRobotName().find("leg") != std::string::npos) {
-        controller = std::make_shared<LeggedController>(this, urdf_doc.GetRootLink());
+        controller = std::make_shared<LeggedController>(this, urdf_doc.GetRootBody());
     }
     else if (urdf_doc.GetRobotName().find("wheel") != std::string::npos) {
-        controller = std::make_shared<WheelController>(this, urdf_doc.GetRootLink());
+        controller = std::make_shared<WheelController>(this, urdf_doc.GetRootBody());
     }
     else {
         std::cerr << "Need to specify controller type in robot name" << std::endl;

@@ -13,7 +13,7 @@ std::string ChUrdfDoc::urdf_abs_path(const std::string& relative_path){
     std::filesystem::path abs_path(urdf_file_);
     abs_path.remove_filename();
     abs_path /= relative_path;
-    return abs_path;
+    return abs_path.string();
 }
 
 bool ChUrdfDoc::color_empty(const urdf::Color& test_color){
@@ -318,13 +318,21 @@ bool ChUrdfDoc::Load_URDF(const std::string& filename, const std::shared_ptr<ChB
     urdf::LinkConstSharedPtr root_link = urdf_robot->getRoot();
     if (root_link){
         link_idx_ = 0;
-        ch_root_link_ = convert_links(root_link, init_pos_body);
+        ch_root_body_ = convert_links(root_link, init_pos_body);
     }
     else{
         return false;
     }
 
     return true;
+}
+
+const ChLinkBodies& ChUrdfDoc::GetLinkBodies(const std::string& name) {
+    if (ch_link_bodies_.find(name) == ch_link_bodies_.end()){
+        std::cerr << "Error: robot " << urdf_robot->getName() << " doesn't contain link " << name << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    return ch_link_bodies_.find(name)->second;
 }
 
 }  // END_OF_NAMESPACE____

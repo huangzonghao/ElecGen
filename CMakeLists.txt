@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.16)
 
 project(Electronics_Generation)
 
@@ -68,7 +68,13 @@ if (NOT urdfdom_FOUND)
             CACHE PATH "Path to CMake config files" FORCE)
 
     elseif (WIN32) # Windows
-        set(ENV{CL} /D_USE_MATH_DEFINES $ENV{CL})
+        # set(ENV{CL} /D_USE_MATH_DEFINES $ENV{CL})
+        # Need to do this due to a flaw of upstream library -- https://github.com/ros/urdfdom/issues/42
+        file(COPY ${CMAKE_SOURCE_DIR}/cmake/urdfdom_cmakelists_patched.txt DESTINATION ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/)
+        file(COPY ${CMAKE_SOURCE_DIR}/cmake/urdfparser_cmakelists_patched.txt DESTINATION ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser)
+        file(RENAME ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdfdom_cmakelists_patched.txt ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/CMakeLists.txt)
+        file(RENAME ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser/urdfparser_cmakelists_patched.txt ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser/CMakeLists.txt)
+
         execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install
                                       -Durdfdom_headers_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/CMake
                                       -Dconsole_bridge_DIR:PATH=${CMAKE_BINARY_DIR}/thirdparty/Install/CMake
@@ -87,8 +93,6 @@ if (NOT urdfdom_FOUND)
 
         set(urdfdom_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install/CMake
             CACHE PATH "Path to CMake config files" FORCE)
-        # Need to do this due to a flaw of upstream library -- https://github.com/ros/urdfdom/issues/42
-        file(TOUCH ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_sensor.lib ${CMAKE_BINARY_DIR}/thirdparty/Install/lib/urdfdom_model_state.lib)
     endif()
 
     find_package(urdfdom QUIET)

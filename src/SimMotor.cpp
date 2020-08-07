@@ -22,7 +22,7 @@ void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
 
 void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
                              const std::shared_ptr<chrono::ChBody>& parent_body){
-    auto tmp_payload = chrono_types::make_shared<chrono::ChBodyEasyBox>(size[0], size[1], size[2], mass / (size[0] * size[1] * size[2], check_collision));
+    auto tmp_payload = chrono_types::make_shared<chrono::ChBodyEasyBox>(size[0], size[1], size[2], mass / (size[0] * size[1] * size[2]), false, check_collision);
     tmp_payload->SetCoord(coord >> parent_body->GetCoord());
     sys->AddBody(tmp_payload);
 
@@ -60,10 +60,12 @@ void SimServo::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
                            chrono::ChUrdfDoc& urdf_doc){
     SimMotorBase::AddtoSystem(sys, urdf_doc);
     ch_motor = chrono_types::make_shared<chrono::ChLinkMotorRotationAngle>();
+    // flip z axis of motor frame, so that a positive speed would make robot go forward
+    chrono::ChFrame<> motor_frame(chlinkbody->link->GetLinkAbsoluteCoords());
+    motor_frame.ConcatenatePostTransformation(chrono::ChFrame<>(chrono::ChVector<>(), chrono::Q_FLIP_AROUND_X));
+    ch_motor->Initialize(chlinkbody->body1, chlinkbody->body2, motor_frame);
     ch_func = chrono_types::make_shared<chrono::ChFunction_Const>(0);
     ch_motor->SetMotorFunction(ch_func);
-    ch_motor->Initialize(chlinkbody->body1, chlinkbody->body2,
-                         chrono::ChFrame<>(chlinkbody->link->GetLinkAbsoluteCoords()));
     sys->AddLink(ch_motor);
     std::dynamic_pointer_cast<chrono::ChLinkLock>(chlinkbody->link)->GetLimit_Z().SetMax(upper_limit);
     std::dynamic_pointer_cast<chrono::ChLinkLock>(chlinkbody->link)->GetLimit_Z().SetMin(lower_limit);
@@ -94,8 +96,11 @@ void SimMotor::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
             ch_motor = chrono_types::make_shared<chrono::ChLinkMotorRotationTorque>();
             break;
     }
-    ch_motor->Initialize(chlinkbody->body1, chlinkbody->body2,
-                         chrono::ChFrame<>(chlinkbody->link->GetLinkAbsoluteCoords()));
+
+    // flip z axis of motor frame, so that a positive speed would make robot go forward
+    chrono::ChFrame<> motor_frame(chlinkbody->link->GetLinkAbsoluteCoords());
+    motor_frame.ConcatenatePostTransformation(chrono::ChFrame<>(chrono::ChVector<>(), chrono::Q_FLIP_AROUND_X));
+    ch_motor->Initialize(chlinkbody->body1, chlinkbody->body2, motor_frame);
     ch_func = chrono_types::make_shared<chrono::ChFunction_Const>(0);
     ch_motor->SetMotorFunction(ch_func);
     sys->AddLink(ch_motor);

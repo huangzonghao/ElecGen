@@ -48,11 +48,9 @@ class ChUrdfDoc {
 
     const std::string& GetRobotName(){ return urdf_robot->getName(); }
 
-    const ChLinkBodies& GetLinkBodies(const std::string& name) {
-        return ch_link_bodies_.find(name)->second;
-    }
+    const ChLinkBodies& GetLinkBodies(const std::string& name);
 
-    std::shared_ptr<ChBody> GetRootLink(){ return ch_root_link_; }
+    std::shared_ptr<ChBody> GetRootBody(){ return ch_root_body_; }
 
   private:
     struct ChMatPair{
@@ -74,7 +72,7 @@ class ChUrdfDoc {
     std::string urdf_file_;
     std::map<std::string, ChMatPair> ch_materials_;
     std::map<std::string, ChLinkBodies> ch_link_bodies_;
-    std::shared_ptr<ChBody> ch_root_link_;
+    std::shared_ptr<ChBody> ch_root_body_;
 
 };
 
