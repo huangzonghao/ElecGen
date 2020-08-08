@@ -1,0 +1,197 @@
+component_name: "Bluefruit_UART"
+component_type: "BLUETOOTH"
+component_class: "SENSOR"
+pin {
+  name: "VIN"
+  pin_class: POWER
+  func_type: ELECTRICAL 
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 16
+  }
+  i_bound {
+	lb: 0
+	ub: 0.03
+  }
+  dependents {
+	others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+	lb: 0
+	ub: 0
+  }
+  dependents {
+	others: "VIN"
+  }
+}
+pin {
+  name: "TXO"
+  pin_class: FUNCTION
+  func_type: UART_TX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VIN"
+	others: "RXI"
+	others: "GND"
+  }
+}
+pin {
+  name: "RXI"
+  pin_class: FUNCTION
+  func_type: UART_RX
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VIN"
+	others: "TXO"
+	others: "GND"
+  }
+}
+pin {
+  name: "CTS"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VIN"
+	others: "TXO"
+	others: "RXI"
+	others: "RTS"
+	others: "GND"
+  }
+}
+pin {
+  name: "RTS"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VIN"
+	others: "TXO"
+	others: "RXI"
+	others: "CTS"
+	others: "GND"
+  }
+}
+pin {
+  name: "MOD"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VIN"
+	others: "GND"
+  }
+}
+pin {
+  name: "DFU"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VIN"
+	others: "GND"
+  }
+}
+nonlin: 0
+size {
+  length: 21
+  width: 32
+  height: 5
+}
+weight: 3.4
+price: 17.5
+[Electronics.Bluetooth.bluetooth] {
+  frequency: 9600
+}
+
+
+
+
+
+
+
+
+

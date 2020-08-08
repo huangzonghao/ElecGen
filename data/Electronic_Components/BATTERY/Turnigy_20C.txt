@@ -1,0 +1,54 @@
+component_name: "Turnigy_20C"
+component_type: "BATTERY"
+component_class: "OTHER"
+pin {
+  name: "+"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 7.4
+    ub: 7.4
+  }
+  i_bound {
+    lb: 0
+	ub: 3
+  }
+  dependents {
+    others: "-"
+  }
+}
+pin {
+  name: "-"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0 
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "+"
+  }
+}
+nonlin: 0
+size {
+  length: 34
+  width: 14
+  height: 72
+}
+weight: 59
+price: 4.87
+[Electronics.Battery.battery] {
+  capacity: 1000
+}

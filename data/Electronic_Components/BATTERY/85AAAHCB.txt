@@ -1,0 +1,54 @@
+component_name: "85AAAHCB"
+component_type: "BATTERY"
+component_class: "OTHER"
+pin {
+  name: "+"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 4.8
+    ub: 4.8
+  }
+  i_bound {
+    lb: 0
+    ub: 3
+  }
+  dependents {
+    others: "-"
+  }
+}
+pin {
+  name: "-"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0 
+  }
+  i_bound {
+    lb: 0
+    ub: 0
+  }
+  dependents {
+    others: "+"
+  }
+}
+nonlin: 0
+size {
+  length: 10
+  width: 10
+  height: 44
+}
+weight: 50.8
+price: 3.99
+[Electronics.Battery.battery] {
+  capacity: 3200
+}

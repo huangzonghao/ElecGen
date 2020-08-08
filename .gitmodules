@@ -7,3 +7,9 @@
 [submodule "thirdparty/console_bridge"]
 	path = thirdparty/console_bridge
 	url = https://github.com/ros/console_bridge.git
+[submodule "thirdparty/discreture"]
+	path = thirdparty/discreture
+	url = https://github.com/mraggi/discreture.git
+[submodule "thirdparty/protobuf"]
+	path = thirdparty/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git

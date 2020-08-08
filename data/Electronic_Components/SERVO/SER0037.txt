@@ -1,0 +1,82 @@
+component_name: "SER0037"
+component_type: "SERVO"
+component_class: "ACTUATOR"
+pin {
+  name: "+"
+  pin_class: BOTH
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 4.8 
+    ub: 6
+  }
+  i_bound {
+	lb: 0
+	ub: 0.5
+  }
+  dependents {
+	others: "-"
+  }
+}
+pin {
+  name: "-"
+  pin_class: BOTH
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: BIDIRECT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0 
+    ub: 0
+  }
+  i_bound {
+	lb: 0
+	ub: 0
+  }
+  dependents {
+	others: "+"
+  }
+}
+pin {
+  name: "SIGNAL"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+	lb: 0
+	ub: 0.01
+  }
+  dependents {
+	others: "+"
+	others: "-"
+  }
+}
+nonlin: 0
+size {
+  length: 19.60
+  width: 8
+  height: 16.3
+}
+weight: 2.9
+price: 7.98
+[Electronics.Motor.motor] {
+  kt: 0.1177
+  ke: 0.3209
+  r: 12
+  vin: 6
+  i: 0.5
+  torq: 0.0588399
+  vel: 14.9600
+}
+

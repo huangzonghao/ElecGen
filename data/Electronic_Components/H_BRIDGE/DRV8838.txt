@@ -1,0 +1,237 @@
+component_name: "DRV8838"
+component_type: "H_BRIDGE"
+component_class: "OTHER"
+pin {
+  name: "VCC"
+  pin_class: POWER
+  func_type: LOGIC
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 1.8
+    ub: 7
+  }
+  i_bound {
+    lb: 0	
+    ub: 0.0003
+  }
+  dependents {
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "VIN"
+  pin_class: POWER
+  func_type: MOTOR
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 11
+  }
+  i_bound {
+    lb: 0	
+    ub: 1.7
+  }
+  dependents {
+    others: "VCC"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "VMM"
+  pin_class: POWER
+  func_type: MOTOR
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 11
+  }
+  i_bound {
+    lb: 0	
+    ub: 1.7
+  }
+  dependents {
+    others: "VCC"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
+  }
+  dependents {
+    others: "VCC"
+    others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0 
+  }
+  dependents {
+    others: "VCC"
+    others: "GND"
+  }
+}
+pin {
+  name: "ENABLE"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 7
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00006
+  }
+  dependents {
+    others: "VCC"
+    others: "VIN"
+    others: "GND" 
+    others: "GND"
+  }
+}
+pin {
+  name: "PHASE"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 7
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00006
+  }
+  dependents {
+    others: "VCC"
+    others: "VIN"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "OUT1"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 11
+  }
+  i_bound {
+    lb: 0 
+    ub: 1.7
+  }
+  dependents {
+    others: "VCC"
+    others: "VIN"
+    others: "ENABLE"
+    others: "GND" 
+    others: "GND"
+  }
+}
+pin {
+  name: "OUT2"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 11
+  }
+  i_bound {
+    lb: 0
+    ub: 1.7
+  }
+  dependents {
+    others: "VCC"
+    others: "VIN"
+    others: "PHASE"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "SLEEP"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00006
+  }
+  dependents {
+  }
+}
+nonlin: 1
+size {
+  length: 10.6
+  width: 12.7
+  height: 2.1
+}
+weight: 0.3
+price: 3.49
+[Electronics.H_Bridge.h_bridge] {
+  logic_level {
+    lb: 2.1
+    ub: 3.5
+  }
+}
