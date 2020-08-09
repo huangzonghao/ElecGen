@@ -58,22 +58,22 @@ if (NOT urdfdom_FOUND)
                         ${CMAKE_BINARY_DIR}/thirdparty/tinyxml
                         ${CMAKE_BINARY_DIR}/thirdparty/Install)
 
-    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers
+    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
 
-    execute_process(COMMAND cmake --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
 
-    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/console_bridge
+    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/console_bridge
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
 
-    execute_process(COMMAND cmake --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
 
-    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/tinyxml
+    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/tinyxml
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
 
-    execute_process(COMMAND cmake --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
 
     if (WIN32) # Windows
@@ -85,13 +85,14 @@ if (NOT urdfdom_FOUND)
         file(RENAME ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser/urdfparser_cmakelists_patched.txt ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser/CMakeLists.txt)
     endif()
 
-    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
-                                  -DTinyXML_ROOT_DIR:PATH=${PROJECT_DEP_INSTALL_DIR}
-                                  -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=True
-                                  ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
+    execute_process(COMMAND ${CMAKE_COMMAND}
+                            -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
+                            -DTinyXML_ROOT_DIR:PATH=${PROJECT_DEP_INSTALL_DIR}
+                            -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=True
+                            ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
 
-    execute_process(COMMAND cmake --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
 
     find_package(urdfdom QUIET)
@@ -111,7 +112,8 @@ if (NOT Protobuf_FOUND)
     if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/protobuf/.git")
         execute_process(COMMAND git submodule update --init --recursive --depth 1)
     endif()
-    execute_process(COMMAND cmake -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
+    execute_process(COMMAND ${CMAKE_COMMAND}
+                            -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
                             -Dprotobuf_BUILD_TESTS=OFF
                             -Dprotobuf_MSVC_STATIC_RUNTIME=OFF
                             -Dprotobuf_WITH_ZLIB=OFF
@@ -119,7 +121,7 @@ if (NOT Protobuf_FOUND)
                             ${CMAKE_SOURCE_DIR}/thirdparty/protobuf/cmake
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
 
-    execute_process(COMMAND cmake --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
     find_package(Protobuf QUIET)
 endif()
@@ -252,5 +254,10 @@ if(MSVC)
 endif()
 target_link_libraries(main_test ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${Gurobi_LIBRARIES} ${Protobuf_LIBRARIES} component_structure)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-add_DLL_copy_command("${CHRONO_DLLS}")
+# function implemented in ChronoConfig.cmake
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    file(GLOB PROJECT_DEP_DLLS "${PROJECT_DEP_INSTALL_DIR}/bin/*.dll")
+    list(APPEND PROJECT_DEP_DLLS ${Gurobi_DLL_LIBRARY} ${CHRONO_DLLS})
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+    add_DLL_copy_command("${PROJECT_DEP_DLLS}")
+endif()
