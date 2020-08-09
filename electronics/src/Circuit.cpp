@@ -6,6 +6,7 @@ using std::cout;
 using std::endl;
 using Eigen::MatrixXd;
 using std::unordered_map;
+using std::shared_ptr;
 
 unordered_map<Electronics::RELATION, char> sign_map{
 	{Electronics::RELATION::GREATER, GRB_GREATER_EQUAL},
@@ -14,7 +15,7 @@ unordered_map<Electronics::RELATION, char> sign_map{
 };
 
 
-Circuit::Circuit(vector<Electrical_Component*> &_components, Pin_Connections &_connections):
+Circuit::Circuit(vector<shared_ptr<Electrical_Component>> &_components, Pin_Connections &_connections):
 	components(_components), pin_connections(_connections)
 {
 	for (size_t i = 0; i < components.size(); i++)
@@ -171,8 +172,8 @@ void Circuit::addCompositions(GRBModel *model) {
 	{
 		stringpair left_pair = separateNames(beg->first);
 		stringpair right_pair = separateNames(beg->second);
-		Electrical_Component *left_component = component_maps[left_pair.first],
-			*right_component = component_maps[right_pair.first];
+		shared_ptr<Electrical_Component> left_component = component_maps[left_pair.first],
+			right_component = component_maps[right_pair.first];
 		
 		model->addConstr(*left_component->var_maps[left_pair.second] == *right_component->var_maps[right_pair.second]);
 	}
@@ -184,10 +185,9 @@ void Circuit::maxSolve(GRBModel *model)
 	restorePrevModelCons(model);
 	model->update();
 	model->optimize();
-	model->write("model.lp");
 	if (model->get(GRB_IntAttr_Status) == GRB_OPTIMAL)
 	{
-		vector<Electrical_Component*> nonlin_components;
+		vector<shared_ptr<Electrical_Component>> nonlin_components;
 		for (size_t i = 0; i < components.size(); i++)
 		{
 			if (components[i]->isNoninComponent())
@@ -216,6 +216,7 @@ void Circuit::maxSolve(GRBModel *model)
 	{
 		components[i]->updateUsedPinsVolUB();
 	}
+	model->write("max_model.lp");
 	report();
 	return;
 }
@@ -258,12 +259,12 @@ void Circuit::updateObjs(GRBModel *model)
 			if (isDutyCycle(used_var_names[j]))
 			{
 				new_components[i]->var_maps[used_var_names[j]]->
-					set(GRB_DoubleAttr_Obj, -1);
+				set(GRB_DoubleAttr_Obj, -1);
 			}
 			else
 			{
 				new_components[i]->var_maps[used_var_names[j]]->
-					set(GRB_DoubleAttr_Obj, 1);
+				set(GRB_DoubleAttr_Obj, 1);
 			}
 		}
 	}
@@ -353,8 +354,8 @@ void Circuit::updateCompositions(GRBModel *model)
 	{
 		stringpair left_pair = separateNames(beg->first),
 			right_pair = separateNames(beg->second);
-		Electrical_Component *left_component = component_maps[left_pair.first],
-			*right_component = component_maps[right_pair.first];
+		shared_ptr<Electrical_Component> left_component = component_maps[left_pair.first],
+			right_component = component_maps[right_pair.first];
 		model->addConstr(*left_component->var_maps[left_pair.second] == *right_component->var_maps[right_pair.second]);
 	}
 }
@@ -401,7 +402,7 @@ void Circuit::verify(GRBModel *model, verifyMode mode, const string &method)
 	if (model->get(GRB_IntAttr_Status) == GRB_OPTIMAL)
 	{
 		// check nonlinear components optimality, update it if not optimal
-		vector<Electrical_Component*> nonlin_components;
+		vector<shared_ptr<Electrical_Component>> nonlin_components;
 		for (size_t i = 0; i < components.size(); i++)
 		{
 			if (components[i]->isNoninComponent())
@@ -449,7 +450,7 @@ void Circuit::updateVerify(GRBModel *model, verifyMode mode, const std::string &
 
 	if (model->get(GRB_IntAttr_Status) == GRB_OPTIMAL)
 	{
-		vector<Electrical_Component*> nonlin_components;
+		vector<shared_ptr<Electrical_Component>> nonlin_components;
 		for (size_t i = 0; i < components.size(); i++)
 		{
 			if (components[i]->isNoninComponent())
@@ -479,8 +480,9 @@ void Circuit::updateVerify(GRBModel *model, verifyMode mode, const std::string &
 	{
 		components[i]->updateUsedPinsVolLB();
 	}
+
 	report();
-	model->write("model.lp");
+	model->write("min_model.lp");
 	return;
 }
 
@@ -500,7 +502,8 @@ void Circuit::report() {
 	}
 }
 
-void Circuit::updateComponents(const vector<Electrical_Component*> &_components)
+void Circuit::updateComponents(const vector<shared_ptr<Electrical_Component>> 
+	&_components)
 {
 	components.insert(components.end(), _components.begin(), _components.end());
 	new_components = _components;
@@ -648,7 +651,7 @@ unsigned Circuit::getMotorNumber()
 	return cnt;
 }
 
-bool Circuit::newton_raphson(vector<Electrical_Component*> nonlin_components, GRBModel *model)
+bool Circuit::newton_raphson(vector<shared_ptr<Electrical_Component>> nonlin_components, GRBModel *model)
 {
 	bool indicator = false;
 	boolvec indicator_vec(nonlin_components.size());

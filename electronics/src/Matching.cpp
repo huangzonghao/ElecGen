@@ -10,27 +10,31 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::bitset;
+using std::shared_ptr;
 
 // all possible component pairs
 unordered_multimap<std::string, std::string> connection_map{
 	{Component_Type::H_Bridge, Component_Type::Motor},
 //	{Component_Type::Encoder, Component_Type::Motor},
-	{Component_Type::Encoder, Component_Type::Micro_Controller},
+	{Component_Type::Micro_Controller, Component_Type::Encoder},
 	{Component_Type::Voltage_Regulator, Component_Type::Encoder},
 	{Component_Type::Battery, Component_Type::Encoder},
-	{Component_Type::Camera, Component_Type::Micro_Controller},
+	{Component_Type::Micro_Controller, Component_Type::Camera},
 	{Component_Type::Voltage_Regulator, Component_Type::Camera},
 	{Component_Type::Battery, Component_Type::Camera},
-	{Component_Type::Bluetooth, Component_Type::Micro_Controller},
+	{Component_Type::Micro_Controller, Component_Type::Bluetooth},
 	{Component_Type::Voltage_Regulator, Component_Type::Bluetooth},
 	{Component_Type::Battery, Component_Type::Bluetooth},
-	{Component_Type::Force_Sensor, Component_Type::Micro_Controller},
+	{Component_Type::Micro_Controller, Component_Type::Force_Sensor},
 	{Component_Type::Micro_Controller, Component_Type::H_Bridge},
 	{Component_Type::Voltage_Regulator, Component_Type::H_Bridge},
 	{Component_Type::Battery, Component_Type::H_Bridge},
 	{Component_Type::Voltage_Regulator, Component_Type::Micro_Controller},
 	{Component_Type::Battery, Component_Type::Micro_Controller},
-	{Component_Type::Battery, Component_Type::Voltage_Regulator}
+	{Component_Type::Battery, Component_Type::Voltage_Regulator},
+	{Component_Type::Voltage_Regulator, Component_Type::Servo},
+	{Component_Type::Micro_Controller, Component_Type::Servo}, 
+	{Component_Type::Battery, Component_Type::Force_Sensor},
 };
 
 struct hash_pair {
@@ -50,33 +54,33 @@ unordered_map<stringpair, bitset<7>, hash_pair> connection_mask_map {
 	{{Component_Type::Voltage_Regulator, Component_Type::H_Bridge},
 	power_mask},
 	{{Component_Type::Battery, Component_Type::H_Bridge}, power_mask},
-	{{Component_Type::Voltage_Regulator, Component_Type::Micro_Controller },
+	{{Component_Type::Voltage_Regulator, Component_Type::Micro_Controller},
 	power_mask},
 	{{Component_Type::Battery, Component_Type::Micro_Controller},
 	power_mask},
 	{{Component_Type::Battery, Component_Type::Voltage_Regulator},
 	power_mask},
 //	{{Component_Type::Motor, Component_Type::Encoder}, power_mask},
-	{{Component_Type::Encoder, Component_Type::Micro_Controller},
+	{{Component_Type::Micro_Controller, Component_Type::Encoder},
 	func_mask},
 	{{Component_Type::Voltage_Regulator, Component_Type::Encoder},
 	power_mask },
 	{{Component_Type::Battery, Component_Type::Encoder}, power_mask},
-	{{Component_Type::Camera, Component_Type::Micro_Controller},
+	{{Component_Type::Micro_Controller, Component_Type::Camera},
 	func_mask},
 	{{Component_Type::Voltage_Regulator, Component_Type::Camera },
 	power_mask},
 	{{Component_Type::Battery, Component_Type::Camera}, power_mask},
-	{{Component_Type::Bluetooth, Component_Type::Micro_Controller},
+	{{Component_Type::Micro_Controller, Component_Type::Bluetooth},
 	func_mask},
 	{{Component_Type::Voltage_Regulator, Component_Type::Bluetooth},
 	power_mask},
 	{{Component_Type::Battery, Component_Type::Bluetooth}, power_mask},
 	{{Component_Type::Battery, Component_Type::Force_Sensor},
 	power_mask},
-	{{Component_Type::Force_Sensor, Component_Type::Micro_Controller},
+	{{Component_Type::Micro_Controller, Component_Type::Force_Sensor},
 	func_mask},
-	{{Component_Type::Servo, Component_Type::Micro_Controller},
+	{{Component_Type::Micro_Controller, Component_Type::Servo},
 	func_mask},
 	{{Component_Type::Voltage_Regulator, Component_Type::Servo}, power_mask },
 	{{Component_Type::Battery, Component_Type::Servo},  power_mask}
@@ -123,30 +127,32 @@ compatible_type_map{
 	{Electronics::ELECTRICAL, Electronics::MOTOR},
 	{Electronics::ELECTRICAL, Electronics::LOGIC},
 	{Electronics::ELECTRICAL, Electronics::GND},
-	{Electronics::UART_RX_I2C_SDA, Electronics::UART_TX},
-	{Electronics::UART_RX_I2C_SDA, Electronics::I2C_SDA},
-	{Electronics::UART_TX_I2C_SCL, Electronics::I2C_SCL},
-	{Electronics::UART_TX_I2C_SCL, Electronics::UART_RX},
-	{Electronics::UART_RX_I2C_SDA, Electronics::DIGITAL_UART_TX},
-	{Electronics::UART_RX_I2C_SDA, Electronics::ANALOG_I2C_SDA},
-	{Electronics::UART_TX_I2C_SCL, Electronics::ANALOG_I2C_SCL},
-	{Electronics::UART_TX_I2C_SCL, Electronics::DIGITAL_UART_RX},
-	{Electronics::UART_RX_I2C_SDA, Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_TX},
-	{Electronics::UART_RX_I2C_SDA, Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SDA},
-	{Electronics::UART_TX_I2C_SCL, Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SCL},
-	{Electronics::UART_TX_I2C_SCL, Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_RX},
-	{Electronics::UART_RX, Electronics::DIGITAL_UART_TX},
-	{Electronics::UART_TX, Electronics::DIGITAL_UART_RX},
-	{Electronics::UART_RX, Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_TX},
-	{Electronics::UART_TX, Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_RX}, 
-	{Electronics::SPI_MISO, Electronics::DIGITAL_SPI_MISO},
-	{Electronics::SPI_MOSI, Electronics::DIGITAL_SPI_MOSI},
-	{Electronics::SPI_SCK, Electronics::DIGITAL_SPI_SCK},
-	{Electronics::SPI_SS, Electronics::DIGITAL_SPI_SS},
-	{Electronics::SPI_MISO, Electronics::PWM_SPI_MISO},
-	{Electronics::SPI_MOSI, Electronics::PWM_SPI_MOSI},
-	{Electronics::SPI_SCK, Electronics::PWM_SPI_SCK},
-	{Electronics::SPI_SS, Electronics::PWM_SPI_SS},
+//	{Electronics::UART_RX_I2C_SDA, Electronics::UART_TX},
+//	{Electronics::UART_TX_I2C_SCL, Electronics::I2C_SCL},
+//	{Electronics::UART_TX_I2C_SCL, Electronics::UART_RX},
+
+	{Electronics::DIGITAL_UART_TX, Electronics::UART_RX_I2C_SDA},
+	{Electronics::ANALOG_I2C_SDA, Electronics::UART_RX_I2C_SDA},
+	{Electronics::ANALOG_I2C_SCL, Electronics::UART_TX_I2C_SCL},
+	{Electronics::I2C_SDA, Electronics::UART_RX_I2C_SDA},
+	{Electronics::I2C_SCL, Electronics::UART_TX_I2C_SCL},
+	{Electronics::DIGITAL_UART_RX, Electronics::UART_TX_I2C_SCL},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_TX, Electronics::UART_RX_I2C_SDA},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SDA, Electronics::UART_RX_I2C_SDA},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SCL, Electronics::UART_TX_I2C_SCL},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_RX, Electronics::UART_TX_I2C_SCL},
+	{Electronics::DIGITAL_UART_TX, Electronics::UART_RX},
+	{Electronics::DIGITAL_UART_RX, Electronics::UART_TX},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_TX, Electronics::UART_RX},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_RX, Electronics::UART_TX},
+	{Electronics::DIGITAL_SPI_MISO, Electronics::SPI_MISO},
+	{Electronics::DIGITAL_SPI_MOSI, Electronics::SPI_MOSI},
+	{Electronics::DIGITAL_SPI_SCK, Electronics::SPI_SCK},
+	{Electronics::DIGITAL_SPI_SS, Electronics::SPI_SS},
+	{Electronics::PWM_SPI_MISO, Electronics::SPI_MISO},
+	{Electronics::PWM_SPI_MOSI , Electronics::SPI_MOSI},
+	{Electronics::PWM_SPI_SCK , Electronics::SPI_SCK},
+	{Electronics::PWM_SPI_SS , Electronics::SPI_SS},
 };
 
 vector<bitset<7>> connect_code_vec{ 0b1001000, 0b1000001, 0b0100100, 
@@ -274,7 +280,7 @@ Pin_Connections groupMatch(vector<Component_Pair> &component_pairs)
 	boolvec pair_usage_vec(component_pairs.size(), true);
 	// get list of unique components and their occurance number, 
 	// start with actuator/sensor
-	vector<Electrical_Component*> components(component_pairs.size() * 2), 
+	vector<shared_ptr<Electrical_Component>> components(component_pairs.size() * 2), 
 		uniq_components;
 	for (size_t i = 0; i < component_pairs.size(); i++)
 	{
@@ -298,14 +304,14 @@ Pin_Connections groupMatch(vector<Component_Pair> &component_pairs)
 			break;
 		}
 
-		Electrical_Component *least_component = nullptr;
+		shared_ptr<Electrical_Component> least_component = nullptr;
 		for (size_t i = 0; i < uniq_components.size(); i++)
 		{
-			if (component_count[i] != 0 &&
-				uniq_components[i]->getComponentClass() ==
+			if (component_count[i] != INT_MAX &&
+				(uniq_components[i]->getComponentClass() ==
 				Component_Class::Actuator ||
 				uniq_components[i]->getComponentClass() ==
-				Component_Class::Sensor)
+				Component_Class::Sensor))
 			{
 				least_component = uniq_components[i];
 			}
@@ -356,8 +362,8 @@ Pin_Connections groupMatch(vector<Component_Pair> &component_pairs)
 Pin_Connections individualMatch(Component_Pair &component_pair)
 {
 	// left output, right input
-	Electrical_Component *left_component = component_pair.first, 
-		*right_component = component_pair.second;
+	shared_ptr<Electrical_Component> left_component = component_pair.first, 
+		right_component = component_pair.second;
 
 	vector<Pin*> left_power_out_pins = left_component->getPowerOutPins(),
 		left_func_out_pins = left_component->getFuncOutPins(),
@@ -474,16 +480,9 @@ stringpair grammer(Pin *left_pin, Pin *right_pin,
 	// conditions need to satisfy
 	// left pin in usable state (see dependents)
 	vector<Pin*> dependent_pins = component_pair.second->getDependentPins();
-	if (dependent_pins.empty())
-	{
-		conditions_code[4] = 1; // all pins can be connected
-	}
-	else
-	{
-		std::find(dependent_pins.begin(), dependent_pins.end(), right_pin) ==
-			dependent_pins.end() ? conditions_code[4] = 0 : conditions_code[4] = 1;
-	}
-
+	std::find(dependent_pins.begin(), dependent_pins.end(), right_pin) ==
+		dependent_pins.end() ? conditions_code[4] = 0 : conditions_code[4] = 1;
+	
 	// both pins in active state
 	(!right_pin->status || right_pin->connection == Electronics::CONNECTION::OTM) 
 		&& (!left_pin->status || left_pin->connection == 
@@ -586,11 +585,13 @@ bool funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 
 		if (pwm_empty && digital_empty)
 		{
-			auto &iter = compatible_type_map.find(left_type);
-			if (iter != compatible_type_map.end())
+			auto &range = compatible_type_map.equal_range(left_type);
+			for (auto &beg = range.first; beg != range.second; beg++)
 			{
-				iter->second == right_type ?
-					result = true : result = false;
+				if (beg->second == right_type) {
+					result = true;
+					break;
+				}
 			}
 		}
 	}
@@ -610,18 +611,17 @@ bool funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 
 stringpair matchDutyCycles(Pin *left_pin, Pin *right_pin, Component_Pair &component_pair)
 {
-	Electrical_Component *left_component = component_pair.first,
-		*right_component = component_pair.second;
+	shared_ptr<Electrical_Component> left_component = component_pair.first,
+		right_component = component_pair.second;
 
 	if (left_component->getComponentType() ==
 		Component_Type::Micro_Controller &&
 		right_component->getComponentType() == Component_Type::H_Bridge)
 	{
 		H_Bridge temp_h_bridge(h_bridge_path +
-			right_component->getComponentName() + ".txt");
+			removeReplicate(right_component->getComponentName()) + ".txt");
 		Micro_Controller temp_micro_controller(micro_controller_path +
-			left_component->getComponentName() + ".txt");
-
+			removeReplicate(left_component->getComponentName()) + ".txt");
 
 		unordered_map<string, string> in_duty_cycle_map =
 			temp_h_bridge.getInDutyCycleMap(),

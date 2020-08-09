@@ -178,14 +178,13 @@ message Battery{
 	optional double capacity = 1;
 }
 
-/*
+
 message Encoder{
 	extend Component{
-		Optional Encoder encoder = 106;
+		optional Encoder encoder = 109;
 	}
-	optional frequency = 1;
+	optional double frequency = 1;
 }
-*/
 
 message Bluetooth{
 	extend Component{

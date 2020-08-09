@@ -16,18 +16,20 @@ using google::protobuf::TextFormat;
 using std::make_pair;
 using std::unordered_map;
 using std::to_string;
+using std::shared_ptr;
+using std::make_shared;
 
 unordered_map<string, Motor> MOTOR_MAP, SERVO_MAP;
 unordered_map<string, H_Bridge> H_BRIDGE_MAP;
 unordered_map<string, Micro_Controller> MICRO_CONTROLLER_MAP;
 unordered_map<string, Voltage_Regulator> VOLTAGE_REGULATOR_MAP;
 unordered_map<string, Battery> BATTERY_MAP;
-// unordered_map<string, Encoder> ENCODER_MAP;
+unordered_map<string, Encoder> ENCODER_MAP;
 unordered_map<string, Camera> CAMERA_MAP;
 unordered_map<string, Bluetooth> BLUETOOTH_MAP;
 unordered_map<string, Force_Sensor> FORCE_SENSOR_MAP;
 
-unordered_map<string, Electrical_Component*> MOTOR_PART_MAP,
+unordered_map<string, shared_ptr<Electrical_Component>> MOTOR_PART_MAP,
 H_BRIDDE_PART_MAP, MICRO_CONTROLLER_PART_MAP, VOLTAGE_REGULATOR_PART_MAP,
 BATTERY_PART_MAP, ENCODER_PART_MAP, CAMERA_PART_MAP, FORCE_SENSOR_PART_MAP, 
 BLUETOOTH_PART_MAP, SERVO_PART_MAP;
@@ -37,6 +39,15 @@ Electrical_Component::Electrical_Component(const string &file)
 	Electronics::Component *base_component = read(file);
 	extractInfo(base_component);
 	delete base_component;
+}
+
+void Electrical_Component::setComponentName(const std::string & name)
+{
+	component_name = name;
+	for (size_t i = 0; i < model_names.size(); i++)
+	{
+		model_names[i] = component_name + model_names[i];
+	}
 }
 
 Voltage_Regulator::Voltage_Regulator(const string& file) : Electrical_Component(file)
@@ -127,7 +138,7 @@ doublevec Micro_Controller::getPowerInCurrentLimit()
 		}
 	}
 
-	return doublevec{ dig_pin_cnt * digital_pins[0].i_bound.second };
+	return doublevec{ dig_pin_cnt * digital_pins[0].i_bound.second/2000 };
 }
 
 double Micro_Controller::getFuncOutCurrentLimit()
@@ -162,6 +173,39 @@ doublepair Micro_Controller::getFuncOutVolRange()
 		gnd_pins.size();
 	return make_pair(pins[digtal_pos].v_bound.first, 
 		pins[digtal_pos].v_bound.second);
+}
+
+stringvec Micro_Controller::getPowerInPinNames()
+{
+	return stringvec{ pins[0].name };
+}
+
+stringvec Micro_Controller::getFuncInPinNames()
+{
+	stringvec func_in_pin_names(digital_pins.size() + analog_pins.size());
+	for (size_t i = 0; i < func_in_pin_names.size(); i++)
+	{
+		if (i < digital_pins.size())
+		{
+			func_in_pin_names[i] = digital_pins[i].name;
+		}
+		else
+		{
+			func_in_pin_names[i] = analog_pins[i - digital_pins.size()].name;
+		}
+	}
+	return func_in_pin_names;
+}
+
+stringvec Micro_Controller::getFuncOutPinNames()
+{
+	stringvec func_in_pin_names(digital_pins.size());
+	for (size_t i = 0; i < func_in_pin_names.size(); i++)
+	{
+
+		func_in_pin_names[i] = digital_pins[i].name;
+	}
+	return func_in_pin_names;
 }
 
 doublepair Micro_Controller::getPowerOutVolRange()
@@ -475,6 +519,11 @@ void Battery::parameters() const
 
 	cout << endl;
 	cout << model_mat << endl;
+}
+
+stringvec Battery::getPowerOutPinNames()
+{
+	return stringvec{pins[0].name};
 }
 
 void Battery::getUsedVarsName(const stringvec &pin_names)
@@ -800,7 +849,7 @@ void initializeAllMotors(const string &dir)
 	{
 		string component = entry.path().string();
 		motor_map[component] = Motor(component);
-		MOTOR_PART_MAP[component] = new Motor(component);
+		MOTOR_PART_MAP[component] = make_shared<Motor>(component);
 	}
 	MOTOR_MAP = motor_map; // avoid conflict with constructor
 }
@@ -812,7 +861,7 @@ void initializeAllServos(const std::string &dir)
 	{
 		string component = entry.path().string();
 		servo_map[component] = Motor(component);
-		SERVO_PART_MAP[component] = new Motor(component);
+		SERVO_PART_MAP[component] = make_shared<Motor>(component);
 	}
 	SERVO_MAP = servo_map; 
 }
@@ -824,7 +873,7 @@ void initializeAllVoltageRegulators(const string &dir)
 	{
 		string component = entry.path().string();
 		voltage_regulator_map[component] = Voltage_Regulator(component);
-		VOLTAGE_REGULATOR_PART_MAP[component] = new Voltage_Regulator(component);
+		VOLTAGE_REGULATOR_PART_MAP[component] = make_shared<Voltage_Regulator>(component);
 	}
 	VOLTAGE_REGULATOR_MAP = voltage_regulator_map; 
 }
@@ -836,7 +885,7 @@ void initializeAllHBridges(const string &dir)
 	{
 		string component = entry.path().string();
 		h_bridge_map[component] = H_Bridge(component);
-		H_BRIDDE_PART_MAP[component] = new H_Bridge(component);
+		H_BRIDDE_PART_MAP[component] = make_shared<H_Bridge>(component);
 	}
 	H_BRIDGE_MAP = h_bridge_map;
 }
@@ -848,7 +897,7 @@ void initializeAllMicroController(const std::string &dir)
 	{
 		string component = entry.path().string();
 		micro_controller_map[component] = Micro_Controller(component);
-		MICRO_CONTROLLER_PART_MAP[component] = new Micro_Controller(component);
+		MICRO_CONTROLLER_PART_MAP[component] = make_shared<Micro_Controller>(component);
 	}
 	MICRO_CONTROLLER_MAP = micro_controller_map;
 }
@@ -860,9 +909,21 @@ void initializeAllBatteries(const string &dir)
 	{
 		string component = entry.path().string();
 		battery_map[component] = Battery(component);
-		BATTERY_PART_MAP[component] = new Battery(component);
+		BATTERY_PART_MAP[component] = make_shared<Battery>(component);
 	}
 	BATTERY_MAP = battery_map;
+}
+
+void initializeAllEncoders(const string &dir)
+{
+	unordered_map<string, Encoder> encoder_map;
+	for (auto &entry : directory_iterator(dir))
+	{
+		string component = entry.path().string();
+		encoder_map[component] = Encoder(component);
+		ENCODER_PART_MAP[component] = make_shared<Encoder>(component);
+	}
+	ENCODER_MAP = encoder_map;
 }
 
 void initializeAllCameras(const string &dir)
@@ -872,7 +933,7 @@ void initializeAllCameras(const string &dir)
 	{
 		string component = entry.path().string();
 		camera_map[component] = Camera(component);
-		CAMERA_PART_MAP[component] = new Camera(component);
+		CAMERA_PART_MAP[component] = make_shared<Camera>(component);
 	}
 	CAMERA_MAP = camera_map;
 }
@@ -884,7 +945,7 @@ void initializeAllBluetooths(const string &dir)
 	{
 		string component = entry.path().string();
 		bluetooth_map[component] = Bluetooth(component);
-		BLUETOOTH_PART_MAP[component] = new Bluetooth(component);
+		BLUETOOTH_PART_MAP[component] = make_shared<Bluetooth>(component);
 	}
 	BLUETOOTH_MAP = bluetooth_map;
 }
@@ -896,7 +957,7 @@ void initializeAllForceSensors(const string &dir)
 	{
 		string component = entry.path().string();
 		force_sensor_map[component] = Force_Sensor(component);
-		FORCE_SENSOR_PART_MAP[component] = new Force_Sensor(component);
+		FORCE_SENSOR_PART_MAP[component] = make_shared<Force_Sensor>(component);
 	}
 	FORCE_SENSOR_MAP = force_sensor_map;
 }
@@ -922,14 +983,68 @@ void Motor::parameters() const
 	cout << model_mat << endl;
 }
 
+doublevec Motor::getFuncInCurrentLimit()
+{
+	if (isServo())
+	{
+		return doublevec{ pins[2].i_bound.second/100 };
+	}
+	else
+	{
+		return doublevec();
+	}
+}
+
 doublevec Motor::getPowerInCurrentLimit()
 {
 	return doublevec{ var_maps["I"]->get(GRB_DoubleAttr_X) };
 }
 
+doublepairs Motor::getFuncInVolRange()
+{
+	if (isServo())
+	{
+		return doublepairs{ make_pair(pins[2].v_bound.first,
+			pins[2].v_bound.second) };
+	}
+	else
+	{
+		return doublepairs();
+	}
+}
+
 doublepairs Motor::getPowerInVolRange()
 {
 	return doublepairs{ make_pair(pins[0].v_bound.first, pins[0].v_bound.second) };
+}
+
+stringvec Motor::getPowerInPinNames()
+{
+	return stringvec{ pins[0].name };
+}
+
+stringvec Motor::getFuncInPinNames()
+{
+	if (isServo())
+	{
+		return stringvec{pins[2].name};
+	}
+	else
+	{
+		return stringvec();
+	}
+}
+
+unsigned Motor::getFuncInSize()
+{
+	if (isServo())
+	{
+		return 1;
+	}
+	else
+	{
+		return pins.size();
+	}
 }
 
 void Motor::setWorkPoint(double _torq_des, double _vel_des)
@@ -1012,8 +1127,8 @@ void Motor::extractInfo(const Electronics::Component *motor)
 	model_relations.resize(model_mat.rows());
 	model_names.resize(model_mat.rows());
 	model_relations[vol_row] = GRB_LESS_EQUAL;
-	model_relations[torq_row] = GRB_EQUAL;
-	model_relations[vel_row] = GRB_EQUAL;
+	model_relations[torq_row] = GRB_GREATER_EQUAL;
+	model_relations[vel_row] = GRB_GREATER_EQUAL;
 	model_names[vol_row] = "VOLTAGE CONS";
 	model_names[torq_row] = "TORQUE CONS";
 	model_names[vel_row] = "VELOCITY_CONS";
@@ -1093,6 +1208,46 @@ doublepair H_Bridge::getFuncOutVolRange()
 	return make_pair(pins[out_pos].v_bound.first, pins[out_pos].v_bound.second);
 }
 
+stringvec H_Bridge::getPowerInPinNames()
+{
+	doublepair log_vol_range = make_pair(pins[0].v_bound.first,
+		pins[0].v_bound.second),
+		mot_vol_range = make_pair(pins[log_pin_num].v_bound.first,
+			pins[log_pin_num].v_bound.second);
+
+	if (isIntersect(log_vol_range, mot_vol_range))
+	{
+		return stringvec{ pins[0].name };
+	}
+	else
+	{
+		return stringvec{ pins[0].name, pins[log_pin_num].name };
+	}
+}
+
+stringvec H_Bridge::getPowerOutPinNames()
+{
+	stringvec out_pin_names;
+	size_t out_pos = log_pin_num + mot_pin_num + ena_pin_num + gnd_pin_num +
+		in_pin_num;
+	for (size_t i = 0; i < out_pin_num; i++)
+	{
+		out_pin_names.push_back(pins[i+out_pos].name);
+	}
+	return out_pin_names;
+}
+
+stringvec H_Bridge::getFuncInPinNames()
+{
+	stringvec in_pin_names;
+	size_t in_pos = log_pin_num + mot_pin_num + ena_pin_num + gnd_pin_num;
+	for (size_t i = 0; i < in_pin_num; i++)
+	{
+		in_pin_names.push_back(pins[i + in_pos].name);
+	}
+	return in_pin_names;
+}
+
 void H_Bridge::getUsedVarsName(const stringvec &pin_names)
 {
 	for (size_t i = 0; i < pin_names.size(); i++)
@@ -1124,10 +1279,10 @@ void H_Bridge::getUsedVarsName(const stringvec &pin_names)
 
 unsigned H_Bridge::getMainPowerIndex()
 {
-	doublepair log_vol_range = make_pair(vars[0].get(GRB_DoubleAttr_X),
-		v_bound_mat(0, 1)),
-		mot_vol_range = make_pair(vars[log_pin_num].get(GRB_DoubleAttr_X),
-			v_bound_mat(log_pin_num, 1));
+	doublepair log_vol_range = make_pair(pins[0].v_bound.first,
+		pins[0].v_bound.second),
+		mot_vol_range = make_pair(pins[log_pin_num].v_bound.first,
+			pins[log_pin_num].v_bound.second);
 
 	if (isIntersect(log_vol_range, mot_vol_range))
 	{
@@ -1137,6 +1292,21 @@ unsigned H_Bridge::getMainPowerIndex()
 	{
 		return 1;
 	}
+}
+
+unsigned H_Bridge::getFuncInSize()
+{
+	unsigned func_in_size = 0;
+	size_t out_pos = log_pin_num + mot_pin_num + ena_pin_num + gnd_pin_num +
+		in_pin_num;
+	for (size_t i = 0; i < out_pin_num; i++)
+	{
+		if (pins[i + out_pos].status)
+		{
+			func_in_size++;
+		}
+	}
+	return func_in_size;
 }
 
 void H_Bridge::extractInfor(const Electronics::Component *h_bridge)
@@ -1439,10 +1609,10 @@ doublevec H_Bridge::getFuncInCurrentLimit()
 
 doublevec H_Bridge::getPowerInCurrentLimit()
 {
-	doublepair log_vol_range = make_pair(vars[0].get(GRB_DoubleAttr_X),
-		v_bound_mat(0, 1)),
-		mot_vol_range = make_pair(vars[log_pin_num].get(GRB_DoubleAttr_X),
-			v_bound_mat(log_pin_num, 1));
+	doublepair log_vol_range = make_pair(pins[0].v_bound.first,
+		pins[0].v_bound.second),
+		mot_vol_range = make_pair(pins[log_pin_num].v_bound.first,
+			pins[log_pin_num].v_bound.second);
 
 	if (isIntersect(log_vol_range, mot_vol_range))
 	{
@@ -1641,14 +1811,20 @@ void Force_Sensor::parameters() const
 	cout << model_mat << endl;
 }
 
+doublevec Force_Sensor::getFuncInCurrentLimit()
+{
+	return doublevec{ i_bound_mat(1, 1) };
+}
+
 doublevec Force_Sensor::getPowerInCurrentLimit()
 {
 	return doublevec{ i_bound_mat(0, 1) };
 }
 
-double Force_Sensor::getFuncOutCurrentLimit()
+doublepairs Force_Sensor::getFuncInVolRange()
 {
-	return i_bound_mat(1, 1);
+	return doublepairs{ make_pair(pins[1].v_bound.first,
+		pins[1].v_bound.second) };
 }
 
 doublepairs Force_Sensor::getPowerInVolRange()
@@ -1657,9 +1833,14 @@ doublepairs Force_Sensor::getPowerInVolRange()
 		pins[0].v_bound.second) };
 }
 
-doublepair Force_Sensor::getFuncOutVolRange()
+stringvec Force_Sensor::getPowerInPinNames()
 {
-	return make_pair(pins[1].v_bound.first, pins[1].v_bound.second);
+	return stringvec{pins[0].name};
+}
+
+stringvec Force_Sensor::getFuncInPinNames()
+{
+	return stringvec{ pins[1].name };
 }
 
 void Force_Sensor::getUsedVarsName(const stringvec &pin_names)
@@ -1713,6 +1894,17 @@ void Force_Sensor::extractInfo(Electronics::Component *force_sensor)
 	model_names[lead2_row] = "LEAD2 CONS";
 	model_index_map[var_names[lead1_col]] = lead1_row;
 	model_index_map[var_names[lead2_col]] = lead2_row;
+}
+
+stringvec Voltage_Regulator::getPowerInPinNames()
+{
+	return stringvec{pins[0].name};
+}
+
+stringvec Voltage_Regulator::getPowerOutPinNames()
+{
+	size_t pow_out_pos = pow_in_pins.size();
+	return stringvec{pins[pow_out_pos].name};
 }
 
 void Voltage_Regulator::getUsedVarsName(const stringvec &pin_names)
@@ -1828,6 +2020,22 @@ void Voltage_Regulator::getPinNumberInfo()
 		v_bound_mat.row(i) << pins[i].v_bound.first, pins[i].v_bound.second;
 		i_bound_mat.row(i) << pins[i].i_bound.first, pins[i].i_bound.second;
 	}
+}
+
+stringvec Camera::getPowerInPinNames()
+{
+	return stringvec{pins[0].name};
+}
+
+stringvec Camera::getFuncInPinNames()
+{
+	stringvec func_in_pin_names(uart_pins.size());
+	size_t comm_pos = pow_in_pins.size() + gnd_pins.size();
+	for (size_t i = 0; i < uart_pins.size(); i++)
+	{
+		func_in_pin_names[i] = uart_pins[i].name;
+	}
+	return func_in_pin_names;
 }
 
 void Camera::getUsedVarsName(const stringvec &pin_names)
@@ -1998,12 +2206,12 @@ void Bluetooth::parameters() const
 doublevec Bluetooth::getFuncInCurrentLimit()
 {
 	size_t comm_pos = pow_in_pins.size() + gnd_pins.size();
-	return doublevec(i_bound_mat(comm_pos, 1));
+	return doublevec{ i_bound_mat(comm_pos, 1) };
 }
 
 doublevec Bluetooth::getPowerInCurrentLimit()
 {
-	return doublevec(i_bound_mat(0, 1));
+	return doublevec{ i_bound_mat(0, 1) };
 }
 
 doublepairs Bluetooth::getFuncInVolRange()
@@ -2017,6 +2225,29 @@ doublepairs Bluetooth::getPowerInVolRange()
 {
 	return doublepairs{make_pair(pins[0].v_bound.first, 
 		pins[0].v_bound.second)};
+}
+
+stringvec Bluetooth::getPowerInPinNames()
+{
+	return stringvec{pins[0].name};
+}
+
+stringvec Bluetooth::getFuncInPinNames()
+{
+	stringvec func_out_pin_names(uart_pins.size() + spi_pins.size());
+	size_t comm_pos = pow_in_pins.size() + gnd_pins.size();
+	for (size_t i = 0; i < func_out_pin_names.size(); i++)
+	{
+		if (i < uart_pins.size())
+		{
+			func_out_pin_names[i] = uart_pins[i].name;
+		}
+		else
+		{
+			func_out_pin_names[i] = spi_pins[i - uart_pins.size()].name;
+		}
+	}
+	return func_out_pin_names;
 }
 
 void Bluetooth::getUsedVarsName(const stringvec &pin_names)
@@ -2181,5 +2412,210 @@ void Bluetooth::getPinNumberInfo()
 		var_names[i] = pins[i].name;
 		v_bound_mat.row(i) << pins[i].v_bound.first, pins[i].v_bound.second;
 		i_bound_mat.row(i) << pins[i].i_bound.first, pins[i].i_bound.second;
+	}
+}
+
+void Encoder::extractInfo(Electronics::Component *encoder)
+{
+	Electronics::Encoder ext = encoder->GetExtension(
+		Electronics::Encoder::encoder);
+	frequency = ext.frequency();
+
+	this->getPinNumberInfo();
+
+	// config info
+	size_t extra_var_size = 1;
+	stringvec extra_var_names = { "CONST_BATTERY" };
+	unsigned pow_in_pin_num = pow_in_pins.size(),
+		gnd_pin_num = gnd_pins.size(), signal_pin_num = signal_pins.size(),
+		other_pin_num = other_pins.size(), range1 = pow_in_pin_num,
+		range2 = range1 + gnd_pin_num, range3 = range2 + signal_pin_num,
+		model_row_size = pins.size();
+
+	for (size_t i = 0; i < extra_var_size; i++)
+	{
+		vars.push_back(GRBVar());
+		var_types.push_back(GRB_CONTINUOUS);
+		var_names.push_back(extra_var_names[i]);
+	}
+
+	// boundary condition matrix
+	var_bound_mat = MatrixXd::Zero(vars.size(), v_bound_mat.cols());
+	var_bound_mat.block(0, 0, v_bound_mat.rows(), v_bound_mat.cols()) =
+		v_bound_mat;
+	var_bound_mat.row(vars.size() - 1) << 1, 1;
+
+
+	// coefficient matrix
+	model_mat = MatrixXd::Zero(model_row_size, vars.size());
+	model_relations.resize(model_mat.rows());
+	model_names.resize(model_mat.rows());
+	for (size_t i = 0; i < model_row_size; i++)
+	{
+		model_mat(i, i) = 1;
+		model_mat(i, vars.size() - 1) = -v_bound_mat(i, 1);
+		model_relations[i] = GRB_LESS_EQUAL;
+		model_index_map[var_names[i]] = i;
+		if (i < range1)
+		{
+			model_names[i] = "POWER INPUT CONS";
+		}
+		else if (i >= range1 && i < range2)
+		{
+			model_names[i] = "GND CONS";
+		}
+		else if (i >= range2 && i < range3)
+		{
+			model_names[i] = "SIGNAL CONS";
+		}
+		else
+		{
+			model_names[i] = "OTHER CONS";
+		}
+	}
+}
+
+void Encoder::getPinNumberInfo()
+{
+	// reorder pins
+	for (auto &beg = pins.begin(); beg != pins.end(); beg++)
+	{
+		if (beg->pin_class == Electronics::POWER)
+		{
+			switch (beg->func_type)
+			{
+			case Electronics::ELECTRICAL: pow_in_pins.push_back(*beg);
+				break;
+			case Electronics::GND: gnd_pins.push_back(*beg);
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			switch (beg->func_type)
+			{
+			case Electronics::DIGITAL: signal_pins.push_back(*beg);
+				break;
+			case Electronics::OTHER: other_pins.push_back(*beg);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	pins.clear();
+	pins.insert(pins.end(), pow_in_pins.begin(), pow_in_pins.end());
+	pins.insert(pins.end(), gnd_pins.begin(), gnd_pins.end());
+	pins.insert(pins.end(), signal_pins.begin(), signal_pins.end());
+	pins.insert(pins.end(), other_pins.begin(), other_pins.end());
+
+	for (size_t i = 0; i < pins.size(); i++)
+	{
+		var_names[i] = pins[i].name;
+		v_bound_mat.row(i) << pins[i].v_bound.first, pins[i].v_bound.second;
+		i_bound_mat.row(i) << pins[i].i_bound.first, pins[i].i_bound.second;
+	}
+}
+
+Encoder::Encoder(const string &file): Electrical_Component(file)
+{
+	if (!ENCODER_MAP.empty())
+	{
+		*this = ENCODER_MAP[file];
+	}
+	else
+	{
+		Electronics::Component *encoder = read(file);
+		extractInfo(encoder);
+		delete encoder;
+	}
+}
+
+void Encoder::parameters() const
+{
+	cout << component_name << " PARAMETERS: " << endl;
+	cout << "FREQUENCY: " << frequency << endl;
+	cout << endl;
+
+	for (size_t i = 0; i < pins.size(); i++)
+	{
+		printPinInfo(pins[i]);
+	}
+
+	cout << endl;
+	cout << model_mat << endl;
+}
+
+doublevec Encoder::getFuncInCurrentLimit()
+{
+	size_t sig_pos = pow_in_pins.size() + gnd_pins.size();
+	return doublevec{i_bound_mat(sig_pos, 1)};
+}
+
+doublevec Encoder::getPowerInCurrentLimit()
+{
+	return doublevec{i_bound_mat(0, 1)};
+}
+
+doublepairs Encoder::getFuncInVolRange()
+{
+	size_t sig_pos = pow_in_pins.size() + gnd_pins.size();
+	return doublepairs{make_pair(pins[sig_pos].v_bound.first, 
+		pins[sig_pos].v_bound.second)};
+}
+
+doublepairs Encoder::getPowerInVolRange()
+{
+	return doublepairs{make_pair(pins[0].v_bound.first, 
+		pins[0].v_bound.second)};
+}
+
+stringvec Encoder::getPowerInPinNames()
+{
+	stringvec pow_in_pin_names;
+	for (size_t i = 0; i < pow_in_pins.size(); i++)
+	{
+		pow_in_pin_names.push_back(pins[i].name);
+	}
+	return pow_in_pin_names;
+}
+
+stringvec Encoder::getFuncInPinNames()
+{
+	size_t sig_pos = pow_in_pins.size() + gnd_pins.size();
+	stringvec func_in_pin_names;
+	for (size_t i = 0; i < signal_pins.size(); i++)
+	{
+		func_in_pin_names.push_back(pins[i + sig_pos].name);
+	}
+	return func_in_pin_names;
+}
+
+void Encoder::getUsedVarsName(const stringvec &pin_names)
+{
+	if (pin_names.empty())
+	{
+		for (size_t i = 0; i < pins.size() - other_pins.size(); i++)
+		{
+			dependent_pins.push_back(&pins[i]);
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < pin_names.size(); i++)
+		{
+			getDependentPins(pin_names[i]);
+		}
+	}
+
+	for (size_t i = 0; i < dependent_pins.size(); i++)
+	{
+		if (getPosInVec(dependent_pins[i]->name, used_var_names) == -1)
+		{
+			used_var_names.push_back(dependent_pins[i]->name);
+		}
 	}
 }

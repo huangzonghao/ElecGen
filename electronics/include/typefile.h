@@ -79,23 +79,21 @@ const std::string sline = "----------------------------------------";
 
 const std::string duty = "DUTY";
 
-const unsigned IN_BATTERY_CONNECTION_FOLDER = 0,
-IN_VOLTAGE_REGULATOR_CONNECTION_FOLDER = 1,
-IN_HBRIDGE_CONNECTION_FOLDER = 2,
-IN_MICRO_CONTROLLER_CONNECTION_FOLDER = 3,
-IN_MOTOR_CONNECTION_FOLDER = 4,
-IN_ENCODER_CONNECTION_FOLDER = 5,
-IN_FORCESENSOR_CONNECTION_FOLDER = 6,
-IN_BLUETOOTH_CONNECTION_FOLDER = 7,
-IN_CAMERA_CONNECTION_FOLDER = 8;
-
 const std::string FILE_DOES_NOT_EXSIT = "File doesn't exit. Please create the file and restart the program.",
 CAN_NOT_PARSE_FILE = "Fail to parse file: ",
 FILE_LOADED = "Has loaded file: ",
 MODEL_IS_INFEASIBLE = "The optimization model is infeasible.",
 MODEL_SOLVED = "The optimization model is solved",
 INTERSECT_ERROR = "Minimum value is greated than maximum value",
-COMPONENT_NOT_FOUND = "This component is not found: ";
+COMPONENT_NOT_FOUND = "This component is not found: ",
+EMPTY_TORQUE = "Input torques empty",
+EMPTY_VELOCITY = "Input velocities empty",
+TORQUE_VELOCITY_SIZE_NOT_MATCH = "input torques and velocities size doesn't match",
+TORQUE_RANGE_INVALID = "Minimum torque is greater than maximum torque",
+NEGATIVE_TORQUE = "input torque is negative",
+VELOCITY_RANGE_INVALID = "Minimum velocity is greater than maximum velocity",
+NEGATIVE_VELOCITY = "input velocity is negative";
+
 
 const double tol = 1e-3;
 

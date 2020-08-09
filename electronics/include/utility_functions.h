@@ -5,14 +5,15 @@
 #include <iostream>
 #include "typefile.h"
 #include <numeric>
+#include <memory>
 #include <discreture.hpp>
 
 // check if two ranges intersect
 bool isIntersect(const doublepair &, const doublepair &);
 doublepair getIntersect(const doublepair &, const doublepair &);
 bool isInTol(double, double);
+std::string removeReplicate(const std::string &);
 
-std::string makeReplicate(const stringvec &, const std::string &, unsigned &);
 bool fileInDirectory(const std::string &, const std::string &);
 
 template<class T>
@@ -56,9 +57,10 @@ inline std::vector<T> getSubVector(const std::vector<T> &vec,
 template<class T>
 inline size_t getPosInVec(const T &element, const std::vector<T> &vec)
 {
-	if (std::find(vec.begin(), vec.end(), element) != vec.end())
+	auto &iter = std::find(vec.begin(), vec.end(), element);
+	if (iter != vec.end())
 	{
-		return std::find(vec.begin(), vec.end(), element) - vec.begin();
+		return iter - vec.begin();
 	}
 	else
 	{
@@ -75,7 +77,6 @@ doublevec sample(const double &, const double &, const unsigned & = unsigned(100
 std::string removeComponentPrePostfix(std::string);
 std::string removeComponentPostfix(std::string);
 
-std::string switchPath(std::string &, const std::string & = "Connections", const std::string & = "Specifications");
 
 double roundByPrecision(const double &, const double & = 1e-4);
 

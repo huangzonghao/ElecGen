@@ -88,7 +88,7 @@ private:
 	connection_relation netlist;
 };
 */
-using Component_Pair = std::pair<Electrical_Component*, Electrical_Component*>;
+using Component_Pair = std::pair<std::shared_ptr<Electrical_Component>, std::shared_ptr<Electrical_Component>>;
 using Pin_Connections = std::unordered_multimap<std::string, std::string>;
 Pin_Connections groupMatch(std::vector<Component_Pair> &);
 Pin_Connections individualMatch(Component_Pair &);

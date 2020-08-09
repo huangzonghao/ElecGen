@@ -1,6 +1,8 @@
 #include "testfile.h"
 using std::vector;
 using std::make_pair;
+using std::shared_ptr;
+using std::make_shared;
 
 void motor_read()
 {
@@ -12,21 +14,21 @@ void motor_read()
 void h_bridge_read()
 {
 	initializeAllHBridges(h_bridge_path);
-	H_Bridge h_bridge(h_bridge_path + "DRV8838.txt");
+	H_Bridge h_bridge(h_bridge_path + "MTD-01.txt");
 //	h_bridge.parameters();
 }
 
 void battery_read()
 {
 	initializeAllBatteries(battery_path);
-	Battery battery(battery_path + "D1604-1F.txt");
+	Battery battery(battery_path + "Turnigy_20C.txt");
 //	battery.parameters();
 }
 
 void micro_controller_read()
 {
 	initializeAllMicroController(micro_controller_path);
-	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mini.txt");
+	Micro_Controller micro_controller(micro_controller_path + "Arduino_Uno.txt");
 //	micro_controller.parameters();
 }
 
@@ -53,7 +55,7 @@ void servo_read()
 
 void camera_read()
 {
-	initializeAllServos(camera_path);
+	initializeAllCameras(camera_path);
 	Camera camera(camera_path + "MU_Vision_Sensor.txt");
 //	camera.parameters();
 }
@@ -65,21 +67,29 @@ void bluetooth_read()
 //	bluetooth.parameters();
 }
 
+void encoder_read()
+{
+	initializeAllEncoders(encoder_path);
+	Encoder encoder(encoder_path + "Pololu_4761.txt");
+//	encoder.parameters();
+}
+
 void motor_solve()
 {
-	Motor dc_motor(dc_motor_path + "Pololu_4797.txt");
-	dc_motor.setWorkPoint(1e-3, 6.0);
+	shared_ptr<Motor> dc_motor = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+	dc_motor->setWorkPoint(1e-3, 6.0);
 
 	// SOLVE TEST
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(dc_motor);
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 }
 
+/*
 void motor_hbridge_solve()
 {
 	Motor dc_motor(dc_motor_path + "Pololu_4797.txt");
@@ -87,22 +97,23 @@ void motor_hbridge_solve()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&dc_motor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	H_Bridge h_bridge(h_bridge_path + "DRV8835.txt");
+	components.push_back(make_shared<Electrical_Component>(&h_bridge));
 	//"TA7291P.txt" *
 	//"MTD-01.txt"
 	//"DRV8838.txt"
 	//"DRV8835.txt"
 
 	// CONNECT TEST
-	Electrical_Component *left_component = &h_bridge,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	Pin_Connections pin_connection_list = groupMatch(
@@ -118,11 +129,10 @@ void motor_hbridge_solve()
 	}
 
 	// SOLVE TEST
-	components.push_back(&h_bridge);
 	components[1]->getUsedNonLinVarNames(pins_vec[1]);
 	components[1]->getUsedVarsName(pins_vec[1]);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 }
@@ -134,18 +144,18 @@ void motor_hbridge_battery_solve()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&dc_motor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	H_Bridge h_bridge(h_bridge_path + "DRV8835.txt");
-
+	components.push_back(make_shared<Electrical_Component>(&h_bridge));
 	// CONNECT TEST
-	Electrical_Component *left_component = &h_bridge,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	Pin_Connections pin_connection_list = groupMatch(
@@ -161,16 +171,16 @@ void motor_hbridge_battery_solve()
 	}
 
 	// SOLVE TEST
-	components.push_back(&h_bridge);
 	components[1]->getUsedNonLinVarNames(pins_vec[1]);
 	components[1]->getUsedVarsName(pins_vec[1]);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Battery battery(battery_path + "PR-CU-R198.txt");
+	components.push_back(make_shared<Electrical_Component>(&battery));
 	// "PR-CU-R198.txt"
 	// "6LR61.txt"
 	// "Turnigy_20C.txt"
@@ -180,7 +190,7 @@ void motor_hbridge_battery_solve()
 
 	// CONNECT TEST
 	vector<Component_Pair> component_pairs;
-	left_component = &battery;
+	left_component = components[2];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -199,11 +209,10 @@ void motor_hbridge_battery_solve()
 	}
 
 	// SOLVE TEST
-	components.push_back(&battery);
 	components[2]->getUsedNonLinVarNames(pins_vec[1]);
 	components[2]->getUsedVarsName(pins_vec[1]);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[2]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[2]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 }
@@ -215,18 +224,19 @@ void motor_hbridge_battery_micro_controller_solve()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&dc_motor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	H_Bridge h_bridge(h_bridge_path + "DRV8835.txt");
+	components.push_back(make_shared<Electrical_Component>(&h_bridge));
 
 	// CONNECT TEST
-	Electrical_Component *left_component = &h_bridge,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	Pin_Connections pin_connection_list = groupMatch(
@@ -242,16 +252,16 @@ void motor_hbridge_battery_micro_controller_solve()
 	}
 
 	// SOLVE TEST
-	components.push_back(&h_bridge);
 	components[1]->getUsedNonLinVarNames(pins_vec[1]);
 	components[1]->getUsedVarsName(pins_vec[1]);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Battery battery(battery_path + "Turnigy_20C.txt");
+	components.push_back(make_shared<Electrical_Component>(&battery));
 	// "PR-CU-R198.txt"
 	// "6LR61.txt"
 	// "Turnigy_20C.txt"
@@ -260,21 +270,20 @@ void motor_hbridge_battery_micro_controller_solve()
 	// "D1604-1F.txt"
 
 	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mega.txt");
+	components.push_back(make_shared<Electrical_Component>(&micro_controller));
 	// "Arduino_Mini.txt"
 	// "Arduino_Uno.txt"
 	// "Arduino_Mega.txt"
 
 	// CONNECT TEST
-	components.push_back(&battery);
-	components.push_back(&micro_controller);
 	vector<Component_Pair> component_pairs;
-	left_component = &battery;
+	left_component = components[2];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = &micro_controller;
+	left_component = components[3];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -324,20 +333,11 @@ void motor_hbridge_battery_micro_controller_solve()
 	pin_connection_list.insert(same_level_connection.begin(), same_level_connection.end());
 	printPinConnections(pin_connection_list);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[2], components[3]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[2], components[3]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 }
-
-void motor_hbridge_voltage_regulator_micro_controller_solve()
-{
-}
-
-void motor_hbridge_voltage_regulator_micro_controller_battery_solve()
-{
-}
-
 
 void motor_hbridge_connect()
 {
@@ -346,22 +346,23 @@ void motor_hbridge_connect()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&dc_motor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	H_Bridge h_bridge(h_bridge_path + "DRV8835.txt");
+	components.push_back(make_shared<Electrical_Component>(&h_bridge));
 	//"TA7291P.txt" *
 	//"MTD-01.txt"
 	//"DRV8838.txt"
 	//"DRV8835.txt"
 
 	// CONNECT TEST
-	Electrical_Component *left_component = &h_bridge,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	Pin_Connections pin_connection_list = groupMatch(
@@ -376,18 +377,19 @@ void motor_hbridge_battery_connect()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&dc_motor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	H_Bridge h_bridge(h_bridge_path + "DRV8835.txt");
+	components.push_back(make_shared<Electrical_Component>(&h_bridge));
 
 	// CONNECT TEST
-	Electrical_Component *left_component = &h_bridge,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	Pin_Connections pin_connection_list = groupMatch(
@@ -403,16 +405,16 @@ void motor_hbridge_battery_connect()
 	}
 
 	// SOLVE TEST
-	components.push_back(&h_bridge);
 	components[1]->getUsedNonLinVarNames(pins_vec[1]);
 	components[1]->getUsedVarsName(pins_vec[1]);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Battery battery(battery_path + "D1604-1F.txt");
+	components.push_back(make_shared<Electrical_Component>(&battery));
 	// "PR-CU-R198.txt"
 	// "6LR61.txt"
 	// "Turnigy_20C.txt"
@@ -422,7 +424,7 @@ void motor_hbridge_battery_connect()
 
 	// CONNECT TEST
 	vector<Component_Pair> component_pairs;
-	left_component = &battery;
+	left_component = components[2];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -439,18 +441,19 @@ void motor_hbridge_battery_micro_controller_connect()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&dc_motor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	H_Bridge h_bridge(h_bridge_path + "DRV8835.txt");
+	components.push_back(make_shared<Electrical_Component>(&h_bridge));
 
 	// CONNECT TEST
-	Electrical_Component *left_component = &h_bridge,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	Pin_Connections pin_connection_list = groupMatch(
@@ -466,16 +469,16 @@ void motor_hbridge_battery_micro_controller_connect()
 	}
 
 	// SOLVE TEST
-	components.push_back(&h_bridge);
 	components[1]->getUsedNonLinVarNames(pins_vec[1]);
 	components[1]->getUsedVarsName(pins_vec[1]);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Battery battery(battery_path + "LP503562.txt");
+	components.push_back(make_shared<Electrical_Component>(&battery));
 	// "PR-CU-R198.txt"
 	// "6LR61.txt"
 	// "Turnigy_20C.txt"
@@ -484,21 +487,20 @@ void motor_hbridge_battery_micro_controller_connect()
 	// "D1604-1F.txt"
 
 	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mini.txt");
+	components.push_back(make_shared<Electrical_Component>(&micro_controller));
 	// "Arduino_Mini.txt"
 	// "Arduino_Uno.txt"
 	// "Arduino_Mega.txt"
 
 	// CONNECT TEST
-	components.push_back(&battery);
-	components.push_back(&micro_controller);
 	vector<Component_Pair> component_pairs;
-	left_component = &battery;
+	left_component = components[2];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = &micro_controller;
+	left_component = components[3];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -557,18 +559,19 @@ void motor_hbridge_voltage_regulator_micro_controller_connect()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&dc_motor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	H_Bridge h_bridge(h_bridge_path + "DRV8835.txt");
+	components.push_back(make_shared<Electrical_Component>(&h_bridge));
 
 	// CONNECT TEST
-	Electrical_Component *left_component = &h_bridge,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	Pin_Connections pin_connection_list = groupMatch(
@@ -584,36 +587,35 @@ void motor_hbridge_voltage_regulator_micro_controller_connect()
 	}
 
 	// SOLVE TEST
-	components.push_back(&h_bridge);
 	components[1]->getUsedNonLinVarNames(pins_vec[1]);
 	components[1]->getUsedVarsName(pins_vec[1]);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Voltage_Regulator voltage_regulator(voltage_regulator_path + "DC-DC_Convertor.txt");
+	components.push_back(shared_ptr<Electrical_Component>(&voltage_regulator));
 	// "DC-DC_Convertor.txt"
 	// "L4931-33.txt"
 
 
 	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mega.txt");
+	components.push_back(shared_ptr<Electrical_Component>(&micro_controller));
 	// "Arduino_Mini.txt"
 	// "Arduino_Uno.txt"
 	// "Arduino_Mega.txt"
 
 	// CONNECT TEST
-	components.push_back(&voltage_regulator);
-	components.push_back(&micro_controller);
 	vector<Component_Pair> component_pairs;
-	left_component = &voltage_regulator;
+	left_component = components[2];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = &micro_controller;
+	left_component = components[3];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -663,7 +665,7 @@ void motor_hbridge_voltage_regulator_micro_controller_connect()
 	pin_connection_list.insert(same_level_connection.begin(), same_level_connection.end());
 	printPinConnections(pin_connection_list);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[2], components[3]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[2], components[3]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
@@ -676,18 +678,19 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&dc_motor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&dc_motor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	H_Bridge h_bridge(h_bridge_path + "DRV8835.txt");
+	components.push_back(shared_ptr<Electrical_Component>(&h_bridge));
 
 	// CONNECT TEST
-	Electrical_Component *left_component = &h_bridge,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	Pin_Connections pin_connection_list = groupMatch(
@@ -703,36 +706,35 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 	}
 
 	// SOLVE TEST
-	components.push_back(&h_bridge);
 	components[1]->getUsedNonLinVarNames(pins_vec[1]);
 	components[1]->getUsedVarsName(pins_vec[1]);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Voltage_Regulator voltage_regulator(voltage_regulator_path + "DC-DC_Convertor.txt");
+	components.push_back(make_shared<Electrical_Component>(&voltage_regulator));
 	// "DC-DC_Convertor.txt"
 	// "L4931-33.txt"
 
 
 	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mega.txt");
+	components.push_back(make_shared<Electrical_Component>(&micro_controller));
 	// "Arduino_Mini.txt"
 	// "Arduino_Uno.txt"
 	// "Arduino_Mega.txt"
 
 	// CONNECT TEST
-	components.push_back(&voltage_regulator);
-	components.push_back(&micro_controller);
 	vector<Component_Pair> component_pairs;
-	left_component = &voltage_regulator;
+	left_component = components[2];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = &micro_controller;
+	left_component = components[3];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -782,23 +784,23 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 	pin_connection_list.insert(same_level_connection.begin(), same_level_connection.end());
 	printPinConnections(pin_connection_list);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[2], components[3]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[2], components[3]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Battery battery(battery_path + "D1604-1F.txt");
+	components.push_back(shared_ptr<Electrical_Component>(&battery));
 
 	// CONNECT TEST
-	components.push_back(&battery);
 	component_pairs.clear();
-	left_component = &battery;
+	left_component = components[4];
 	right_component = components[2];
 	component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = &battery;
+	left_component = components[4];
 	right_component = components[3];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -835,7 +837,7 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 		components[i]->getUsedVarsName(pins_vec[i - 4]);
 	}
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[4]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[4]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
@@ -848,15 +850,15 @@ void force_sensor_battery_micro_controller_connect()
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&force_sensor);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&force_sensor));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	Battery battery(battery_path + "Turnigy_20C.txt");
-	components.push_back(&battery);
+	components.push_back(make_shared<Electrical_Component>(&battery));
 	// "PR-CU-R198.txt"
 	// "6LR61.txt"
 	// "Turnigy_20C.txt"
@@ -865,27 +867,27 @@ void force_sensor_battery_micro_controller_connect()
 	// "D1604-1F.txt"
 
 	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mini.txt");
-	components.push_back(&micro_controller);
+	components.push_back(make_shared<Electrical_Component>(&micro_controller));
 	// "Arduino_Mini.txt"
 	// "Arduino_Uno.txt"
 	// "Arduino_Mega.txt"
 
 	// CONNECT TEST
 	vector<Component_Pair> component_pairs;
-	Electrical_Component *left_component = &battery,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = components[0];
-	right_component = &micro_controller;
+	left_component = components[2];
+	right_component = components[0];
 	component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
 	Pin_Connections pin_connection_list = groupMatch(component_pairs);
-//	printPinConnections(pin_connection_list);
+	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
 	// process connections
@@ -924,7 +926,7 @@ void force_sensor_battery_micro_controller_connect()
 	pin_connection_list.insert(same_level_connection.begin(), same_level_connection.end());
 	printPinConnections(pin_connection_list);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1], components[2]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1], components[2]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
@@ -933,12 +935,13 @@ void force_sensor_battery_micro_controller_connect()
 void servo_micro_controller_voltage_regulator_battery_connect()
 {
 	Motor servo(servo_path + "LS-0009AF.txt");
-	servo.setWorkPoint(1e-3, 10);
+//	servo.setWorkPoint(1e-3, 10);
+	servo.setWorkPoint(0.14, 1e-3);
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&servo);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&servo));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
@@ -946,24 +949,24 @@ void servo_micro_controller_voltage_regulator_battery_connect()
 
 	Voltage_Regulator voltage_regulator(voltage_regulator_path + "DC-DC_Convertor.txt");
 	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mini.txt");
-	components.push_back(&voltage_regulator);
-	components.push_back(&micro_controller);
+	components.push_back(make_shared<Electrical_Component>(&voltage_regulator));
+	components.push_back(make_shared<Electrical_Component>(&micro_controller));
 
 	// CONNECT TEST
 	vector<Component_Pair> component_pairs;
-	Electrical_Component *left_component = &voltage_regulator ,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = components[0];
-	right_component = &micro_controller;
+	left_component = components[2];
+	right_component = components[0];
 	component_pair = make_pair(left_component, right_component);
 	component_pairs.push_back(component_pair);
 
 	Pin_Connections pin_connection_list = groupMatch(component_pairs);
-//	printPinConnections(pin_connection_list);
+	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
 	// process connections
@@ -1002,23 +1005,23 @@ void servo_micro_controller_voltage_regulator_battery_connect()
 	pin_connection_list.insert(same_level_connection.begin(), same_level_connection.end());
 	printPinConnections(pin_connection_list);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1], components[2]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1], components[2]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Battery battery(battery_path + "D1604-1F.txt");
-	components.push_back(&battery);
+	components.push_back(make_shared<Electrical_Component>(&battery));
 
 	// CONNECT TEST
 	component_pairs.clear();
-	left_component = &battery;
+	left_component = components[3];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = &battery;
+	left_component = components[3];
 	right_component = components[2];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -1055,7 +1058,7 @@ void servo_micro_controller_voltage_regulator_battery_connect()
 		components[i]->getUsedVarsName(pins_vec[i - 3]);
 	}
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[3]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[3]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
@@ -1063,38 +1066,38 @@ void servo_micro_controller_voltage_regulator_battery_connect()
 
 void camera_voltage_regulator_micro_controller_battery_connect()
 {
-	Camera camera(camera_path + "TTL_Serial_Camera.txt");
+	Camera camera(camera_path + "MU_Vision_Sensor.txt");
 	// TTL_Serial_Camera
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&camera);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&camera));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
 	Voltage_Regulator voltage_regulator(voltage_regulator_path + "DC-DC_Convertor.txt");
-	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mega.txt");
-	components.push_back(&voltage_regulator);
-	components.push_back(&micro_controller);
+	Micro_Controller micro_controller(micro_controller_path + "Arduino_Uno.txt");
+	components.push_back(make_shared<Electrical_Component>(&voltage_regulator));
+	components.push_back(make_shared<Electrical_Component>(&micro_controller));
 
 	// CONNECT TEST
 	vector<Component_Pair> component_pairs;
-	Electrical_Component *left_component = &voltage_regulator,
-		*right_component = components[0];
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = components[0];
-	right_component = &micro_controller;
+	left_component = components[2];
+	right_component = components[0];
 	component_pair = make_pair(left_component, right_component);
 	component_pairs.push_back(component_pair);
 
 	Pin_Connections pin_connection_list = groupMatch(component_pairs);
-//	printPinConnections(pin_connection_list);
+	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
 	// process connections
@@ -1133,23 +1136,23 @@ void camera_voltage_regulator_micro_controller_battery_connect()
 	pin_connection_list.insert(same_level_connection.begin(), same_level_connection.end());
 	printPinConnections(pin_connection_list);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1], components[2]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1], components[2]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
 	Battery battery(battery_path + "D1604-1F.txt");
-	components.push_back(&battery);
+	components.push_back(make_shared<Electrical_Component>(&battery));
 
 	// CONNECT TEST
 	component_pairs.clear();
-	left_component = &battery;
+	left_component = components[3];
 	right_component = components[1];
 	component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = &battery;
+	left_component = components[3];
 	right_component = components[2];
 	component_pair = make_pair(left_component,
 		right_component);
@@ -1186,7 +1189,7 @@ void camera_voltage_regulator_micro_controller_battery_connect()
 		components[i]->getUsedVarsName(pins_vec[i - 3]);
 	}
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[3]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[3]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
@@ -1194,13 +1197,13 @@ void camera_voltage_regulator_micro_controller_battery_connect()
 
 void bluetooth_battery_micro_controller_connect()
 {
-	Bluetooth bluetooth(bluetooth_path + "Bluefruit_UART.txt");
+	Bluetooth bluetooth(bluetooth_path + "Bluefruit_SPI.txt");
 	// Bluefruit_UART.txt
 
 	GRBEnv env = GRBEnv();
 	GRBModel model = GRBModel(env);
-	vector<Electrical_Component*> components;
-	components.push_back(&bluetooth);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(make_shared<Electrical_Component>(&bluetooth));
 	components[0]->getUsedVarsName(stringvec());
 	Circuit test_circuit(components);
 	test_circuit.verify(&model);
@@ -1208,24 +1211,24 @@ void bluetooth_battery_micro_controller_connect()
 
 	Battery battery(battery_path + "D1604-1F.txt");
 	Micro_Controller micro_controller(micro_controller_path + "Arduino_Mega.txt");
-	components.push_back(&battery);
-	components.push_back(&micro_controller);
+	components.push_back(make_shared<Electrical_Component>(&battery));
+	components.push_back(make_shared<Electrical_Component>(&micro_controller));
 
 	// CONNECT TEST
 	vector<Component_Pair> component_pairs;
-	Electrical_Component *left_component = &battery,
-		*right_component = components[0];	
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];	
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
 
-	left_component = components[0];
-	right_component = &micro_controller;
+	left_component = components[2];
+	right_component = components[0];
 	component_pair = make_pair(left_component, right_component);
 	component_pairs.push_back(component_pair);
 
 	Pin_Connections pin_connection_list = groupMatch(component_pairs);
-//	printPinConnections(pin_connection_list);
+	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
 	// process connections
@@ -1264,7 +1267,86 @@ void bluetooth_battery_micro_controller_connect()
 	pin_connection_list.insert(same_level_connection.begin(), same_level_connection.end());
 	printPinConnections(pin_connection_list);
 
-	test_circuit.updateComponents(vector<Electrical_Component*>{components[1], components[2]});
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1], components[2]});
+	test_circuit.updateConnections(pin_connection_list);
+	test_circuit.updateVerify(&model);
+	test_circuit.maxSolve(&model);
+}
+*/
+
+void encoder_battery_micro_controller_connect()
+{
+	shared_ptr<Encoder> bluetooth = make_shared<Encoder>(encoder_path + "Pololu_4761.txt");
+	// Bluefruit_UART.txt
+
+	GRBEnv env = GRBEnv();
+	GRBModel model = GRBModel(env);
+	vector<shared_ptr<Electrical_Component>> components;
+	components.push_back(bluetooth);
+	components[0]->getUsedVarsName(stringvec());
+	Circuit test_circuit(components);
+	test_circuit.verify(&model);
+	test_circuit.maxSolve(&model);
+
+	shared_ptr<Battery> battery = make_shared<Battery>(battery_path + "D1604-1F.txt");
+	shared_ptr<Micro_Controller> micro_controller = make_shared<Micro_Controller>(micro_controller_path + "Arduino_Mini.txt");
+	components.push_back(battery);
+	components.push_back(micro_controller);
+
+	// CONNECT TEST
+	vector<Component_Pair> component_pairs;
+	shared_ptr<Electrical_Component> left_component = components[1],
+		right_component = components[0];
+	Component_Pair component_pair = make_pair(left_component,
+		right_component);
+	component_pairs.push_back(component_pair);
+
+	left_component = components[2];
+	right_component = components[0];
+	component_pair = make_pair(left_component, right_component);
+	component_pairs.push_back(component_pair);
+
+	Pin_Connections pin_connection_list = groupMatch(component_pairs);
+	printPinConnections(pin_connection_list);
+
+	stringvec2d pins_vec(2);
+	// process connections
+	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+		beg++)
+	{
+		stringpair left_pair = separateNames(beg->first),
+			right_pair = separateNames(beg->second);
+		for (size_t i = 1; i < components.size(); i++)
+		{
+			if (components[i]->getComponentName() == left_pair.first)
+			{
+				pins_vec[i - 1].push_back(left_pair.second);
+			}
+
+			if (components[i]->getComponentName() == right_pair.first)
+			{
+				pins_vec[i - 1].push_back(right_pair.second);
+			}
+		}
+	}
+
+	for (size_t i = 1; i < components.size(); i++)
+	{
+		components[i]->getUsedNonLinVarNames(pins_vec[i - 1]);
+		components[i]->getUsedVarsName(pins_vec[i - 1]);
+	}
+
+	component_pairs.clear();
+	left_component = components[1];
+	right_component = components[2];
+	component_pair = make_pair(left_component, right_component);
+	component_pairs.push_back(component_pair);
+
+	Pin_Connections same_level_connection = groupMatch(component_pairs);
+	pin_connection_list.insert(same_level_connection.begin(), same_level_connection.end());
+	printPinConnections(pin_connection_list);
+
+	test_circuit.updateComponents(vector<shared_ptr<Electrical_Component>>{components[1], components[2]});
 	test_circuit.updateConnections(pin_connection_list);
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
@@ -1272,11 +1354,90 @@ void bluetooth_battery_micro_controller_connect()
 
 void system_test()
 {
-	Motor dc_motor(dc_motor_path + "Pololu_4797.txt");
-	dc_motor.setWorkPoint(1e-3, 6.0);
+	// pre-processing 
+//	stringvec input_types{ Component_Type::Motor, Component_Type::Motor, 
+//		Component_Type::Motor, Component_Type::Motor,
+//		Component_Type::Encoder, Component_Type::Encoder, 
+//		Component_Type::Encoder, Component_Type::Encoder };
+//	doublepairs input_torques{make_pair<double>(1e-3, 0.4), 
+//		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4), 
+//		make_pair<double>(1e-3, 0.4) };
+//	doublepairs input_velocities{make_pair<double>(1e-3, 6.0), 
+//		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0), 
+//		make_pair<double>(1e-3, 6.0)};
 
-	Infer_Node infer_node(&dc_motor);
-	BBNode root(infernodevec{ infer_node });
-	branchNBound(bbnodevec{ root });
+//	stringvec2d component_versions = preprocess(input_types, input_torques, input_velocities);
+//	infernodevec2d infer_nodes_vec = initialize(component_versions, input_torques, input_velocities);
+//	bbnodevec bbnode_vec = initialize(infer_nodes_vec);
+	
+	// SINGLE/MULTIPLE MOTOR TEST
+//	shared_ptr<Motor> dc_motor1 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor2 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor3 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor4 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+// HIGH SPEED - LOW TORQUE
+// 	dc_motor1->setWorkPoint(1e-3, 6.0);  
+//	dc_motor2->setWorkPoint(1e-3, 6.0);
+//	dc_motor3->setWorkPoint(1e-3, 6.0);
+//	dc_motor4->setWorkPoint(1e-3, 6.0);
+	// LOW SPEED - HIGH TORQUE
+//	dc_motor1->setWorkPoint(0.4, 1e-3);
+//	dc_motor2->setWorkPoint(0.4, 1e-3);
+//	dc_motor3->setWorkPoint(0.4, 1e-3);
+//	dc_motor4->setWorkPoint(0.4, 1e-3);
 
+	// SINGLE/MULTIPLE SERVO TEST
+//	shared_ptr<Motor> servo_motor1 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
+//	shared_ptr<Motor> servo_motor2 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
+//	shared_ptr<Motor> servo_motor3 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
+//	shared_ptr<Motor> servo_motor4 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
+	// HIGH SPEED - LOW TORQUE	
+//	servo_motor1->setWorkPoint(1e-3, 10);
+//	servo_motor2->setWorkPoint(1e-3, 10);
+//	servo_motor3->setWorkPoint(1e-3, 10);
+//	servo_motor4->setWorkPoint(1e-3, 10);
+	// LOW SPEED - HIGH TORQUE
+//	servo_motor1->setWorkPoint(0.14, 1e-3);
+//	servo_motor2->setWorkPoint(0.14, 1e-3);
+//	servo_motor3->setWorkPoint(0.14, 1e-3);
+//	servo_motor4->setWorkPoint(0.14, 1e-3);
+
+	// SINGLE CAMERA TEST
+//	shared_ptr<Camera> camera = make_shared<Camera>(camera_path + "MU_Vision_Sensor.txt");
+	// "MU_Vision_Sensor.txt" got stuck when use 6 batteries
+
+	// SINGLE/MULTIPLE FORCE SENSOR TEST
+//	shared_ptr<Force_Sensor> force_sensor1 = make_shared<Force_Sensor>(forcesensor_path + "Pololu_1645.txt");
+//	shared_ptr<Force_Sensor> force_sensor2 = make_shared<Force_Sensor>(forcesensor_path + "Pololu_1645.txt");
+
+	// SINGLE BLUETOOTH TEST
+//	shared_ptr<Bluetooth> bluetooth = make_shared<Bluetooth>(bluetooth_path + "Bluefruit_SPI.txt");
+
+	// SINGLE ENCODER TEST
+//	shared_ptr<Encoder> encoder = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+
+	// dc motor*4 + encoder*4 TEST
+	shared_ptr<Motor> dc_motor1 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+	shared_ptr<Motor> dc_motor2 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+	shared_ptr<Motor> dc_motor3 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+	shared_ptr<Motor> dc_motor4 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+	dc_motor1->setWorkPoint(1e-3, 6.0);  
+	dc_motor2->setWorkPoint(1e-3, 6.0);
+	dc_motor3->setWorkPoint(1e-3, 6.0);
+	dc_motor4->setWorkPoint(1e-3, 6.0);
+	shared_ptr<Encoder> encoder1 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+	shared_ptr<Encoder> encoder2 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+	shared_ptr<Encoder> encoder3 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+	shared_ptr<Encoder> encoder4 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+
+
+	Infer_Node infer_node1(dc_motor1), infer_node2(dc_motor2), infer_node3(dc_motor3), infer_node4(dc_motor4),
+		infer_node5(encoder1), infer_node6(encoder2), infer_node7(encoder3), infer_node8(encoder4);
+	infernodevec infer_nodes{ infer_node1, infer_node2, infer_node3, infer_node4,
+	infer_node5, infer_node6, infer_node7,  infer_node8 };
+	BBNode root(infer_nodes);
+	bbnodevec bbnodes{ root };
+	branchNBound(bbnodes);
+	
 }
+

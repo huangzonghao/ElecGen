@@ -4,8 +4,6 @@
 // #include <sstream>
 // #include <cstring>
 // #include <stdlib.h> 
-// #include "boost/variant/variant.hpp"
-// #include <discreture.hpp>
 // #include <type_traits>
 // #include <iomanip>
 
@@ -46,6 +44,7 @@ struct BBNode
 	cliqueindex2d vol_index;
 	cliqueindex2d vol_vol_index;
 	doublevec3d current_set;
+	stringvec component_names;
 //	stringvec connect_components_vec;
 
 	unsigned id = 0;
@@ -96,7 +95,8 @@ struct BBNode
 	infernodevec2d numberInfer(const stringvec2d &);
 	void minCliqueCover();
 	void clearPinConnections();
-	std::vector<Electrical_Component*> getComponents();
+	void makeReplicates();
+	std::vector<std::shared_ptr<Electrical_Component>> getComponents();
 	Pin_Connections getPinConections() { return pin_connections; }
 	void updateInPrevNode();
 	unsigned getComponenetNum() const { return component_num; }
@@ -122,40 +122,62 @@ struct Infer_Node
 //	double extra_current = 0;
 	bool operator==(const Infer_Node &obj) const { return id == obj.id; }
 	
-	std::string getType() const { return component->getComponentType(); }
-	std::string getName() const { return component->getComponentName(); }
+	std::string getType() const;
+	std::string getName() const;
+	void setName(const std::string &name) { component->setComponentName(name); }
+	unsigned getId() const { return id; }
 	void getUsedVarsName(const stringvec &);
 	void getUsedNonLinVarNames(const stringvec &);
 
 	Infer_Node() = default;
 	Infer_Node(const std::string &, Infer_Node & = Infer_Node());
-	Infer_Node(Electrical_Component *, Infer_Node & = Infer_Node());
-//	~Infer_Node() { delete component; }
-	bool empty() { return component == nullptr; }
+	Infer_Node(std::shared_ptr<Electrical_Component> , Infer_Node & = Infer_Node());
+//	~Infer_Node() { std::cout << "INFER NODE DESTRUCTOR" << std::endl; }
+	bool empty();
 	void addPrevNode(Infer_Node &);
 	void addNextNode(Infer_Node &);
-	void computeElectricProperties();
+	void computeElectricProperties(Pin_Connections &);;
 	doublevec getInVal(const std::string &);
 	double getOutVal(const Electronics::CLASS &);
 	doublepairs getInVolRange(const std::string &);
 	doublevec getInCurrentLimit(const std::string &);
-	doublevec getPowerInCurrent() { return pow_in_current; }
-	unsigned getMainPowerIndex() { return component->getMainPowerIndex(); }
-	void computePowInCurrent();
-	Electrical_Component *getComponent() { return component; }
-	infernodevec &getDescendents() { return next_nodes; }
-	infernodevec &getAnscentors() { return prev_nodes; }
+	stringvec getInPinNames(const std::string &) const;
+	stringvec getOutPinNames(const std::string &) const;
+	doublevec getPowerInCurrent() const { return pow_in_current; }
+	doublevec getFuncInCurrent() const { return func_in_current; }
+	doublepairs getPowerInVolRange() const { return pow_in_vol_range; }
+	doublepairs getFuncInVolRange() const { return func_in_vol_range; }
+	unsigned getMainPowerIndex();
+	void computePowInCurrent(Pin_Connections &);
+	void computePowInPinNames();
+	void computePowOutPinNames();
+	void computeFuncInPinNames();
+	void computeFuncOutPinNames();
+	stringvec getPowInPinNames() const { return pow_in_pin_names; }
+	stringvec getPowOutPinNames() const { return pow_out_pin_names; }
+	stringvec getFuncInPinNames() const { return func_in_pin_names; }
+	stringvec getFuncOutPinNames() const { return func_out_pin_names; }
+	std::shared_ptr<Electrical_Component> getComponent();
+	infernodevec &getDescendants() { return next_nodes; }
+	infernodevec getAncestors();
+	void updatePrevNode(const Infer_Node &);
+	void updateNextNode(const Infer_Node &);
 
 private:
-	Electrical_Component *component;
-	infernodevec prev_nodes;
+	std::shared_ptr<Electrical_Component> component;
+	unsignedvec prev_node_ids;
 	infernodevec next_nodes;
 	unsigned id;
 	bool visited = false;
 	doublevec pow_in_current = doublevec();
-	doublevec func_in_cuurent = doublevec();
+	doublevec func_in_current = doublevec();
 	doublepairs pow_in_vol_range = doublepairs();
 	doublepairs func_in_vol_range = doublepairs();
+	stringvec pow_in_pin_names = stringvec();
+	stringvec pow_out_pin_names = stringvec();
+	stringvec func_in_pin_names = stringvec();
+	stringvec func_out_pin_names = stringvec();
+	double extra_current = 0.0;
 	static unsigned num_of_nodes;
 
 	double getFuncOutSize();
@@ -164,24 +186,18 @@ private:
 	doublevec getPowerInVal();
 	doublepairs getFuncInVolRange();
 	doublepairs getPowerInVolRange();
-//	Infer_Node(const std::string &_type, const std::string &_version): type(_type), version(_version) { id = ++num_of_nodes; }
-//	Infer_Node(const std::string &_type, const std::string &_version, const double &_current): type(_type),
-//		version(_version), extra_current(_current){
-//		id = ++num_of_nodes;
-//	}
 };
 
+
 // initialization function
-/*
-stringvec preprocessing(const std::string &, const doublepairs &, const doublepairs &);
-std::string preprocessing(const doublepair &, const doublepair &);
-stringvec2d allPreprocessing(const std::string &, const doublepairs &, const doublepairs &);
-stringvec2d allPreprocessing(const std::string &, const doublepairs &);
-stringvec allPreprocessing(const doublepair &, const doublepair &);
-nodeptrvec initialization(const std::string &, const doublepairs &, const doublepairs &);
-bbnodevec allInitialization(const std::string &, const doublepairs &, const doublepairs &);
-bbnodevec allInitialization(const std::string &, const doublepairs &);
-*/
+stringvec2d preprocess(const stringvec &, const doublepairs & = doublepairs(),
+	const doublepairs & = doublepairs());
+stringvec2d sensorPreprocess(const stringvec &);
+stringvec2d actuatorPreprocess(const stringvec &, const doublepairs & = doublepairs(), 
+	const doublepairs & = doublepairs());
+infernodevec2d initialize(const stringvec2d &, const doublepairs & = doublepairs(),
+	const doublepairs & = doublepairs());
+bbnodevec initialize(const infernodevec2d &);
 
 // version/number graph formulation function
 
@@ -200,7 +216,8 @@ bool backTrack(BBNode &);
 stringvec typeInfer(const Infer_Node &);
 stringvec typeInfer(const std::string &);
 stringvec removeEmptyTypes(stringvec &);
-bool hasMatchComponents(const stringvec &, const infernodevec &);
+boolvec hasMatchComponents(const stringvec &, const infernodevec &, 
+	const Infer_Node &, const Pin_Connections &);
 
 stringvec2d versionInfer(const std::string &, const doublepairs &, const doublepairs &, const doublevec &);
 stringvec2d versionInfer(const std::string &, const doublepairs &, const doublevec2d &);
@@ -212,10 +229,7 @@ double getCurrentVal(const std::string &, const doublevec & = doublevec());
  infernodevec numberInfer(const std::string &, infernodevec &, const stringvec &,
 	 const cliqueindex &, const cliqueindex &);
 
-cliquetype minCliqueCover(const doublepairs &);
 /*
-cliquetype exactrRangeCover(const doublepairs &);
-
 doublevec getCurrentClique(const cliqueindex &, const doublevec &);
 doublevec changeCurrentSet(doublevec &, const connect_relation &, const unsigned &);
 
@@ -245,10 +259,10 @@ std::tuple<infernodevec2d, unsignedvec2d> identifyTypes(const infernodevec &);
 // nodeptrvec getAproNodes(const nodeptrvec &);
 // nodeptrvec generateNodeptrVec(const std::string &, const stringvec &);
 infernodevec generateNodeptrVec(const std::string &, const stringvec &);
-
+*/
 // This function checks the inputs' validity
 bool inputsValidityCheck(const doublepairs &, const doublepairs &);
-*/
+
 int branchNBound(bbnodevec & = bbnodevec());
 
 //void expandMap(const bbnodevec &, bbglobalmap &);
@@ -272,10 +286,22 @@ std::vector<Component_Pair> extractComponentPairs(infernodevec &, infernodevec &
 Pin_Connections maxNodeMatch(BBNode &, infernodevec & = infernodevec());
 Pin_Connections nodeMatch(infernodevec &);
 Pin_Connections nodeMatch(infernodevec &, infernodevec &);
+void createLinks(infernodevec &, Pin_Connections &);
+void createLinks(infernodevec &, infernodevec &, Pin_Connections &);
 void getDependentPins(infernodevec &, Pin_Connections &);
 infernodevec getAllAnscenstor(BBNode &);
+void addInferNodeMap(const infernodevec &);
+std::string makeReplicate(const std::string &, const stringvec &);
+std::string makeReplicate(const std::string &);
 
-Electrical_Component *creatComponent(const std::string &);
+std::shared_ptr<Electrical_Component> creatComponent(const std::string &);
+stringvec getAllSensorVersions(const std::string &);
+stringvec getAllVersions(const std::string &);
+stringvec2d getAllActuatorVersions(const std::string &, const std::vector<std::pair<doublepair, doublepair>> &);
+bool operator==(const std::pair<doublepair, doublepair> &,
+	const std::pair<doublepair, doublepair> &);
+stringvec2d getMotorVersions(const std::string &, const std::vector<std::pair<doublepair, doublepair>> &);
+stringvec getMotorVersions(const std::string &, const std::pair<doublepair, doublepair> &);
 
 namespace Current_Operation {
 	double add(const doublevec &vec);

@@ -30,36 +30,6 @@ doublepair getIntersect(const doublepair &range1, const doublepair &range2)
 	}
 }
 
-string makeReplicate(const stringvec &reference, const string &name, unsigned &index)
-{
-	std::string _name;
-	if (index != 0)
-	{
-		_name = name + std::to_string(index);
-	}
-	else
-	{
-		_name = name;
-	}
-
-	auto &iter = std::find(reference.begin(), reference.end(), _name);
-	if (iter != reference.end())
-	{
-		return makeReplicate(reference, name, ++index);
-	}
-	else
-	{
-		if (index == 0)
-		{
-			return name;
-		}
-		else
-		{
-			return name + std::to_string(index);
-		}
-	}
-}
-
 bool fileInDirectory(const std::string &file, const std::string &directory)
 {
 	for (const auto &entry : std::filesystem::directory_iterator(directory))
@@ -112,14 +82,6 @@ string removeComponentPostfix(std::string component)
 	return component.substr(0, end_pos+1);
 }
 
-std::string switchPath(std::string &path, const std::string &str1, const std::string &str2)
-{
-	auto idx = path.find(str1);
-	path.erase(idx, str1.size());
-	path.insert(path.begin() + idx, str2.begin(), str2.end());
-	return path;
-}
-
 double roundByPrecision(const double &val, const double &precesion)
 {
 	int temp_int = static_cast<int>(val / precesion);
@@ -142,6 +104,19 @@ bool isInTol(double min, double max)
 		status = true;
 	}
 	return status;
+}
+
+string removeReplicate(const string &name)
+{
+	size_t pos = name.find_last_of("@");
+	if (pos >= name.size())
+	{
+		return name;
+	}
+	else
+	{
+		return name.substr(0, pos);
+	}
 }
 
 unsigned getFileNumInDirectory(const std::string &path)

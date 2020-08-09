@@ -21,9 +21,9 @@ enum verifyMode
 class Circuit
 {
 public:
-	typedef bool(Circuit::*func)(std::vector<Electrical_Component*>, GRBModel *); // just declaration
+	typedef bool(Circuit::*func)(std::vector<std::shared_ptr<Electrical_Component>>, GRBModel *); // just declaration
 	Circuit() = default;
-	Circuit(std::vector<Electrical_Component*> &, Pin_Connections & = Pin_Connections());
+	Circuit(std::vector<std::shared_ptr<Electrical_Component>> &, Pin_Connections & = Pin_Connections());
 
 	// methods
 	void maxSolve(GRBModel *);
@@ -34,14 +34,14 @@ public:
 	void updateMinObjs(GRBModel *);
 //	void updateReplicates(std::vector<Electrical_Component*> &);
 	void report();
-	void updateComponents(const std::vector<Electrical_Component*> &_components);
+	void updateComponents(const std::vector<std::shared_ptr<Electrical_Component>> &_components);
 	void updateConnections(const Pin_Connections &);
 //	void changeMotorWorkingPoint(const double &, const double &, const unsigned &, GRBModel *);
 	doublevec getVals(unsigned &, unsigned &, unsigned &);
 	doublevec getMaxVals(unsigned &, unsigned &, unsigned &);
 	unsigned getComponentsSize() { return static_cast<unsigned>(components.size()); }
-	std::vector<Electrical_Component*>& getComponents() { return components; }
-	std::vector<Electrical_Component*> getComponents() const { return components; }
+//	std::vector<Electrical_Component*>& getComponents() { return components; }
+//	std::vector<Electrical_Component*> getComponents() const { return components; }
 	
 	void syncVars(const GRBModel &);
 	unsigned getMotorNumber();
@@ -73,20 +73,18 @@ private:
 	void updateCompositions(GRBModel *);
 	void restorePrevModelCons(GRBModel *);
 
-	bool newton_raphson(std::vector<Electrical_Component*>, GRBModel *);
-	bool expect_maximize(std::vector<Electrical_Component*>, GRBModel *) { return false; }
-	bool stochastic_optimize(std::vector<Electrical_Component*>, GRBModel *) { return false; }
+	bool newton_raphson(std::vector<std::shared_ptr<Electrical_Component>>, GRBModel *);
+	bool expect_maximize(std::vector<std::shared_ptr<Electrical_Component>>, GRBModel *) { return false; }
+	bool stochastic_optimize(std::vector<std::shared_ptr<Electrical_Component>>, GRBModel *) { return false; }
 //	void getComponentPins(str_strvec_uomap &, const std::string &, const std::string &);
 
 
-	std::vector<Electrical_Component*> components;
-	std::vector<Electrical_Component*> new_components;
-	std::unordered_map<std::string, Electrical_Component*> component_maps;
+	std::vector<std::shared_ptr<Electrical_Component>> components;
+	std::vector<std::shared_ptr<Electrical_Component>> new_components;
+	std::unordered_map<std::string, std::shared_ptr<Electrical_Component>> component_maps;
 	stringvec component_names;
 	Pin_Connections pin_connections;
 	Pin_Connections new_pin_connections;
-//	str_strvec_uomap componentpins;
-//	str_strvec_uomap refer_componentpins;
 	std::vector<GRBConstr> cons; // constraint vector
 	std::vector<GRBConstr> model_cons;
 	std::vector<GRBConstr> lin_cons;
