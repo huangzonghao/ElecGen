@@ -10,7 +10,7 @@ urdf_filename = '';
 
 % IO file locations
 outputfile = fullfile('..', 'output.txt');
-output_urdffile = fullfile('..', 'robots', 'robot.urdf.tmp');
+output_urdffile = fullfile('..', 'data', 'robots', 'robot.urdf.tmp');
 
 % colors
 bckclr = [1 1 1];
@@ -465,7 +465,7 @@ redrawEnv;
             {'*.urdf','URDF (*.urdf)';
             '*.*',  'All Files (*.*)'}, ...
             'Select a robot to load.',...
-            fullfile('..', 'robots'),'MultiSelect', 'off');
+            fullfile('..', 'data', 'robots'),'MultiSelect', 'off');
         if isequal(filename,0)
             disp('No file selected')
         else
@@ -489,7 +489,7 @@ redrawEnv;
             '*.obj', 'OBJ (*.obj)';
             '*.*',  'All Files (*.*)'}, ...
             'Select an environment to load.',...
-            fullfile('..', 'maps'),'MultiSelect', 'off');
+            fullfile('..', 'data', 'maps'),'MultiSelect', 'off');
         
         if isequal(filename,0)
             disp('No file selected')

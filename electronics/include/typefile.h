@@ -6,6 +6,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <filesystem>
+#include "data_dir_path.h"
 
 
 //extern struct CurrentTracker;
@@ -55,19 +56,19 @@ using connection_relation_vec = std::vector<connection_relation>;
 using connection_relation_vec2d = std::vector<connection_relation_vec>;
 
 // file path
-const std::string current_path = std::filesystem::current_path().string(),
-	dc_motor_path = current_path + "\\Electronic_Components\\DC_MOTOR\\",
-	battery_path = current_path + "\\Electronic_Components\\BATTERY\\",
-	h_bridge_path = current_path + "\\Electronic_Components\\H_BRIDGE\\",
-	micro_controller_path = current_path + "\\Electronic_Components\\MICRO_CONTROLLER\\",
-	voltage_regulator_path = current_path + "\\Electronic_Components\\VOLTAGE_REGULATOR\\",
-	encoder_path = current_path + "\\Electronic_Components\\ENCODER\\",
-	bluetooth_path = current_path + "\\Electronic_Components\\BLUETOOTH\\",
-	camera_path = current_path + "\\Electronic_Components\\CAMERA\\",
-	forcesensor_path = current_path + "\\Electronic_Components\\FORCE_SENSOR\\",
-	servo_path = current_path + "\\Electronic_Components\\SERVO\\";
-// design_path = current_path + "\\Designs\\";
-// design_path = current_path + "\\files\\";
+const std::string elec_root(const std::string(DATA_DIRECTORY_PATH) + "/Electronic_Components/");
+
+const std::string
+    dc_motor_path          (elec_root + "DC_MOTOR/"),
+    battery_path           (elec_root + "BATTERY/"),
+    h_bridge_path          (elec_root + "H_BRIDGE/"),
+    micro_controller_path  (elec_root + "MICRO_CONTROLLER/"),
+    voltage_regulator_path (elec_root + "VOLTAGE_REGULATOR/"),
+    encoder_path           (elec_root + "ENCODER/"),
+    bluetooth_path         (elec_root + "BLUETOOTH/"),
+    camera_path            (elec_root + "CAMERA/"),
+    forcesensor_path       (elec_root + "FORCE_SENSOR/"),
+    servo_path             (elec_root + "SERVO/");
 
 // prefix, postfix
 const std::string design_pf = "circuit_specs",
