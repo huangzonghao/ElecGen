@@ -1,3 +1,4 @@
+#include <chrono>
 #include "chrono_irrlicht/ChIrrApp.h"
 #include "chrono/physics/ChBodyEasy.h"
 #include "chrono_vehicle/terrain/RigidTerrain.h"
@@ -8,9 +9,15 @@
 
 using namespace chrono;
 
-SimulationManager::SimulationManager()
-    :system_friction_k(1.9), system_friction_s(2.0), system_type(NSC),
-     task_done(false), timeout(5), time_step(0.005)
+SimulationManager::SimulationManager(double step_size,
+                                     double timeout,
+                                     double system_friction_k,
+                                     double system_friction_s,
+                                     SystemType system_type):
+    step_size(step_size), timeout(timeout),
+    system_friction_k(system_friction_k),
+    system_friction_s(system_friction_s),
+    system_type(NSC)
 {
     payloads.clear();
     motors.clear();
@@ -90,7 +97,13 @@ bool SimulationManager::RunSimulation(bool do_viz){
     ChUrdfDoc urdf_doc(sim_system);
 
     if (!urdf_file.empty()){
-        bool load_ok = urdf_doc.Load_URDF(urdf_file, waypoints[0]);
+        bool load_ok;
+        if (!waypoints.empty()){
+            load_ok = urdf_doc.Load_URDF(urdf_file, waypoints[0]);
+        }
+        else{
+            load_ok = urdf_doc.Load_URDF(urdf_file, ChVector<>(0,0,0));
+        }
 
         if (!load_ok) {
             chrono::GetLog() << "Warning. Desired URDF file could not be opened/parsed \n";
@@ -99,6 +112,17 @@ bool SimulationManager::RunSimulation(bool do_viz){
     }
     else {
         return false;
+    }
+
+    // add waypoint markers
+    auto wp_color = chrono_types::make_shared<ChColorAsset>();
+    wp_color->SetColor(ChColor(0.8f, 0.0f, 0.0f));
+    for(auto waypoint : waypoints){
+        auto wp_marker = chrono_types::make_shared<ChBodyEasyBox>(0.5, 0.5, 0.2, 1.0, true, false);
+        wp_marker->SetPos(waypoint);
+        wp_marker->SetBodyFixed(true);
+        wp_marker->AddAsset(wp_color);
+        sim_system->AddBody(wp_marker);
     }
 
     // Add motors and extra weights to system
@@ -119,41 +143,54 @@ bool SimulationManager::RunSimulation(bool do_viz){
         std::cerr << "Need to specify controller type in robot name" << std::endl;
     }
 
-    double timer = 0;
+    const std::shared_ptr<ChBody>& camera_body = urdf_doc.GetCameraBody();
+
+    std::chrono::steady_clock::time_point tik;
+    std::chrono::steady_clock::time_point tok;
     if(do_viz){
         using namespace chrono::irrlicht;
         using namespace irr::core;
-        ChIrrApp vis_app(sim_system.get(), L"Auto-Electronics Simulation", dimension2d<irr::u32>(640, 480), false);
-        ChIrrWizard::add_typical_Logo(vis_app.GetDevice());
-        ChIrrWizard::add_typical_Sky(vis_app.GetDevice());
-        ChIrrWizard::add_typical_Lights(vis_app.GetDevice(), vector3df(0., 0., 50.), vector3df(0., 0., -50));
-        ChIrrWizard::add_typical_Camera(vis_app.GetDevice(), vector3df(0, -5, 4), vector3df(0, 0, 0));
+        ChIrrApp vis_app(sim_system.get(),
+                         L"Auto-Electronics Simulation",
+                         dimension2d<irr::u32>(640, 480), false);
+
+        vis_app.AddTypicalLogo();
+        vis_app.AddTypicalSky();
+        vis_app.AddTypicalLights(vector3df(0., 0., 50.), vector3df(0., 0., -50));
+        vis_app.AddTypicalCamera(vector3df(0, -10, 10), vector3df(0, 0, 0));
 
         vis_app.AssetBindAll();
         vis_app.AssetUpdateAll();
 
-        vis_app.SetTimestep(time_step);
-        while (timer < timeout && !task_done && vis_app.GetDevice()->run()) {
+        vis_app.SetTimestep(step_size);
+
+        tik = std::chrono::steady_clock::now();
+        while (sim_system->GetChTime() < timeout && !task_done && vis_app.GetDevice()->run()) {
             vis_app.BeginScene(true, true, irr::video::SColor(255, 140, 161, 192));
+            // vis_app.GetSceneManager()->getActiveCamera()->setTarget(vector3dfCH(camera_body->GetPos()));
             vis_app.DrawAll();
             vis_app.DoStep();
             vis_app.EndScene();
 
             task_done = controller->Update();
-            process_data();
-            timer += time_step;
         }
+        tok = std::chrono::steady_clock::now();
 
     }
     else{
-        while(timer < timeout && !task_done) {
-            sim_system->DoStepDynamics(time_step);
+        std::cout << "Simulating without visualization" << std::endl;
+
+        tik = std::chrono::steady_clock::now();
+        while(sim_system->GetChTime() < timeout && !task_done) {
+            sim_system->DoStepDynamics(step_size);
 
             task_done = controller->Update();
-            process_data();
-            timer += time_step;
         }
+        tok = std::chrono::steady_clock::now();
     }
+
+    std::cout << "Simulation time: " << std::chrono::duration_cast<std::chrono::milliseconds>(tok - tik).count() << "[ms]" << std::endl;
+    std::cout << "Step count: " << sim_system->GetStepcount() << std::endl;
 
     return true;
 }

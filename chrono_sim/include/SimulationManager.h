@@ -35,10 +35,15 @@ class  SimulationManager {
 
     bool task_done = false;
 
-    double time_step;
+    double step_size;
     double timeout;
 
-    SimulationManager();
+    SimulationManager(double step_size=0.005,
+                      double timeout=50,
+                      double system_friction_k=1.9,
+                      double system_friction_s=2.0,
+                      SystemType system_type=NSC);
+
     ~SimulationManager(){
         payloads.clear();
         motors.clear();
