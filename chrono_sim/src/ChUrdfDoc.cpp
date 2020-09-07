@@ -337,7 +337,7 @@ bool ChUrdfDoc::Load_URDF(const std::string& filename, const std::shared_ptr<ChB
     return true;
 }
 
-const ChLinkBodies& ChUrdfDoc::GetLinkBodies(const std::string& name) {
+const ChLinkBodies& ChUrdfDoc::GetLinkBodies(const std::string& name) const {
     if (ch_link_bodies_.find(name) == ch_link_bodies_.end()){
         std::cerr << "Error: robot " << urdf_robot->getName() << " doesn't contain link " << name << std::endl;
         exit(EXIT_FAILURE);

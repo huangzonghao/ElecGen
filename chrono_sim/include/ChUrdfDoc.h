@@ -30,13 +30,13 @@ class ChUrdfDoc {
 
     void SetSystem(std::shared_ptr<ChSystem>& sys){ robot_system = sys; }
 
-    std::shared_ptr<chrono::ChSystem> GetSystem(){ return robot_system; }
+    std::shared_ptr<chrono::ChSystem> GetSystem() const { return robot_system; }
 
     void SetUrdfFile(std::string& filepath){ urdf_file_ = filepath; }
 
-    const std::string& GetUrdfFile(){ return urdf_file_; }
+    const std::string& GetUrdfFile() const { return urdf_file_; }
 
-    urdf::ModelInterfaceSharedPtr GetUrdf(){ return urdf_robot; }
+    urdf::ModelInterfaceSharedPtr GetUrdf() const { return urdf_robot; }
 
     bool Load_URDF(const std::string& filename, double x=0, double y=0, double z=0, double rx=0, double ry=0, double rz=0);
     bool Load_URDF(const std::string& filename, const ChVector<>& init_pos);
@@ -46,11 +46,12 @@ class ChUrdfDoc {
     std::shared_ptr<chrono::ChSystem> robot_system;
     urdf::ModelInterfaceSharedPtr urdf_robot;
 
-    const std::string& GetRobotName(){ return urdf_robot->getName(); }
+    const std::string& GetRobotName() const { return urdf_robot->getName(); }
 
-    const ChLinkBodies& GetLinkBodies(const std::string& name);
+    const ChLinkBodies& GetLinkBodies(const std::string& name) const;
 
-    std::shared_ptr<ChBody> GetRootBody(){ return ch_root_body_; }
+    std::shared_ptr<ChBody> GetRootBody() const { return ch_root_body_; }
+    std::shared_ptr<ChBody> GetCameraBody() const { return GetRootBody(); }
 
   private:
     struct ChMatPair{
