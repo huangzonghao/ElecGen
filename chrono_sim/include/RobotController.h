@@ -3,30 +3,35 @@
 
 #include "chrono/core/ChMathematics.h"
 #include "chrono/physics/ChBody.h"
-#include "chrono/physics/ChController.h"
 
 #include "SimMotor.h"
-#include "SimulationManager.h"
-
-class SimulationManager; // forward declaration
 
 class RobotController {
   public:
     enum ControllerType {MANIPULATOR, WHEEL, LEGGED} type;
-    RobotController(SimulationManager *sm):sim_magr(sm){}
-    RobotController(SimulationManager *sm, ControllerType type):sim_magr(sm), type(type){}
+
+    RobotController(std::vector<std::shared_ptr<SimMotor> > *motors,
+                    std::vector<chrono::ChVector<> > *waypoints,
+                    ControllerType type);
     virtual ~RobotController() = 0;
 
-    SimulationManager *sim_magr;
-
     virtual bool Update() = 0;
+
+  protected:
+    int waypoint_idx = 0;
+    std::vector<std::shared_ptr<SimMotor> > *motors;
+    std::vector<chrono::ChVector<> > *waypoints;
+
 };
 
 class ManipulatorController : public RobotController {
   public:
     double speed = 5;
 
-    ManipulatorController(SimulationManager *sm): RobotController(sm, MANIPULATOR){}
+    ManipulatorController(std::vector<std::shared_ptr<SimMotor> > *motors,
+                          std::vector<chrono::ChVector<> > *waypoints):
+        RobotController(motors, waypoints, MANIPULATOR){}
+
     ~ManipulatorController(){};
 
     bool Update() override;
@@ -35,19 +40,14 @@ class ManipulatorController : public RobotController {
 class WheelController : public RobotController {
   public:
 
-    WheelController(SimulationManager *sm,
-                    const std::shared_ptr<chrono::ChBody>& ch_body);
+    WheelController(std::vector<std::shared_ptr<SimMotor> > *motors,
+                    std::vector<chrono::ChVector<> > *waypoints,
+                    const std::shared_ptr<chrono::ChBody>& ch_body):
+        RobotController(motors, waypoints, WHEEL), robot_body(ch_body.get()){}
+
     ~WheelController(){};
+
     chrono::ChBody *robot_body;
-
-    chrono::ChControllerPID pid;
-
-    double speed[2];
-    double init_speed = 5;
-    double max_speed = 15;
-    double speed_diff = 0;
-
-    int waypoint_idx = 0;
 
     bool Update() override;
 
@@ -55,22 +55,21 @@ class WheelController : public RobotController {
 
 class LeggedController : public RobotController {
   public:
-    LeggedController(SimulationManager *sm,
-                     const std::shared_ptr<chrono::ChBody>& ch_body);
+    LeggedController(std::vector<std::shared_ptr<SimMotor> > *motors,
+                     std::vector<chrono::ChVector<> > *waypoints,
+                     const std::shared_ptr<chrono::ChBody>& ch_body):
+        RobotController(motors, waypoints, WHEEL), robot_body(ch_body.get()){}
+
     ~LeggedController(){};
 
     chrono::ChBody *robot_body;
 
-    chrono::ChControllerPID pid;
-
-    double speed[4];
-    double init_speed = 5;
-    double max_speed = 15;
-    double speed_diff = 0;
-
-    int waypoint_idx = 0;
-
     bool Update() override;
+
+  private:
+    enum GAITS {FORWARD, BACKWARD, LEFT1, RIGHT1, LEFT2, RIGHT2} gait;
+    void exe_gait();
+    bool command_hold = false;
 };
 
 

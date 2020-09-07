@@ -13,40 +13,24 @@ SimulationManager::SimulationManager()
      task_done(false), timeout(5), time_step(0.005)
 {
     payloads.clear();
-    servos.clear();
     motors.clear();
     waypoints.clear();
     SetChronoDataPath(CHRONO_DATA_DIR);
 }
+
 void SimulationManager::AddPayload(double mass, double size_x, double size_y, double size_z,
                                    double coord_x, double coord_y, double coord_z){
     payloads.push_back(std::make_shared<SimPayload>(mass, size_x, size_y, size_z,
                                                     coord_x, coord_y, coord_z));
 
 }
-void SimulationManager::AddServo(const std::string& link_name, double mass,
-                                 double size_x, double size_y, double size_z,
-                                 double upper_limit, double lower_limit,
-                                 double coord_x, double coord_y, double coord_z){
-    servos.push_back(std::make_shared<SimServo>(link_name, mass,
-                                                size_x, size_y, size_z,
-                                                coord_x, coord_y, coord_z,
-                                                upper_limit, lower_limit));
 
-}
 void SimulationManager::AddMotor(const std::string& link_name, double mass,
-                                 double size_x, double size_y, double size_z, SimMotor::MotorType type,
+                                 double size_x, double size_y, double size_z,
                                  double coord_x, double coord_y, double coord_z){
     motors.push_back(std::make_shared<SimMotor>(link_name, mass,
                                                 size_x, size_y, size_z,
-                                                coord_x, coord_y, coord_z, type));
-}
-
-// there is a virtual void CustomEndOfStep() in ChSystem, but need to make a derived
-// ChSystem class to implement it
-void SimulationManager::process_data(){
-    for (auto servo : servos) servo->UpdateMaxTorque();
-    for (auto motor : motors) motor->UpdateMaxTorque();
+                                                coord_x, coord_y, coord_z));
 }
 
 bool SimulationManager::RunSimulation(bool do_viz){
@@ -119,18 +103,17 @@ bool SimulationManager::RunSimulation(bool do_viz){
 
     // Add motors and extra weights to system
     for (auto payload : payloads) payload->AddtoSystem(sim_system);
-    for (auto servo : servos) servo->AddtoSystem(sim_system, urdf_doc);
     for (auto motor : motors) motor->AddtoSystem(sim_system, urdf_doc);
 
     // init controller
     if (urdf_doc.GetRobotName().find("manipulator") != std::string::npos) {
-        controller = std::make_shared<ManipulatorController>(this);
+        controller = std::make_shared<ManipulatorController>(&motors, &waypoints);
     }
     else if (urdf_doc.GetRobotName().find("leg") != std::string::npos) {
-        controller = std::make_shared<LeggedController>(this, urdf_doc.GetRootBody());
+        controller = std::make_shared<LeggedController>(&motors, &waypoints, urdf_doc.GetRootBody());
     }
     else if (urdf_doc.GetRobotName().find("wheel") != std::string::npos) {
-        controller = std::make_shared<WheelController>(this, urdf_doc.GetRootBody());
+        controller = std::make_shared<WheelController>(&motors, &waypoints, urdf_doc.GetRootBody());
     }
     else {
         std::cerr << "Need to specify controller type in robot name" << std::endl;

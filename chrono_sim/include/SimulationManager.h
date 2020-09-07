@@ -18,7 +18,6 @@ class  SimulationManager {
     double system_friction_s;
 
     std::vector<std::shared_ptr<SimPayload> > payloads;
-    std::vector<std::shared_ptr<SimServo> > servos;
     std::vector<std::shared_ptr<SimMotor> > motors;
 
     std::vector<chrono::ChVector<> > waypoints;
@@ -34,7 +33,7 @@ class  SimulationManager {
     std::shared_ptr<chrono::ChSystem> sim_system;
     std::shared_ptr<RobotController> controller;
 
-    bool task_done;
+    bool task_done = false;
 
     double time_step;
     double timeout;
@@ -42,7 +41,6 @@ class  SimulationManager {
     SimulationManager();
     ~SimulationManager(){
         payloads.clear();
-        servos.clear();
         motors.clear();
         waypoints.clear();
     }
@@ -55,12 +53,8 @@ class  SimulationManager {
 
     void AddPayload(double mass, double size_x, double size_y, double size_z,
                     double coord_x=0, double coord_y=0, double coord_z=0);
-    void AddServo(const std::string& link_name, double mass,
-                  double size_x, double size_y, double size_z,
-                  double upper_limit, double lower_limit,
-                  double coord_x=0, double coord_y=0, double coord_z=0);
     void AddMotor(const std::string& link_name, double mass,
-                  double size_x, double size_y, double size_z, SimMotor::MotorType type=SimMotor::SPEED,
+                  double size_x, double size_y, double size_z,
                   double coord_x=0, double coord_y=0, double coord_z=0);
     void AddWaypoint(double x, double y, double z){ waypoints.push_back(chrono::ChVector<>(x,y,z)); };
     void SetStartJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {start_joint_pos = jointpos;};
@@ -68,8 +62,6 @@ class  SimulationManager {
 
     bool RunSimulation(bool do_viz=true);
 
-  private:
-    void process_data();
 };
 
 #endif /* end of SIMULATION_MANAGER_H */
