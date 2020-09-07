@@ -4,6 +4,7 @@
 
 #include "ChUrdfDoc.h"
 #include "SimulationManager.h"
+#include "data_dir_path.h"
 
 using namespace chrono;
 
@@ -15,6 +16,7 @@ SimulationManager::SimulationManager()
     servos.clear();
     motors.clear();
     waypoints.clear();
+    SetChronoDataPath(CHRONO_DATA_DIR);
 }
 void SimulationManager::AddPayload(double mass, double size_x, double size_y, double size_z,
                                    double coord_x, double coord_y, double coord_z){
