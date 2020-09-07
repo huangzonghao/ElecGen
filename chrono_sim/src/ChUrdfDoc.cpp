@@ -32,8 +32,7 @@ void ChUrdfDoc::convert_materials(){
         ChMatPair tmp_pair;
         if (!color_empty(u_mat_iter->second->color)){
             urdf::Color *u_color = &u_mat_iter->second->color;
-            tmp_pair.color = chrono_types::make_shared<ChColorAsset>();
-            tmp_pair.color->SetColor(ChColor(u_color->r, u_color->g, u_color->b, u_color->a));
+            tmp_pair.color = chrono_types::make_shared<ChColor>(u_color->r, u_color->g, u_color->b, u_color->a);
         }
         if(!u_mat_iter->second->texture_filename.empty()){
             tmp_pair.texture = chrono_types::make_shared<ChTexture>();
@@ -77,73 +76,82 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     }
 
 
-    // TODO: Assuming each body contains only one shape
-
     // Visual
     if (u_link->visual){
-        std::shared_ptr<ChVisualization> tmp_viasset;
-        switch (u_link->visual->geometry->type){
-            case urdf::Geometry::BOX:
-            {
-                tmp_viasset = chrono_types::make_shared<ChBoxShape>();
-                urdf::BoxSharedPtr tmp_urdf_box_ptr = std::dynamic_pointer_cast<urdf::Box>(u_link->visual->geometry);
-                std::dynamic_pointer_cast<ChBoxShape>(tmp_viasset)->GetBoxGeometry().SetLengths(ChVector<>(tmp_urdf_box_ptr->dim.x,
-                                                                                                           tmp_urdf_box_ptr->dim.y,
-                                                                                                           tmp_urdf_box_ptr->dim.z));
-                break;
+        for (auto u_visual : u_link->visual_array){
+            std::shared_ptr<ChVisualization> tmp_viasset;
+            switch (u_visual->geometry->type){
+                case urdf::Geometry::BOX:
+                {
+                    tmp_viasset = chrono_types::make_shared<ChBoxShape>();
+                    urdf::BoxSharedPtr tmp_urdf_box_ptr = std::dynamic_pointer_cast<urdf::Box>(u_visual->geometry);
+                    std::dynamic_pointer_cast<ChBoxShape>(tmp_viasset)->GetBoxGeometry().SetLengths(ChVector<>(tmp_urdf_box_ptr->dim.x,
+                                                                                                               tmp_urdf_box_ptr->dim.y,
+                                                                                                               tmp_urdf_box_ptr->dim.z));
+                    break;
+                }
+                case urdf::Geometry::SPHERE:
+                {
+                    tmp_viasset = chrono_types::make_shared<ChSphereShape>();
+                    std::dynamic_pointer_cast<ChSphereShape>(tmp_viasset)->GetSphereGeometry().rad = std::dynamic_pointer_cast<urdf::Sphere>(u_visual->geometry)->radius;
+                    break;
+                }
+                case urdf::Geometry::CYLINDER:
+                {
+                    tmp_viasset = chrono_types::make_shared<ChCylinderShape>();
+                    urdf::CylinderSharedPtr tmp_urdf_cylinder_ptr = std::dynamic_pointer_cast<urdf::Cylinder>(u_visual->geometry);
+                    geometry::ChCylinder& tmp_geometry = std::dynamic_pointer_cast<ChCylinderShape>(tmp_viasset)->GetCylinderGeometry();
+                    // urdf cylinder is along z axis (while chrono cylinder defaults to y axis - doesn't matter here)
+                    tmp_geometry.p1 = ChVector<>(0, 0, -tmp_urdf_cylinder_ptr->length / 2);
+                    tmp_geometry.p2 = ChVector<>(0, 0, tmp_urdf_cylinder_ptr->length / 2);
+                    tmp_geometry.rad = tmp_urdf_cylinder_ptr->radius;
+                    break;
+                }
+                case urdf::Geometry::MESH:
+                {
+                    urdf::MeshSharedPtr tmp_urdf_mesh_ptr = std::dynamic_pointer_cast<urdf::Mesh>(u_visual->geometry);
+                    auto trimesh = chrono_types::make_shared<geometry::ChTriangleMeshConnected>();
+                    trimesh->LoadWavefrontMesh(urdf_abs_path(tmp_urdf_mesh_ptr->filename));
+                    trimesh->Transform(VNULL, ChMatrix33<>(ChVector<>(tmp_urdf_mesh_ptr->scale.x,
+                                                                      tmp_urdf_mesh_ptr->scale.y,
+                                                                      tmp_urdf_mesh_ptr->scale.z)));
+                    auto trimesh_shape = chrono_types::make_shared<ChTriangleMeshShape>();
+                    trimesh_shape->SetMesh(trimesh);
+                    trimesh_shape->SetName(ch_body->GetNameString() + "_vis_mesh");
+                    // for some reason this SetScale method doesn't work
+                    // trimesh_shape->SetScale(ChVector<>(tmp_urdf_mesh_ptr->scale.x,
+                                                       // tmp_urdf_mesh_ptr->scale.y,
+                                                       // tmp_urdf_mesh_ptr->scale.z));
+                    tmp_viasset = trimesh_shape;
+                    break;
+                }
             }
-            case urdf::Geometry::SPHERE:
-            {
-                tmp_viasset = chrono_types::make_shared<ChSphereShape>();
-                std::dynamic_pointer_cast<ChSphereShape>(tmp_viasset)->GetSphereGeometry().rad = std::dynamic_pointer_cast<urdf::Sphere>(u_link->visual->geometry)->radius;
-                break;
+            tmp_viasset->Pos = ChVector<>(u_visual->origin.position.x,
+                                          u_visual->origin.position.y,
+                                          u_visual->origin.position.z);
+            tmp_viasset->Rot = ChMatrix33<>(ChQuaternion<>(u_visual->origin.rotation.w,
+                                                           u_visual->origin.rotation.x,
+                                                           u_visual->origin.rotation.y,
+                                                           u_visual->origin.rotation.z));
+
+            if (u_visual->material){
+                const ChMatPair& ch_vis_mat = GetMaterial(u_visual->material_name);
+                if (ch_vis_mat.color) {
+                    // currently the SetColor method doesn't work, waiting for response from chrono team
+                    // the AddAsset method would change color for all vis shapes, so make sure only specify
+                    // one color in urdf file
+                    // tmp_viasset->SetColor(*(ch_vis_mat.color));
+                    ch_body->AddAsset(chrono_types::make_shared<ChColorAsset>(*(ch_vis_mat.color)));
+                }
+                // undefined behavior if multiple textures have been defined for a single link
+                // avoid that!
+                if (ch_vis_mat.texture) ch_body->AddAsset(ch_vis_mat.texture);
             }
-            case urdf::Geometry::CYLINDER:
-            {
-                tmp_viasset = chrono_types::make_shared<ChCylinderShape>();
-                urdf::CylinderSharedPtr tmp_urdf_cylinder_ptr = std::dynamic_pointer_cast<urdf::Cylinder>(u_link->visual->geometry);
-                geometry::ChCylinder& tmp_geometry = std::dynamic_pointer_cast<ChCylinderShape>(tmp_viasset)->GetCylinderGeometry();
-                // urdf cylinder is along z axis (while chrono cylinder defaults to y axis - doesn't matter here)
-                tmp_geometry.p1 = ChVector<>(0, 0, -tmp_urdf_cylinder_ptr->length / 2);
-                tmp_geometry.p2 = ChVector<>(0, 0, tmp_urdf_cylinder_ptr->length / 2);
-                tmp_geometry.rad = tmp_urdf_cylinder_ptr->radius;
-                break;
-            }
-            case urdf::Geometry::MESH:
-            {
-                urdf::MeshSharedPtr tmp_urdf_mesh_ptr = std::dynamic_pointer_cast<urdf::Mesh>(u_link->visual->geometry);
-                auto trimesh = chrono_types::make_shared<geometry::ChTriangleMeshConnected>();
-                trimesh->LoadWavefrontMesh(urdf_abs_path(tmp_urdf_mesh_ptr->filename));
-                trimesh->Transform(VNULL, ChMatrix33<>(ChVector<>(tmp_urdf_mesh_ptr->scale.x,
-                                                                  tmp_urdf_mesh_ptr->scale.y,
-                                                                  tmp_urdf_mesh_ptr->scale.z)));
-                auto trimesh_shape = chrono_types::make_shared<ChTriangleMeshShape>();
-                trimesh_shape->SetMesh(trimesh);
-                trimesh_shape->SetName(ch_body->GetNameString() + "_vis_mesh");
-                // for some reason this SetScale method doesn't work
-                // trimesh_shape->SetScale(ChVector<>(tmp_urdf_mesh_ptr->scale.x,
-                                                // tmp_urdf_mesh_ptr->scale.y,
-                                                // tmp_urdf_mesh_ptr->scale.z));
-                tmp_viasset = trimesh_shape;
-                break;
-            }
+
+            ch_body->AddAsset(tmp_viasset);
         }
-        tmp_viasset->Pos = ChVector<>(u_link->visual->origin.position.x,
-                                      u_link->visual->origin.position.y,
-                                      u_link->visual->origin.position.z);
-        tmp_viasset->Rot = ChMatrix33<>(ChQuaternion<>(u_link->visual->origin.rotation.w,
-                                                       u_link->visual->origin.rotation.x,
-                                                       u_link->visual->origin.rotation.y,
-                                                       u_link->visual->origin.rotation.z));
-
-        ch_body->AddAsset(tmp_viasset);
     }
 
-    if (u_link->visual->material){
-        const ChMatPair& ch_vis_mat = GetMaterial(u_link->visual->material_name);
-        if (ch_vis_mat.color) ch_body->AddAsset(ch_vis_mat.color);
-        if (ch_vis_mat.texture) ch_body->AddAsset(ch_vis_mat.texture);
-    }
 
     // Collision
     // The collsion geometry type could be different from visual, that's why we don't merge them together
@@ -151,55 +159,57 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     if (u_link->collision){
         auto tmp_mat = chrono_types::make_shared<ChMaterialSurfaceNSC>();
         ch_body->GetCollisionModel()->ClearModel();
-        switch (u_link->collision->geometry->type){
-            case urdf::Geometry::BOX:
-            {
-                urdf::BoxSharedPtr tmp_urdf_box_ptr = std::dynamic_pointer_cast<urdf::Box>(u_link->collision->geometry);
-                ch_body->GetCollisionModel()->AddBox(tmp_mat,
-                                                     tmp_urdf_box_ptr->dim.x / 2,
-                                                     tmp_urdf_box_ptr->dim.y / 2,
-                                                     tmp_urdf_box_ptr->dim.z / 2,
-                                                     ChVector<>(u_link->collision->origin.position.x,
-                                                                u_link->collision->origin.position.y,
-                                                                u_link->collision->origin.position.z),
-                                                     ChMatrix33<>(ChQuaternion<>(u_link->collision->origin.rotation.w,
-                                                                                 u_link->collision->origin.rotation.x,
-                                                                                 u_link->collision->origin.rotation.y,
-                                                                                 u_link->collision->origin.rotation.z)));
-                break;
-            }
-            case urdf::Geometry::SPHERE:
-            {
-                ch_body->GetCollisionModel()->AddSphere(tmp_mat,
-                                                        std::dynamic_pointer_cast<urdf::Sphere>(u_link->collision->geometry)->radius,
-                                                        ChVector<>(u_link->collision->origin.position.x,
-                                                                   u_link->collision->origin.position.y,
-                                                                   u_link->collision->origin.position.z));
-                break;
-            }
-            case urdf::Geometry::CYLINDER:
-            {
-                urdf::CylinderSharedPtr tmp_urdf_cylinder_ptr = std::dynamic_pointer_cast<urdf::Cylinder>(u_link->collision->geometry);
-                // Chrono defaults cylinders to y axis, so we need to first rotate it to z axis (urdf default) then apply the rotation stored in urdf
-                ch_body->GetCollisionModel()->AddCylinder(tmp_mat,
-                                                          tmp_urdf_cylinder_ptr->radius,
-                                                          tmp_urdf_cylinder_ptr->radius,
-                                                          tmp_urdf_cylinder_ptr->length / 2,
-                                                          ChVector<>(u_link->collision->origin.position.x,
-                                                                     u_link->collision->origin.position.y,
-                                                                     u_link->collision->origin.position.z),
-                                                          ChMatrix33<>(Q_ROTATE_Y_TO_Z >> ChQuaternion<>(
-                                                                          u_link->collision->origin.rotation.w,
-                                                                          u_link->collision->origin.rotation.x,
-                                                                          u_link->collision->origin.rotation.y,
-                                                                          u_link->collision->origin.rotation.z)));
-                break;
-            }
-            case urdf::Geometry::MESH:
-            {
-                // TODO: Let go for now
-                std::cout << "Chrono_urdf: MESH is not supported in urdf-link yet" << std::endl;
-                break;
+        for (auto u_collision : u_link->collision_array){
+            switch (u_collision->geometry->type){
+                case urdf::Geometry::BOX:
+                {
+                    urdf::BoxSharedPtr tmp_urdf_box_ptr = std::dynamic_pointer_cast<urdf::Box>(u_collision->geometry);
+                    ch_body->GetCollisionModel()->AddBox(tmp_mat,
+                                                         tmp_urdf_box_ptr->dim.x / 2,
+                                                         tmp_urdf_box_ptr->dim.y / 2,
+                                                         tmp_urdf_box_ptr->dim.z / 2,
+                                                         ChVector<>(u_collision->origin.position.x,
+                                                                    u_collision->origin.position.y,
+                                                                    u_collision->origin.position.z),
+                                                         ChMatrix33<>(ChQuaternion<>(u_collision->origin.rotation.w,
+                                                                                     u_collision->origin.rotation.x,
+                                                                                     u_collision->origin.rotation.y,
+                                                                                     u_collision->origin.rotation.z)));
+                    break;
+                }
+                case urdf::Geometry::SPHERE:
+                {
+                    ch_body->GetCollisionModel()->AddSphere(tmp_mat,
+                                                            std::dynamic_pointer_cast<urdf::Sphere>(u_collision->geometry)->radius,
+                                                            ChVector<>(u_collision->origin.position.x,
+                                                                       u_collision->origin.position.y,
+                                                                       u_collision->origin.position.z));
+                    break;
+                }
+                case urdf::Geometry::CYLINDER:
+                {
+                    urdf::CylinderSharedPtr tmp_urdf_cylinder_ptr = std::dynamic_pointer_cast<urdf::Cylinder>(u_collision->geometry);
+                    // Chrono defaults cylinders to y axis, so we need to first rotate it to z axis (urdf default) then apply the rotation stored in urdf
+                    ch_body->GetCollisionModel()->AddCylinder(tmp_mat,
+                                                              tmp_urdf_cylinder_ptr->radius,
+                                                              tmp_urdf_cylinder_ptr->radius,
+                                                              tmp_urdf_cylinder_ptr->length / 2,
+                                                              ChVector<>(u_collision->origin.position.x,
+                                                                         u_collision->origin.position.y,
+                                                                         u_collision->origin.position.z),
+                                                              ChMatrix33<>(Q_ROTATE_Y_TO_Z >>
+                                                                           ChQuaternion<>(u_collision->origin.rotation.w,
+                                                                                          u_collision->origin.rotation.x,
+                                                                                          u_collision->origin.rotation.y,
+                                                                                          u_collision->origin.rotation.z)));
+                    break;
+                }
+                case urdf::Geometry::MESH:
+                {
+                    // TODO: Let go for now
+                    std::cout << "Chrono_urdf: MESH is not supported in urdf-link yet" << std::endl;
+                    break;
+                }
             }
         }
         ch_body->GetCollisionModel()->BuildModel();
@@ -245,7 +255,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                                                         Q_from_Vect_to_Vect(VECT_Z,
                                                                             ChVector<>(u_parent_joint->axis.x,
                                                                                        u_parent_joint->axis.y,
-                                                                                       u_parent_joint->axis.z)) >> ch_body->GetRot()));
+                                                                                       u_parent_joint->axis.z)).GetNormalized() >> ch_body->GetRot()));
                 break;
             case urdf::Joint::FLOATING:
                 // TODO: Let go for now

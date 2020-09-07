@@ -54,7 +54,7 @@ class ChUrdfDoc {
 
   private:
     struct ChMatPair{
-        std::shared_ptr<ChColorAsset> color;
+        std::shared_ptr<ChColor> color;
         std::shared_ptr<ChTexture> texture;
     };
 
