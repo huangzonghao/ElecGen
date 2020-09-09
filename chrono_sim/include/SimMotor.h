@@ -31,7 +31,6 @@ class SimMotorController {
     chrono::ChLinkMotorRotationTorque *ch_motor;
 
     SimMotorController(const std::shared_ptr<chrono::ChLinkMotorRotationTorque>& target_motor);
-    // SimMotorController(const std::shared_ptr<chrono::ChLinkMotorRotationTorque>& target_motor, Mode mode);
     ~SimMotorController(){};
 
     void SetVel(double new_vel);
@@ -49,13 +48,16 @@ class SimPayload {
   public:
     std::string body_name;
     // with respect  to the parent body frame
-    chrono::ChCoordsys<> coord;
+    chrono::ChVector<> pos;
+    chrono::ChMatrix33<> inertia;
     double size[3];
     double mass;
+    bool visible;
     bool check_collision;
     SimPayload();
-    SimPayload(double mass, double size_x, double size_y, double size_z,
-               double coord_x, double coord_y, double coord_z);
+    SimPayload(const std::string& body_name, double mass,
+               double size_x, double size_y, double size_z,
+               double pos_x, double pos_y, double pos_z);
     ~SimPayload(){};
     virtual void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys);
     void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
@@ -70,9 +72,9 @@ class SimMotor : public SimPayload {
 
     std::shared_ptr<SimMotorController> motor_controller;
 
-    SimMotor(const std::string& link_name, double mass,
-             double size_x, double size_y, double size_z,
-             double coord_x, double coord_y, double coord_z);
+    SimMotor(const std::string& body_name, const std::string& link_name,
+             double mass, double size_x, double size_y, double size_z,
+             double pos_x, double pos_y, double pos_z);
     ~SimMotor(){};
 
     void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys, const chrono::ChUrdfDoc& urdf_doc);

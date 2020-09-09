@@ -18,12 +18,12 @@ int main(){
     sm.SetFrictionS(s_friction);
 
     // this part will be done by UI
-    sm.AddMotor("chassis_wheel_rl", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis_wheel_rr", 1,0.1,0.1,0.1);
-    // sm.AddMotor("base_link_link1", 1,0.1,0.1,0.1);
-    // sm.AddMotor("base_link_link2", 1,0.1,0.1,0.1);
-    // sm.AddMotor("base_link_link3", 1,0.1,0.1,0.1);
-    // sm.AddMotor("base_link_link4", 1,0.1,0.1,0.1);
+    // sm.AddMotor("chassis_wheel_rl", 1,0.1,0.1,0.1);
+    // sm.AddMotor("chassis_wheel_rr", 1,0.1,0.1,0.1);
+    sm.AddMotor("base_link", "base_link_link1", 1,0.1,0.1,0.1);
+    sm.AddMotor("base_link", "base_link_link2", 1,0.1,0.1,0.1);
+    sm.AddMotor("base_link", "base_link_link3", 1,0.1,0.1,0.1);
+    sm.AddMotor("base_link", "base_link_link4", 1,0.1,0.1,0.1);
     sm.AddWaypoint(0, 0, 1);
     sm.AddWaypoint(5, 0, 1);
     sm.AddWaypoint(8, 0, 1);

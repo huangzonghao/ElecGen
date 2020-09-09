@@ -48,7 +48,13 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     // first make the chbody for yourself
     urdf::JointSharedPtr u_parent_joint = u_link->parent_joint;
 
-    auto ch_body = chrono_types::make_shared<ChBody>();
+    std::shared_ptr<ChBody> ch_body;
+    if (auxrefs && auxrefs->find(u_link->name) != auxrefs->end()){
+        ch_body = chrono_types::make_shared<ChBodyAuxRef>();
+    }
+    else {
+        ch_body = chrono_types::make_shared<ChBody>();
+    }
 
     ch_body->SetIdentifier(link_idx_++);
     ch_body->SetNameString(u_link->name);
@@ -351,6 +357,10 @@ const ChLinkBodies& ChUrdfDoc::GetLinkBodies(const std::string& name) const {
         exit(EXIT_FAILURE);
     }
     return ch_link_bodies_.find(name)->second;
+}
+
+void ChUrdfDoc::SetAuxRef(std::unordered_set<std::string>& new_auxrefs){
+    auxrefs = &new_auxrefs;
 }
 
 }  // END_OF_NAMESPACE____

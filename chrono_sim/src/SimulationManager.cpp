@@ -25,19 +25,22 @@ SimulationManager::SimulationManager(double step_size,
     SetChronoDataPath(CHRONO_DATA_DIR);
 }
 
-void SimulationManager::AddPayload(double mass, double size_x, double size_y, double size_z,
-                                   double coord_x, double coord_y, double coord_z){
-    payloads.push_back(std::make_shared<SimPayload>(mass, size_x, size_y, size_z,
-                                                    coord_x, coord_y, coord_z));
-
+void SimulationManager::AddPayload(const std::string& body_name, double mass,
+                                   double size_x, double size_y, double size_z,
+                                   double pos_x, double pos_y, double pos_z){
+    payloads.push_back(std::make_shared<SimPayload>(body_name, mass,
+                                                    size_x, size_y, size_z,
+                                                    pos_x, pos_y, pos_z));
+    auxrefs.insert(body_name);
 }
 
-void SimulationManager::AddMotor(const std::string& link_name, double mass,
-                                 double size_x, double size_y, double size_z,
-                                 double coord_x, double coord_y, double coord_z){
-    motors.push_back(std::make_shared<SimMotor>(link_name, mass,
+void SimulationManager::AddMotor(const std::string& body_name, const std::string& link_name,
+                                 double mass, double size_x, double size_y, double size_z,
+                                 double pos_x, double pos_y, double pos_z){
+    motors.push_back(std::make_shared<SimMotor>(body_name, link_name, mass,
                                                 size_x, size_y, size_z,
-                                                coord_x, coord_y, coord_z));
+                                                pos_x, pos_y, pos_z));
+    auxrefs.insert(body_name);
 }
 
 bool SimulationManager::RunSimulation(bool do_viz){
@@ -95,6 +98,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
 
     // Load URDF file and add to the system
     ChUrdfDoc urdf_doc(sim_system);
+    urdf_doc.SetAuxRef(auxrefs);
 
     if (!urdf_file.empty()){
         bool load_ok;

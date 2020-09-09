@@ -38,6 +38,8 @@ class ChUrdfDoc {
 
     urdf::ModelInterfaceSharedPtr GetUrdf() const { return urdf_robot; }
 
+    void SetAuxRef(std::unordered_set<std::string>& new_auxrefs);
+
     bool Load_URDF(const std::string& filename, double x=0, double y=0, double z=0, double rx=0, double ry=0, double rz=0);
     bool Load_URDF(const std::string& filename, const ChVector<>& init_pos);
     bool Load_URDF(const std::string& filename, const ChCoordsys<>& init_coord);
@@ -74,7 +76,8 @@ class ChUrdfDoc {
     std::map<std::string, ChMatPair> ch_materials_;
     std::map<std::string, ChLinkBodies> ch_link_bodies_;
     std::shared_ptr<ChBody> ch_root_body_;
-
+    // names of bodies that would use ChBodyAuxRef
+    std::unordered_set<std::string> *auxrefs = NULL;
 };
 
 }  // END_OF_NAMESPACE____

@@ -22,6 +22,9 @@ class  SimulationManager {
 
     std::vector<chrono::ChVector<> > waypoints;
 
+    // names of bodies that would use ChBodyAuxRef
+    std::unordered_set<std::string> auxrefs;
+
     // for manipulator
     std::shared_ptr<std::vector<double> > start_joint_pos;
     std::shared_ptr<std::vector<double> > goal_joint_pos;
@@ -56,11 +59,12 @@ class  SimulationManager {
     void SetFrictionS(double fs) {system_friction_s = fs;};
     void SetFrictionK(double fk) {system_friction_k = fk;};
 
-    void AddPayload(double mass, double size_x, double size_y, double size_z,
-                    double coord_x=0, double coord_y=0, double coord_z=0);
-    void AddMotor(const std::string& link_name, double mass,
-                  double size_x, double size_y, double size_z,
-                  double coord_x=0, double coord_y=0, double coord_z=0);
+    void AddPayload(const std::string& body_name, double mass,
+                    double size_x, double size_y, double size_z,
+                    double pos_x=0, double pos_y=0, double pos_z=0);
+    void AddMotor(const std::string& body_name, const std::string& link_name,
+                  double mass, double size_x, double size_y, double size_z,
+                  double pos_x=0, double pos_y=0, double pos_z=0);
     void AddWaypoint(double x, double y, double z){ waypoints.push_back(chrono::ChVector<>(x,y,z)); };
     void SetStartJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {start_joint_pos = jointpos;};
     void SetGoalJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {goal_joint_pos = jointpos;};
