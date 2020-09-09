@@ -232,7 +232,15 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                                                         Q_from_Vect_to_Vect(VECT_Z,
                                                                             ChVector<>(u_parent_joint->axis.x,
                                                                                        u_parent_joint->axis.y,
-                                                                                       u_parent_joint->axis.z)) >> ch_body->GetRot()));
+                                                                                       u_parent_joint->axis.z)).GetNormalized() >> ch_body->GetRot()));
+                if (u_parent_joint->limits){
+                    ch_parent_link->GetLimit_Rz().SetMin(u_parent_joint->limits->lower);
+                    ch_parent_link->GetLimit_Rz().SetMax(u_parent_joint->limits->upper);
+                    ch_parent_link->GetLimit_Rz().SetActive(true);
+                    std::cout << "joint limits lower: " << u_parent_joint->limits->lower << " , upper: " << u_parent_joint->limits->upper << std::endl;
+                    // u_parent_joint->limits->effort - max joint effort
+                    // u_parent_joint->limits->velocity - max joint velocity
+                }
                 break;
             case urdf::Joint::PRISMATIC:
                 ch_parent_link = chrono_types::make_shared<ChLinkLockPrismatic>();
