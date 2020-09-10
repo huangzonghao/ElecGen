@@ -51,6 +51,10 @@ class WheelController : public RobotController {
 
     bool Update() override;
 
+  private:
+    enum GAITS {FORWARD, BACKWARD, LEFT1, RIGHT1, LEFT2, RIGHT2} gait;
+    void exe_gait();
+
 };
 
 class LeggedController : public RobotController {
@@ -58,7 +62,7 @@ class LeggedController : public RobotController {
     LeggedController(std::vector<std::shared_ptr<SimMotor> > *motors,
                      std::vector<chrono::ChVector<> > *waypoints,
                      const std::shared_ptr<chrono::ChBody>& ch_body):
-        RobotController(motors, waypoints, WHEEL), robot_body(ch_body.get()){}
+        RobotController(motors, waypoints, LEGGED), robot_body(ch_body.get()){}
 
     ~LeggedController(){};
 

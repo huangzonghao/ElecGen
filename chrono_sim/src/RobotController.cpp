@@ -12,7 +12,43 @@ bool ManipulatorController::Update(){
 }
 
 bool WheelController::Update(){
-    return true;
+    if ((robot_body->GetPos() - waypoints->at(waypoint_idx)).Length() < 2){
+        if (waypoint_idx < waypoints->size() - 1){
+            ++waypoint_idx;
+        }
+        else {
+            return true;
+        }
+    }
+
+    chrono::ChVector<> goal_local =
+        robot_body->TransformPointParentToLocal(waypoints->at(waypoint_idx));
+
+    double yx_ratio = goal_local.y() / (goal_local.x() + 1e-8); // in case x is zero
+
+    // the head of robot is pointing +x
+    if (yx_ratio > 0.33){
+        gait = LEFT2;
+    }
+    else if (yx_ratio < -0.33){
+        gait = RIGHT2;
+    }
+    else{
+        if (goal_local.x() > 0){
+            gait = FORWARD;
+        }
+        else {
+            gait = BACKWARD;
+        }
+    }
+
+    exe_gait();
+
+    for (auto motor : *motors){
+        motor->UpdateTorque();
+    }
+
+    return false;
 }
 
 bool LeggedController::Update(){
@@ -75,6 +111,49 @@ bool LeggedController::Update(){
     }
 
     return false;
+}
+
+void WheelController::exe_gait(){
+    // motor 0 1 right, 2 3 left
+    // positive vel moves the robot forward
+    switch(gait){
+        case FORWARD:
+            motors->at(0)->SetVel(-6);
+            motors->at(1)->SetVel(-6);
+            motors->at(2)->SetVel(-6);
+            motors->at(3)->SetVel(-6);
+            break;
+        case BACKWARD:
+            motors->at(0)->SetVel(6);
+            motors->at(1)->SetVel(6);
+            motors->at(2)->SetVel(6);
+            motors->at(3)->SetVel(6);
+            break;
+        case LEFT1:
+            motors->at(0)->SetVel(-6);
+            motors->at(1)->SetVel(-6);
+            motors->at(2)->SetVel(6);
+            motors->at(3)->SetVel(6);
+            break;
+        case RIGHT1:
+            motors->at(0)->SetVel(6);
+            motors->at(1)->SetVel(6);
+            motors->at(2)->SetVel(-6);
+            motors->at(3)->SetVel(-6);
+            break;
+        case LEFT2:
+            motors->at(0)->SetVel(-6);
+            motors->at(1)->SetVel(-6);
+            motors->at(2)->SetVel(6);
+            motors->at(3)->SetVel(6);
+            break;
+        case RIGHT2:
+            motors->at(0)->SetVel(6);
+            motors->at(1)->SetVel(6);
+            motors->at(2)->SetVel(-6);
+            motors->at(3)->SetVel(-6);
+            break;
+    }
 }
 
 void LeggedController::exe_gait(){
