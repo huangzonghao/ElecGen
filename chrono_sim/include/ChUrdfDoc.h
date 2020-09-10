@@ -21,29 +21,27 @@ struct ChLinkBodies{
 
 class ChUrdfDoc {
   public:
-    ChUrdfDoc(std::shared_ptr<ChSystem> sys){ robot_system = sys; }
+    ChUrdfDoc(){}
+    ChUrdfDoc(const std::string& filename){ Load_URDF(filename); }
 
     virtual ~ChUrdfDoc(){
         ch_materials_.clear();
         ch_link_bodies_.clear();
     };
 
-    void SetSystem(std::shared_ptr<ChSystem>& sys){ robot_system = sys; }
+    const std::string& GetUrdfFileName() const { return urdf_file_; }
 
-    std::shared_ptr<chrono::ChSystem> GetSystem() const { return robot_system; }
-
-    void SetUrdfFile(std::string& filepath){ urdf_file_ = filepath; }
-
-    const std::string& GetUrdfFile() const { return urdf_file_; }
-
-    urdf::ModelInterfaceSharedPtr GetUrdf() const { return urdf_robot; }
+    urdf::ModelInterfaceSharedPtr GetUrdfRobot() const { return urdf_robot; }
 
     void SetAuxRef(std::unordered_set<std::string>& new_auxrefs);
 
-    bool Load_URDF(const std::string& filename, double x=0, double y=0, double z=0, double rx=0, double ry=0, double rz=0);
-    bool Load_URDF(const std::string& filename, const ChVector<>& init_pos);
-    bool Load_URDF(const std::string& filename, const ChCoordsys<>& init_coord);
-    bool Load_URDF(const std::string& filename, const std::shared_ptr<ChBody>& init_pos_body);
+    bool Load_URDF(const std::string& filename);
+    bool AddtoSystem(const std::shared_ptr<ChSystem>& sys, double x=0, double y=0, double z=0, double rx=0, double ry=0, double rz=0);
+    bool AddtoSystem(const std::shared_ptr<ChSystem>& sys, const ChVector<>& init_pos);
+    bool AddtoSystem(const std::shared_ptr<ChSystem>& sys, const ChCoordsys<>& init_coord);
+    bool AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::shared_ptr<ChBody>& init_pos_body);
+
+    std::shared_ptr<chrono::ChSystem> GetSystem() const { return robot_system; }
 
     std::shared_ptr<chrono::ChSystem> robot_system;
     urdf::ModelInterfaceSharedPtr urdf_robot;
@@ -54,6 +52,8 @@ class ChUrdfDoc {
 
     std::shared_ptr<ChBody> GetRootBody() const { return ch_root_body_; }
     std::shared_ptr<ChBody> GetCameraBody() const { return GetRootBody(); }
+
+    const std::string& GetLinkBodyName(const std::string& link_name, int body_idx);
 
   private:
     struct ChMatPair{

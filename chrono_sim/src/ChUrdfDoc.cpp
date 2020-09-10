@@ -306,36 +306,41 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     return ch_body;
 }
 
-bool ChUrdfDoc::Load_URDF(const std::string& filename, double x, double y, double z, double rx, double ry, double rz) {
-    return Load_URDF(filename, ChCoordsys<>(ChVector<>(x, y, z), Q_from_Euler123(ChVector<>(rx, ry, rz))));
-}
-
-bool ChUrdfDoc::Load_URDF(const std::string& filename, const ChVector<>& init_pos) {
-    return Load_URDF(filename, ChCoordsys<>(init_pos, QUNIT));
-}
-
-bool ChUrdfDoc::Load_URDF(const std::string& filename, const ChCoordsys<>& init_coord) {
-    auto init_pos_body = chrono_types::make_shared<ChBody>();
-    init_pos_body->SetCoord(init_coord);
-    return Load_URDF(filename, init_pos_body);
-}
-
-bool ChUrdfDoc::Load_URDF(const std::string& filename, const std::shared_ptr<ChBody>& init_pos_body) {
-
-    if (!robot_system){
-        std::cerr << "ERROR: ChSystem not initialized" << std::endl;
-        return false;
+bool ChUrdfDoc::Load_URDF(const std::string& filename) {
+    if (urdf_file_ == filename){
+        return true;
     }
-
     urdf_file_ = filename;
-
     urdf_robot = urdf::parseURDFFile(filename);
 
     if (!urdf_robot){
         std::cerr << "ERROR: Model Parsing the xml failed" << std::endl;
         return false;
     }
+    return true;
+}
+
+bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, double x, double y, double z, double rx, double ry, double rz) {
+    return AddtoSystem(sys, ChCoordsys<>(ChVector<>(x, y, z), Q_from_Euler123(ChVector<>(rx, ry, rz))));
+}
+
+bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const ChVector<>& init_pos) {
+    return AddtoSystem(sys, ChCoordsys<>(init_pos, QUNIT));
+}
+
+bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const ChCoordsys<>& init_coord) {
+    auto init_pos_body = chrono_types::make_shared<ChBody>();
+    init_pos_body->SetCoord(init_coord);
+    return AddtoSystem(sys, init_pos_body);
+}
+
+bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::shared_ptr<ChBody>& init_pos_body) {
+    if (!urdf_robot){
+        std::cerr << "ERROR: No URDF loaded, call Load_URDF first" << std::endl;
+        return false;
+    }
     std::cout << "robot name is: " << urdf_robot->getName() << std::endl;
+    robot_system = sys;
 
     convert_materials();
 
@@ -345,6 +350,7 @@ bool ChUrdfDoc::Load_URDF(const std::string& filename, const std::shared_ptr<ChB
         ch_root_body_ = convert_links(root_link, init_pos_body);
     }
     else{
+        std::cerr << "ERROR: Could not find root link in file " << urdf_file_ << std::endl;
         return false;
     }
 
@@ -361,6 +367,30 @@ const ChLinkBodies& ChUrdfDoc::GetLinkBodies(const std::string& name) const {
 
 void ChUrdfDoc::SetAuxRef(std::unordered_set<std::string>& new_auxrefs){
     auxrefs = &new_auxrefs;
+}
+
+const std::string& ChUrdfDoc::GetLinkBodyName(const std::string& link_name, int body_idx){
+    if (!urdf_robot){
+        std::cerr << "ERROR: No URDF loaded, call Load_URDF first" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    const urdf::JointConstSharedPtr& u_joint = urdf_robot->getJoint(link_name);
+    if (!u_joint){
+        std::cerr << "ERROR: link " << link_name << "not found in " << GetRobotName() << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (body_idx == 1){
+        return u_joint->child_link_name;
+    }
+    else if (body_idx == 2){
+        return u_joint->parent_link_name;
+    }
+    else {
+        std::cerr << "ERROR: Invalid body_idx, has to be 1 or 2" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 }  // END_OF_NAMESPACE____

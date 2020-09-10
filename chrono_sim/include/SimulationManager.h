@@ -4,6 +4,7 @@
 #include "chrono/physics/ChSystem.h"
 #include "SimMotor.h"
 #include "RobotController.h"
+#include "ChUrdfDoc.h"
 
 class RobotController;
 
@@ -29,10 +30,10 @@ class  SimulationManager {
     std::shared_ptr<std::vector<double> > start_joint_pos;
     std::shared_ptr<std::vector<double> > goal_joint_pos;
 
-    std::string urdf_file;
     std::string env_file;
     chrono::ChVector<> env_size;
 
+    std::shared_ptr<chrono::ChUrdfDoc> urdf_doc;
     std::shared_ptr<chrono::ChSystem> sim_system;
     std::shared_ptr<RobotController> controller;
 
@@ -54,7 +55,7 @@ class  SimulationManager {
     }
 
     void SetSystemType(SystemType new_type){ system_type = new_type; }
-    void SetUrdfFile(std::string filename){ urdf_file = filename; };
+    void SetUrdfFile(std::string filename);
     void SetEnvFile(std::string filename){ env_file = filename; };
     void SetFrictionS(double fs) {system_friction_s = fs;};
     void SetFrictionK(double fk) {system_friction_k = fk;};
@@ -62,6 +63,9 @@ class  SimulationManager {
     void AddPayload(const std::string& body_name, double mass,
                     double size_x, double size_y, double size_z,
                     double pos_x=0, double pos_y=0, double pos_z=0);
+    void AddMotor(const std::string& link_name,
+                  double mass, double size_x, double size_y, double size_z,
+                  double pos_x=0, double pos_y=0, double pos_z=0);
     void AddMotor(const std::string& body_name, const std::string& link_name,
                   double mass, double size_x, double size_y, double size_z,
                   double pos_x=0, double pos_y=0, double pos_z=0);
@@ -70,6 +74,7 @@ class  SimulationManager {
     void SetGoalJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {goal_joint_pos = jointpos;};
 
     bool RunSimulation(bool do_viz=true);
+    const std::string& GetUrdfFileName();
 
 };
 

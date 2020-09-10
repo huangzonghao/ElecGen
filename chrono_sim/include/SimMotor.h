@@ -55,11 +55,15 @@ class SimPayload {
     bool visible;
     bool check_collision;
     SimPayload();
+    SimPayload(double mass,
+               double size_x, double size_y, double size_z,
+               double pos_x, double pos_y, double pos_z);
     SimPayload(const std::string& body_name, double mass,
                double size_x, double size_y, double size_z,
                double pos_x, double pos_y, double pos_z);
     ~SimPayload(){};
     virtual void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys);
+  protected:
     void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
                      const std::shared_ptr<chrono::ChBody>& parent_body);
 };
@@ -72,12 +76,22 @@ class SimMotor : public SimPayload {
 
     std::shared_ptr<SimMotorController> motor_controller;
 
+    // the motor will actuate the link specified by link_name, and the mass
+    // of the motor will be added to the body specified by body_name
+    // i.e. the motor actuating the joint between body B and C could be residing
+    // on body A.
     SimMotor(const std::string& body_name, const std::string& link_name,
+             double mass, double size_x, double size_y, double size_z,
+             double pos_x, double pos_y, double pos_z);
+    // if body name is not specified, the mass will be added to the parent body
+    // of the link (body 2)
+    SimMotor(const std::string& link_name,
              double mass, double size_x, double size_y, double size_z,
              double pos_x, double pos_y, double pos_z);
     ~SimMotor(){};
 
-    void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys, const chrono::ChUrdfDoc& urdf_doc);
+    void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys) override;
+    void AddtoSystem(const chrono::ChUrdfDoc& urdf_doc);
     void SetVel(double new_vel);
     void SetPos(double new_pos);
     void SetPhase(double new_phase);

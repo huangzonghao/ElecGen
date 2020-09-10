@@ -3,7 +3,6 @@
 #include "chrono/physics/ChBodyEasy.h"
 #include "chrono_vehicle/terrain/RigidTerrain.h"
 
-#include "ChUrdfDoc.h"
 #include "SimulationManager.h"
 #include "data_dir_path.h"
 
@@ -25,12 +24,39 @@ SimulationManager::SimulationManager(double step_size,
     SetChronoDataPath(CHRONO_DATA_DIR);
 }
 
+void SimulationManager::SetUrdfFile(std::string filename){
+    urdf_doc = std::make_shared<ChUrdfDoc>(filename);
+}
+
+const std::string& SimulationManager::GetUrdfFileName(){
+    if(!urdf_doc){
+        std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    return urdf_doc->GetUrdfFileName();
+}
+
 void SimulationManager::AddPayload(const std::string& body_name, double mass,
                                    double size_x, double size_y, double size_z,
                                    double pos_x, double pos_y, double pos_z){
     payloads.push_back(std::make_shared<SimPayload>(body_name, mass,
                                                     size_x, size_y, size_z,
                                                     pos_x, pos_y, pos_z));
+    auxrefs.insert(body_name);
+}
+
+void SimulationManager::AddMotor(const std::string& link_name,
+                                 double mass, double size_x, double size_y, double size_z,
+                                 double pos_x, double pos_y, double pos_z){
+    motors.push_back(std::make_shared<SimMotor>(link_name, mass,
+                                                size_x, size_y, size_z,
+                                                pos_x, pos_y, pos_z));
+
+    if (!urdf_doc){
+        std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
+        return;
+    }
+    auto& body_name = urdf_doc->GetLinkBodyName(link_name, 2);
     auxrefs.insert(body_name);
 }
 
@@ -96,25 +122,25 @@ bool SimulationManager::RunSimulation(bool do_viz){
         return 1;
     }
 
-    // Load URDF file and add to the system
-    ChUrdfDoc urdf_doc(sim_system);
-    urdf_doc.SetAuxRef(auxrefs);
 
-    if (!urdf_file.empty()){
-        bool load_ok;
+    if (urdf_doc){
+        urdf_doc->SetAuxRef(auxrefs);
+
+        bool add_ok;
         if (!waypoints.empty()){
-            load_ok = urdf_doc.Load_URDF(urdf_file, waypoints[0]);
+            add_ok = urdf_doc->AddtoSystem(sim_system, waypoints[0]);
         }
         else{
-            load_ok = urdf_doc.Load_URDF(urdf_file, ChVector<>(0,0,0));
+            add_ok = urdf_doc->AddtoSystem(sim_system, ChVector<>(0,0,0));
         }
 
-        if (!load_ok) {
-            chrono::GetLog() << "Warning. Desired URDF file could not be opened/parsed \n";
+        if (!add_ok) {
+            chrono::GetLog() << "Warning. Could not add urdf robot to ChSystem\n";
             return false;
         }
     }
     else {
+        std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
         return false;
     }
 
@@ -131,23 +157,23 @@ bool SimulationManager::RunSimulation(bool do_viz){
 
     // Add motors and extra weights to system
     for (auto payload : payloads) payload->AddtoSystem(sim_system);
-    for (auto motor : motors) motor->AddtoSystem(sim_system, urdf_doc);
+    for (auto motor : motors) motor->AddtoSystem(*urdf_doc);
 
     // init controller
-    if (urdf_doc.GetRobotName().find("manipulator") != std::string::npos) {
+    if (urdf_doc->GetRobotName().find("manipulator") != std::string::npos) {
         controller = std::make_shared<ManipulatorController>(&motors, &waypoints);
     }
-    else if (urdf_doc.GetRobotName().find("leg") != std::string::npos) {
-        controller = std::make_shared<LeggedController>(&motors, &waypoints, urdf_doc.GetRootBody());
+    else if (urdf_doc->GetRobotName().find("leg") != std::string::npos) {
+        controller = std::make_shared<LeggedController>(&motors, &waypoints, urdf_doc->GetRootBody());
     }
-    else if (urdf_doc.GetRobotName().find("wheel") != std::string::npos) {
-        controller = std::make_shared<WheelController>(&motors, &waypoints, urdf_doc.GetRootBody());
+    else if (urdf_doc->GetRobotName().find("wheel") != std::string::npos) {
+        controller = std::make_shared<WheelController>(&motors, &waypoints, urdf_doc->GetRootBody());
     }
     else {
         std::cerr << "Need to specify controller type in robot name" << std::endl;
     }
 
-    const std::shared_ptr<ChBody>& camera_body = urdf_doc.GetCameraBody();
+    const std::shared_ptr<ChBody>& camera_body = urdf_doc->GetCameraBody();
 
     std::chrono::steady_clock::time_point tik;
     std::chrono::steady_clock::time_point tok;

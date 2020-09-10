@@ -94,6 +94,13 @@ SimPayload::SimPayload()
     :visible(false), check_collision(false), mass(0), size{0,0,0}
 {}
 
+SimPayload::SimPayload(double mass,
+                       double size_x, double size_y, double size_z,
+                       double pos_x, double pos_y, double pos_z)
+    :visible(false), check_collision(false), mass(mass),
+     size{size_x, size_y, size_z}, pos(pos_x, pos_y, pos_z)
+{}
+
 SimPayload::SimPayload(const std::string& body_name, double mass,
                        double size_x, double size_y, double size_z,
                        double pos_x, double pos_y, double pos_z)
@@ -138,6 +145,13 @@ void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
     }
 }
 
+SimMotor::SimMotor(const std::string& link_name,
+                   double mass, double size_x, double size_y, double size_z,
+                   double pos_x, double pos_y, double pos_z)
+    :SimPayload(mass, size_x, size_y, size_z, pos_x, pos_y, pos_z),
+     link_name(link_name)
+{}
+
 SimMotor::SimMotor(const std::string& body_name, const std::string& link_name,
                    double mass, double size_x, double size_y, double size_z,
                    double pos_x, double pos_y, double pos_z)
@@ -145,37 +159,32 @@ SimMotor::SimMotor(const std::string& body_name, const std::string& link_name,
      link_name(link_name)
 {}
 
-void SimMotor::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
-                           const chrono::ChUrdfDoc& urdf_doc){
+void SimMotor::AddtoSystem(const chrono::ChUrdfDoc& urdf_doc){
+    auto& sys = urdf_doc.robot_system;
     chlinkbody = &(urdf_doc.GetLinkBodies(link_name));
-    std::shared_ptr<chrono::ChBody> parent_body;
-    std::shared_ptr<chrono::ChBody> child_body;
-    if (body_name == chlinkbody->body2->GetNameString()){
-        parent_body = chlinkbody->body2;
-        child_body = chlinkbody->body1;
-    }
-    else if (body_name == chlinkbody->body1->GetNameString()){
-        parent_body = chlinkbody->body1;
-        child_body = chlinkbody->body2;
+
+    if (!body_name.empty()){
+        SimPayload::AddtoSystem(sys);
     }
     else {
-        std::cerr << "Error: Cannot add motor, " << link_name << " doesn't contain body " << body_name << std::endl;
-        exit(EXIT_FAILURE);
+        SimPayload::AddtoSystem(sys, chlinkbody->body2);
     }
-    SimPayload::AddtoSystem(sys, parent_body);
 
     ch_motor = chrono_types::make_shared<chrono::ChLinkMotorRotationTorque>();
 
     // flip z axis of motor frame, so that a positive speed would make robot go forward
     chrono::ChFrame<> motor_frame(chlinkbody->link->GetLinkAbsoluteCoords());
     // motor_frame.ConcatenatePostTransformation(chrono::ChFrame<>(chrono::ChVector<>(), chrono::Q_FLIP_AROUND_X));
-    ch_motor->Initialize(child_body, parent_body, motor_frame);
+    ch_motor->Initialize(chlinkbody->body1, chlinkbody->body2, motor_frame);
     ch_func = chrono_types::make_shared<chrono::ChFunction_Setpoint>();
     ch_motor->SetMotorFunction(ch_func);
     sys->AddLink(ch_motor);
 
     ch_link = chlinkbody->link.get();
     motor_controller = std::make_shared<SimMotorController>(ch_motor);
+}
+void SimMotor::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
+    std::cerr << "Error: Need to pass on the ChUrdfDoc when adding SimMotor to system" << std::endl;
 }
 
 void SimMotor::SetVel(double new_vel){
