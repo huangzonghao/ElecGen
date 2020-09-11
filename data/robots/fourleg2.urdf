@@ -1,7 +1,7 @@
 <?xml verison="1.0"?>
 <robot name ="fourleg2">
 
-<link name = "base_link">
+<link name = "chassis">
     <visual>
         <origin rpy = "0 0 0" xyz = "0 0 0" />
         <geometry>
@@ -20,111 +20,40 @@
     </inertial>
 </link>
 
-<link name = "link4">
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
-        <geometry>
-            <box size=" 0.3 0.3 1.05"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
-        <geometry>
-            <box size=" 0.3 0.3 1.05"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <mass value="1"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-</link>
-
-<joint name = "base_link_link4" type = "continuous">
-    <parent link = "base_link"/>
-    <child link = "link4"/>
-    <origin xyz = "1.2 -1.8 0" rpy = "0 0 0" />
-    <axis xyz = "0 1 0" />
-</joint>
-
-<link name = "link3">
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
-        <geometry>
-            <box size=" 0.3 0.3 1.05"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
-        <geometry>
-            <box size="0.3 0.3 1.05"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <mass value="1"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-</link>
-
-<joint name = "base_link_link3" type = "continuous">
-    <parent link = "base_link"/>
-    <child link = "link3"/>
-    <origin xyz = "-1.2 -1.8 0" rpy = "0 0 0" />
-    <axis xyz = "0 1 0" />
-</joint>
-
-<link name = "link2">
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
-        <geometry>
-            <box size=" 0.3 0.3 1.05"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
-        <geometry>
-            <box size="0.3 0.3 1.05"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <mass value="1"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-</link>
-
-<joint name = "base_link_link2" type = "continuous">
-    <parent link = "base_link"/>
-    <child link = "link2"/>
-    <origin xyz = "-1.2 1.8 0" rpy = "0 0 0" />
-    <axis xyz = "0 1 0" />
-</joint>
-
-<link name = "link1">
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
-        <geometry>
-            <box size=" 0.3 0.3 1.05"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
-        <geometry>
-            <box size="0.3 0.3 1.05"/>
-        </geometry>
-    </collision>
-    <inertial>
-        <mass value="1"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-</link>
-
-<joint name = "base_link_link1" type = "continuous">
-    <parent link = "base_link"/>
-    <child link = "link1"/>
+<joint name = "chassis-fl_upper" type = "continuous">
+    <parent link = "chassis"/>
+    <child link = "fl_upper"/>
     <origin xyz = "1.2 1.8 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
-<link name = "link4_2">
+<link name = "fl_upper">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <geometry>
+            <box size=" 0.3 0.3 1.05"/>
+        </geometry>
+    </visual>
+    <collision>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <geometry>
+            <box size="0.3 0.3 1.05"/>
+        </geometry>
+    </collision>
+    <inertial>
+        <mass value="1"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+</link>
+
+<joint name = "fl_upper-fl_lower" type = "continuous">
+    <parent link = "fl_upper"/>
+    <child link = "fl_lower"/>
+    <origin xyz = "0 0 -1" rpy = "0 0 0" />
+    <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "fl_lower">
     <visual>
         <origin rpy = "0 0 0" xyz = "0 0 -0.5" />
         <geometry>
@@ -155,7 +84,40 @@
     </inertial>
 </link>
 
-<link name = "link3_2">
+<joint name = "chassis-fr_upper" type = "continuous">
+    <parent link = "chassis"/>
+    <child link = "fr_upper"/>
+    <origin xyz = "1.2 -1.8 0" rpy = "0 0 0" />
+    <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "fr_upper">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <geometry>
+            <box size=" 0.3 0.3 1.05"/>
+        </geometry>
+    </visual>
+    <collision>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <geometry>
+            <box size=" 0.3 0.3 1.05"/>
+        </geometry>
+    </collision>
+    <inertial>
+        <mass value="1"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+</link>
+
+<joint name = "fr_upper-fr_lower" type = "continuous">
+    <parent link = "fr_upper"/>
+    <child link = "fr_lower"/>
+    <origin xyz = "0 0 -1" rpy = "0 0 0" />
+    <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "fr_lower">
     <visual>
         <origin rpy = "0 0 0" xyz = "0 0 -0.5" />
         <geometry>
@@ -186,7 +148,40 @@
     </inertial>
 </link>
 
-<link name = "link2_2">
+<joint name = "chassis-bl_upper" type = "continuous">
+    <parent link = "chassis"/>
+    <child link = "bl_upper"/>
+    <origin xyz = "-1.2 1.8 0" rpy = "0 0 0" />
+    <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "bl_upper">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <geometry>
+            <box size=" 0.3 0.3 1.05"/>
+        </geometry>
+    </visual>
+    <collision>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <geometry>
+            <box size="0.3 0.3 1.05"/>
+        </geometry>
+    </collision>
+    <inertial>
+        <mass value="1"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+</link>
+
+<joint name = "bl_upper-bl_lower" type = "continuous">
+    <parent link = "bl_upper"/>
+    <child link = "bl_lower"/>
+    <origin xyz = "0 0 -1" rpy = "0 0 0" />
+    <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "bl_lower">
     <visual>
         <origin rpy = "0 0 0" xyz = "0 0 -0.5" />
         <geometry>
@@ -217,7 +212,40 @@
     </inertial>
 </link>
 
-<link name = "link1_2">
+<joint name = "chassis-br_upper" type = "continuous">
+    <parent link = "chassis"/>
+    <child link = "br_upper"/>
+    <origin xyz = "-1.2 -1.8 0" rpy = "0 0 0" />
+    <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "br_upper">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <geometry>
+            <box size=" 0.3 0.3 1.05"/>
+        </geometry>
+    </visual>
+    <collision>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <geometry>
+            <box size="0.3 0.3 1.05"/>
+        </geometry>
+    </collision>
+    <inertial>
+        <mass value="1"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+</link>
+
+<joint name = "br_upper-br_lower" type = "continuous">
+    <parent link = "br_upper"/>
+    <child link = "br_lower"/>
+    <origin xyz = "0 0 -1" rpy = "0 0 0" />
+    <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "br_lower">
     <visual>
         <origin rpy = "0 0 0" xyz = "0 0 -0.5" />
         <geometry>
@@ -247,33 +275,5 @@
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
 </link>
-
-<joint name = "link4_link4_2" type = "continuous">
-    <parent link = "link4"/>
-    <child link = "link4_2"/>
-    <origin xyz = "0 0 -1" rpy = "0 0 0" />
-    <axis xyz = "0 1 0" />
-</joint>
-
-<joint name = "link3_link3_2" type = "continuous">
-    <parent link = "link3"/>
-    <child link = "link3_2"/>
-    <origin xyz = "0 0 -1" rpy = "0 0 0" />
-    <axis xyz = "0 1 0" />
-</joint>
-
-<joint name = "link2_link2_2" type = "continuous">
-    <parent link = "link2"/>
-    <child link = "link2_2"/>
-    <origin xyz = "0 0 -1" rpy = "0 0 0" />
-    <axis xyz = "0 1 0" />
-</joint>
-
-<joint name = "link1_link1_2" type = "continuous">
-    <parent link = "link1"/>
-    <child link = "link1_2"/>
-    <origin xyz = "0 0 -1" rpy = "0 0 0" />
-    <axis xyz = "0 1 0" />
-</joint>
 
 </robot>

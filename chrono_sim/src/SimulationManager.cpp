@@ -165,6 +165,16 @@ bool SimulationManager::RunSimulation(bool do_viz){
     }
     else if (urdf_doc->GetRobotName().find("leg") != std::string::npos) {
         controller = std::make_shared<LeggedController>(&motors, &waypoints, urdf_doc->GetRootBody());
+        if (urdf_doc->GetRobotName().find("2") != std::string::npos) {
+            std::dynamic_pointer_cast<LeggedController>(controller)->model = LeggedController::M2;
+        }
+        else if (urdf_doc->GetRobotName().find("3") != std::string::npos) {
+            std::dynamic_pointer_cast<LeggedController>(controller)->model = LeggedController::M3;
+        }
+        else{
+            std::dynamic_pointer_cast<LeggedController>(controller)->model = LeggedController::M1;
+        }
+
     }
     else if (urdf_doc->GetRobotName().find("wheel") != std::string::npos) {
         controller = std::make_shared<WheelController>(&motors, &waypoints, urdf_doc->GetRootBody());
