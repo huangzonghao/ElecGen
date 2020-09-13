@@ -13,3 +13,12 @@
 [submodule "thirdparty/protobuf"]
 	path = thirdparty/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
+[submodule "thirdparty/towr"]
+	path = thirdparty/towr
+	url = https://github.com/ethz-adrl/towr.git
+[submodule "thirdparty/Ipopt"]
+	path = thirdparty/Ipopt
+	url = https://github.com/coin-or/Ipopt.git
+[submodule "thirdparty/ifopt"]
+	path = thirdparty/ifopt
+	url = https://github.com/ethz-adrl/ifopt.git
