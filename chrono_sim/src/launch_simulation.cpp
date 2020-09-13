@@ -1,127 +1,168 @@
-#include "chrono/physics/ChLinkMotorRotationSpeed.h"
-#include "chrono_irrlicht/ChIrrApp.h"
-#include "chrono/physics/ChBodyEasy.h"
-#include "chrono_vehicle/terrain/RigidTerrain.h"
-
-#include "ChUrdfDoc.h"
-
-
-using namespace chrono;
+#include <iostream>
+#include <Eigen/Core>
+#include "SimulationManager.h"
 
 const double s_friction = 2.0;
 const double k_friction = 1.9;
 
-int launch_simulation(double init_x, double init_y, double goal_x, double goal_y,
-                      std::string urdf_filename, std::string env_filename){
+void test_fourwheel(Eigen::MatrixXd waypoints){
+    const std::string urdf_filename = "../data/robots/fourwheels.urdf";
 
-    std::shared_ptr<ChSystemNSC> my_system = chrono_types::make_shared<ChSystemNSC>();
+    SimulationManager sm;
+    sm.SetUrdfFile(urdf_filename);
+    sm.SetEnv(env_filename);
+    sm.SetFrictionK(k_friction);
+    sm.SetFrictionS(s_friction);
+    // sm.timeout = 10;
+    sm.AddMotor("chassis_wheel_fl", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis_wheel_rl", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis_wheel_fr", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis_wheel_rr", 1,0.1,0.1,0.1);
 
-    my_system->Set_G_acc(ChVector<>(0, 0, -9.81));
-    my_system->SetSolverMaxIterations(20);  // the higher, the easier to keep the constraints satisifed.
+    sm.AddWaypoints(waypoints);
 
-    ChVector<> init_pos(init_x, init_y, 2);
-    ChVector<> goal_pos(goal_x, goal_y, 0.);
+    // use this loop for iterations
+    bool sim_done = false;
+    while (!sim_done){
+        bool task_done = sm.RunSimulation();
 
-    auto init_pos_body = chrono_types::make_shared<ChBodyEasyBox>(0.5, 0.5, 0.2, 1.0, true, false);
-    init_pos_body->SetPos(init_pos);
-    init_pos_body->SetBodyFixed(true);
-    auto init_pos_color = chrono_types::make_shared<ChColorAsset>();
-    init_pos_color->SetColor(ChColor(0.0f, 0.8f, 0.0f));
-    init_pos_body->AddAsset(init_pos_color);
-    my_system->AddBody(init_pos_body);
+        // now the torques are ready to read
+        std::cout << "motor 1 torque " << sm.motors[0]->max_torque << std::endl;
+        std::cout << "motor 2 torque " << sm.motors[1]->max_torque << std::endl;
+        std::cout << "motor 3 torque " << sm.motors[2]->max_torque << std::endl;
+        std::cout << "motor 4 torque " << sm.motors[3]->max_torque << std::endl;
 
-    auto goal_pos_body = chrono_types::make_shared<ChBodyEasyBox>(0.5, 0.5, 0.2, 1.0, true, false);
-    goal_pos_body->SetPos(goal_pos);
-    goal_pos_body->SetBodyFixed(true);
-    auto goal_pos_color = chrono_types::make_shared<ChColorAsset>();
-    goal_pos_color->SetColor(ChColor(0.0f, 0.0f, 0.8f));
-    goal_pos_body->AddAsset(goal_pos_color);
-    my_system->AddBody(goal_pos_body);
-
-    auto ground_mat = chrono_types::make_shared<ChMaterialSurfaceNSC>();
-    ground_mat->SetSfriction(s_friction);
-    ground_mat->SetKfriction(k_friction);
-    ground_mat->SetRestitution(0.01f);
-
-    if (env_filename.find(".bmp") != std::string::npos){
-        vehicle::RigidTerrain terrain(my_system.get());
-        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0), QUNIT),
-                                      env_filename, "ground_mesh", 50, 50, 0, 2);
-        patch->SetColor(ChColor(0.2, 0.2, 0.2));
-        terrain.Initialize();
-    }
-    else if (env_filename.find(".obj") != std::string::npos){
-        vehicle::RigidTerrain terrain(my_system.get());
-        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0), QUNIT),
-                                      env_filename, "ground_mesh");
-        patch->SetColor(ChColor(0.2, 0.2, 0.2));
-        terrain.Initialize();
-    }
-    else {
-        // ground body
-        auto my_ground = chrono_types::make_shared<ChBodyEasyBox>(50, 50, 0.9, 1.0, true, true, ground_mat);
-        my_ground->SetPos(ChVector<>(0, 0., -0.5));
-        // my_ground->SetRot(Q_from_AngAxis(0.1, VECT_Y));
-        my_ground->SetBodyFixed(true);
-        auto ground_texture = chrono_types::make_shared<ChColorAsset>();
-        ground_texture->SetColor(ChColor(0.2f, 0.2f, 0.2f));
-        my_ground->AddAsset(ground_texture);
-        my_system->AddBody(my_ground);
+        sim_done = true;
     }
 
-    // Load URDF file and add to the system
-    ChUrdfDoc urdf_doc(my_system);
+}
 
-    if (!urdf_filename.empty()){
-        bool load_ok = urdf_doc.Load_URDF(urdf_filename, init_pos_body);
+void test_fourleg(Eigen::MatrixXd waypoints){
+    const std::string urdf_filename = "../data/robots/fourleg.urdf";
+    // first init simulation manager
+    SimulationManager sm;
+    sm.SetUrdfFile(urdf_filename);
+    sm.SetEnv(env_filename);
+    sm.SetFrictionK(k_friction);
+    sm.SetFrictionS(s_friction);
+    // sm.timeout = 10;
+    // try to use a wrong body name and see what happened
+    // this part will be done by UI
+    // front left
+    sm.AddMotor("base_link_link1", 1,0.1,0.1,0.1);
+    // rear left
+    sm.AddMotor("base_link_link2", 1,0.1,0.1,0.1);
+    // front right
+    sm.AddMotor("base_link_link4", 1,0.1,0.1,0.1);
+    // rear right
+    sm.AddMotor("base_link_link3", 1,0.1,0.1,0.1);
 
-        if (!load_ok) {
-            chrono::GetLog() << "Warning. Desired URDF file could not be opened/parsed \n";
-        }
+    sm.AddWaypoints(waypoints);
+
+    // use this loop for iterations
+    bool sim_done = false;
+    while (!sim_done){
+        bool task_done = sm.RunSimulation();
+
+        // now the torques are ready to read
+        std::cout << "motor 1 torque " << sm.motors[0]->max_torque << std::endl;
+        std::cout << "motor 2 torque " << sm.motors[1]->max_torque << std::endl;
+        std::cout << "motor 3 torque " << sm.motors[2]->max_torque << std::endl;
+        std::cout << "motor 4 torque " << sm.motors[3]->max_torque << std::endl;
+
+        sim_done = true;
     }
 
+}
 
-    chrono::irrlicht::ChIrrApp application(my_system.get(), L"Auto-Electronics Simulation", irr::core::dimension2d<irr::u32>(640, 480), false);
-    chrono::irrlicht::ChIrrWizard::add_typical_Logo(application.GetDevice());
-    chrono::irrlicht::ChIrrWizard::add_typical_Sky(application.GetDevice());
-    chrono::irrlicht::ChIrrWizard::add_typical_Lights(application.GetDevice(), irr::core::vector3df(0., 0., 50.), irr::core::vector3df(0., 0., -50));
-    chrono::irrlicht::ChIrrWizard::add_typical_Camera(application.GetDevice(), irr::core::vector3df(0, -5, 4), irr::core::vector3df(0, 0, 0));
+void test_fourleg2(Eigen::MatrixXd waypoints){
+    const std::string urdf_filename = "../data/robots/fourleg2.urdf";
+    // first init simulation manager
+    SimulationManager sm;
+    sm.SetUrdfFile(urdf_filename);
+    sm.SetEnv(env_filename);
+    sm.SetFrictionK(k_friction);
+    sm.SetFrictionS(s_friction);
+    // sm.timeout = 10;
+    // try to use a wrong body name and see what happened
+    sm.AddMotor("chassis", "chassis-fl_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "fl_upper-fl_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "chassis-bl_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "bl_upper-bl_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "chassis-fr_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "fr_upper-fr_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "chassis-br_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "br_upper-br_lower", 1,0.1,0.1,0.1);
 
-    // Bind visualization assets.
-    application.AssetBindAll();
-    application.AssetUpdateAll();
+    sm.AddWaypoints(waypoints);
 
-    // Timer for enforcing sodt real-time
-    ChRealtimeStepTimer realtime_timer;
-    double time_step = 0.005;
+    // use this loop for iterations
+    bool sim_done = false;
+    while (!sim_done){
+        bool task_done = sm.RunSimulation(true);
+        // bool task_done = sm.RunSimulation(false);
 
-    while (application.GetDevice()->run()) {
-        // Irrlicht must prepare frame to draw
-        application.BeginScene(true, true, irr::video::SColor(255, 140, 161, 192));
+        // now the torques are ready to read
+        std::cout << "motor 1 torque " << sm.motors[0]->max_torque << std::endl;
+        std::cout << "motor 2 torque " << sm.motors[1]->max_torque << std::endl;
+        std::cout << "motor 3 torque " << sm.motors[2]->max_torque << std::endl;
+        std::cout << "motor 4 torque " << sm.motors[3]->max_torque << std::endl;
 
-        // Irrlicht now draws simple lines in 3D world representing a
-        // skeleton of the mechanism, in this instant:
-        //
-        // .. draw solid 3D items (boxes, cylinders, shapes) belonging to Irrlicht scene, if any
-        application.DrawAll();
-
-        // .. draw a grid (rotated so that it's horizontal)
-        chrono::irrlicht::ChIrrTools::drawGrid(application.GetVideoDriver(), 2, 2, 30, 30,
-                             ChCoordsys<>(ChVector<>(0, 0.01, 0), QUNIT),
-                             irr::video::SColor(255, 80, 130, 130), true);
-
-        // .. draw GUI user interface items (sliders, buttons) belonging to Irrlicht screen, if any
-        application.GetIGUIEnvironment()->drawAll();
-
-        // ADVANCE SYSTEM STATE BY ONE STEP
-        my_system->DoStepDynamics(time_step);
-        // Enforce soft real-time
-        realtime_timer.Spin(time_step);
-
-        // Irrlicht must finish drawing the frame
-        application.EndScene();
+        sim_done = true;
     }
 
+}
 
-    return 0;
+void test_fourleg3(Eigen::MatrixXd waypoints){
+    const std::string urdf_filename = "../data/robots/fourleg3.urdf";
+    // first init simulation manager
+    SimulationManager sm;
+    sm.SetUrdfFile(urdf_filename);
+    sm.SetEnv(env_filename, 50, 50, 5);
+    sm.SetFrictionK(k_friction);
+    sm.SetFrictionS(s_friction);
+    // sm.timeout = 10;
+    // try to use a wrong body name and see what happened
+    // this part will be done by UI
+    sm.AddMotor("chassis", "chassis-fl_cyl", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "fl_cyl-fl_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "fl_upper-fl_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "chassis-bl_cyl", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "bl_cyl-bl_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "bl_upper-bl_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "chassis-fr_cyl", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "fr_cyl-fr_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "fr_upper-fr_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "chassis-br_cyl", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "br_cyl-br_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("chassis", "br_upper-br_lower", 1,0.1,0.1,0.1);
+
+    sm.AddWaypoints(waypoints);
+
+    // use this loop for iterations
+    bool sim_done = false;
+    while (!sim_done){
+        bool task_done = sm.RunSimulation(true);
+        // bool task_done = sm.RunSimulation(false);
+
+        // now the torques are ready to read
+        std::cout << "motor 1 torque " << sm.motors[0]->max_torque << std::endl;
+        std::cout << "motor 2 torque " << sm.motors[1]->max_torque << std::endl;
+        std::cout << "motor 3 torque " << sm.motors[2]->max_torque << std::endl;
+        std::cout << "motor 4 torque " << sm.motors[3]->max_torque << std::endl;
+
+        sim_done = true;
+    }
+
+}
+void launch_simulation(std::string urdf_filename,
+                       Eigen::MatrixXd heightmap,
+                       Eigen::MatrixXd waypoints){
+
+    if      (urdf_filename.find("fourwheel") != std::string::npos) test_fourwheel(waypoints);
+    else if (urdf_filename.find("fourleg2")  != std::string::npos) test_fourleg2(waypoints);
+    else if (urdf_filename.find("fourleg3")  != std::string::npos) test_fourleg3(waypoints);
+    else if (urdf_filename.find("fourleg")   != std::string::npos) test_fourleg(waypoints);
+    else std::cout << "Error: unknown robot " << urdf_filename << std::endl;
+    return;
 }

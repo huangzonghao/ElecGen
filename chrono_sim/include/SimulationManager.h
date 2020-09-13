@@ -5,6 +5,7 @@
 #include "SimMotor.h"
 #include "RobotController.h"
 #include "ChUrdfDoc.h"
+#include <Eigen/Core>
 
 class RobotController;
 
@@ -69,7 +70,8 @@ class  SimulationManager {
     void AddMotor(const std::string& body_name, const std::string& link_name,
                   double mass, double size_x, double size_y, double size_z,
                   double pos_x=0, double pos_y=0, double pos_z=0);
-    void AddWaypoint(double x, double y, double z){ waypoints.push_back(chrono::ChVector<>(x,y,z)); };
+    void AddWaypoint(double x, double y, double z);
+    void AddWaypoints(const Eigen::MatrixXd& waypoints_mat);
     void SetStartJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {start_joint_pos = jointpos;};
     void SetGoalJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {goal_joint_pos = jointpos;};
 

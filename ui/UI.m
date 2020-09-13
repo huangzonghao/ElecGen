@@ -6,8 +6,6 @@ if flag
     close(fignum);
 end
 
-urdf_filename = '';
-
 % IO file locations
 outputfile = fullfile('..', 'output.txt');
 output_urdffile = fullfile('..', 'data', 'robots', 'robot.urdf.tmp');
@@ -52,10 +50,12 @@ EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
 
 % data
 envFile = '';
+urdf_file = '';
 envMesh = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
 trajectory = zeros(0,3);
 traj_handle = []; traj_proj_handle = [];
 dist_thresh = 0.05; traj_zoffset = 0.01;
+heightmap = [];
 
 robotName = '';
 robotLinks = '';
@@ -70,10 +70,12 @@ redrawEnv;
 %% SIMULATION
     function run(~,~)
         addpath('../build');
-        mexRun(0, 0, 10, 0, urdf_filename, envFile);
-        writeURDF(output_urdffile, robotName, robotLinks, robotJoints, ButtonFunctions, FunctionType);
+        % writeURDF(output_urdffile, robotName, robotLinks, robotJoints, ButtonFunctions, FunctionType);
 
-        displayOutput;
+        % pass trajectory as a 3xN matrix
+        mexRun(urdf_file, heightmap, trajectory');
+
+        % displayOutput;
     end
 
 %% OUTPUT
@@ -470,8 +472,8 @@ redrawEnv;
             disp('No file selected')
         else
             disp(['Loading ' filename]);
-            urdf_filename = fullfile(pathname, filename);
-            [robotName, robotLinks, robotJoints] = loadURDF(urdf_filename);
+            urdf_file = fullfile(pathname, filename);
+            [robotName, robotLinks, robotJoints] = loadURDF(urdf_file);
             
             redrawRobot;
         end
@@ -510,7 +512,8 @@ redrawEnv;
                     
                     [X, Y] = meshgrid(linspace(0,1,size(heightmap,1)), linspace(0,1,size(heightmap,2)));
                     faces = delaunay(X, Y);
-                    envMesh = triangulation(faces, X(:), Y(:), double(heightmap(:))/255*0.2);
+                    heightmap = double(heightmap)/255*0.2;
+                    envMesh = triangulation(faces, X(:), Y(:), heightmap(:));
             end
             
             V = envMesh.Points;

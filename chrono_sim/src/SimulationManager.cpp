@@ -69,6 +69,20 @@ void SimulationManager::AddMotor(const std::string& body_name, const std::string
     auxrefs.insert(body_name);
 }
 
+void SimulationManager::AddWaypoint(double x, double y, double z){
+    waypoints.push_back(chrono::ChVector<>(x,y,z));
+}
+
+void SimulationManager::AddWaypoints(const Eigen::MatrixXd& waypoints_mat){
+    if (waypoints_mat.rows() != 3){
+        std::cerr << "Error: waypoint matrix passed to SimulationManager::AddWaypoints should be 3xN matrix" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    for (int i = 0; i < waypoints_mat.cols(); ++i){
+        AddWaypoint(waypoints_mat(1,i), waypoints_mat(2,i), waypoints_mat(3,i));
+    }
+}
+
 bool SimulationManager::RunSimulation(bool do_viz){
     task_done = false;
 
