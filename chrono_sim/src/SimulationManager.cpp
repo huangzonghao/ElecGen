@@ -28,11 +28,11 @@ void SimulationManager::SetUrdfFile(std::string filename){
     urdf_doc = std::make_shared<ChUrdfDoc>(filename);
 }
 
-void SimulationManager::SetEnv(std::string filename, double len_x, double len_y, double len_z){
+void SimulationManager::SetEnv(std::string filename, double env_x, double env_y, double env_z){
     env_file_ = filename;
-    env_x_ = len_x;
-    env_y_ = len_y;
-    env_z_ = len_z;
+    env_x_ = env_x;
+    env_y_ = env_y;
+    env_z_ = env_z;
 }
 
 const std::string& SimulationManager::GetUrdfFileName(){
@@ -116,8 +116,9 @@ bool SimulationManager::RunSimulation(bool do_viz){
         std::cout << "Map file not initialized, building default ground" << std::endl;
         // ground body
         auto my_ground = chrono_types::make_shared<ChBodyEasyBox>(50, 50, 0.9, 1.0, true, true, ground_mat);
-        my_ground->SetPos(ChVector<>(0, 0., -0.5));
-        // my_ground->SetRot(Q_from_AngAxis(0.1, VECT_Y));
+        // make sure (0,0) is at the corner of the environment
+        my_ground->SetPos(ChVector<>(25, 25, -0.5));
+        my_ground->SetRot(Q_ROTATE_X_TO_Y);
         my_ground->SetBodyFixed(true);
         auto ground_texture = chrono_types::make_shared<ChColorAsset>();
         ground_texture->SetColor(ChColor(0.2f, 0.2f, 0.2f));
@@ -126,7 +127,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
     }
     else if (env_file_.find(".bmp") != std::string::npos){
         vehicle::RigidTerrain terrain(sim_system.get());
-        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0), QUNIT),
+        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(env_x_ / 2, env_y_ / 2, -0.5), Q_ROTATE_X_TO_Y),
                                       env_file_, "ground_mesh", env_x_, env_y_, 0, env_z_);
         std::cerr << "after" << std::endl;
         patch->SetColor(ChColor(0.2, 0.2, 0.2));
@@ -134,10 +135,36 @@ bool SimulationManager::RunSimulation(bool do_viz){
     }
     else if (env_file_.find(".obj") != std::string::npos){
         vehicle::RigidTerrain terrain(sim_system.get());
-        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0), QUNIT),
+        // TODO: need to set map pos offset, to make (0,0) appear at corner
+        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, 0, -0.5), Q_ROTATE_X_TO_Y),
                                       env_file_, "ground_mesh");
         patch->SetColor(ChColor(0.2, 0.2, 0.2));
         terrain.Initialize();
+
+        // // For debug purposes
+        // auto x_box = chrono_types::make_shared<ChBodyEasyBox>(20, 1, 1, 1.0, true, true, ground_mat);
+        // x_box->SetPos(ChVector<>(10, 0, 0.5));
+        // x_box->SetBodyFixed(true);
+        // auto x_text = chrono_types::make_shared<ChColorAsset>();
+        // x_text->SetColor(ChColor(0.9f, 0.0f, 0.0f)); // red
+        // x_box->AddAsset(x_text);
+        // sim_system->AddBody(x_box);
+
+        // auto y_box = chrono_types::make_shared<ChBodyEasyBox>(1, 20, 1, 1.0, true, true, ground_mat);
+        // y_box->SetPos(ChVector<>(0, 10, 0.5));
+        // y_box->SetBodyFixed(true);
+        // auto y_text = chrono_types::make_shared<ChColorAsset>();
+        // y_text->SetColor(ChColor(0.0f, 0.9f, 0.0f)); // green
+        // y_box->AddAsset(y_text);
+        // sim_system->AddBody(y_box);
+
+        // auto z_box = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 20, 1.0, true, true, ground_mat);
+        // z_box->SetPos(ChVector<>(0, 0, 10));
+        // z_box->SetBodyFixed(true);
+        // auto z_text = chrono_types::make_shared<ChColorAsset>();
+        // z_text->SetColor(ChColor(0.0f, 0.0f, 0.9f)); // blue
+        // z_box->AddAsset(z_text);
+        // sim_system->AddBody(z_box);
     }
     else {
         std::cerr << "Map file " << env_file_ << " not recognized, exiting" << std::endl;

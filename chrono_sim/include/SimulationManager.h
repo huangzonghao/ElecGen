@@ -54,7 +54,7 @@ class  SimulationManager {
 
     void SetSystemType(SystemType new_type){ system_type = new_type; }
     void SetUrdfFile(std::string filename);
-    void SetEnv(std::string filename, double len_x=50, double len_y=50, double len_z=2.5);
+    void SetEnv(std::string filename, double env_x=50, double env_y=50, double env_z=2.5);
     void SetFrictionS(double fs) {system_friction_s = fs;};
     void SetFrictionK(double fk) {system_friction_k = fk;};
 
