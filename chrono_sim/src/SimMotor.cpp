@@ -160,7 +160,7 @@ SimMotor::SimMotor(const std::string& body_name, const std::string& link_name,
 {}
 
 void SimMotor::AddtoSystem(const chrono::ChUrdfDoc& urdf_doc){
-    auto& sys = urdf_doc.robot_system;
+    auto& sys = urdf_doc.GetSystem();
     chlinkbody = &(urdf_doc.GetLinkBodies(link_name));
 
     if (!body_name.empty()){

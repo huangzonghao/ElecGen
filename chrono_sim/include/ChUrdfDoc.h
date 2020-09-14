@@ -31,7 +31,7 @@ class ChUrdfDoc {
 
     const std::string& GetUrdfFileName() const { return urdf_file_; }
 
-    urdf::ModelInterfaceSharedPtr GetUrdfRobot() const { return urdf_robot; }
+    urdf::ModelInterfaceSharedPtr GetUrdfRobot() const { return urdf_robot_; }
 
     void SetAuxRef(std::unordered_set<std::string>& new_auxrefs);
 
@@ -41,12 +41,9 @@ class ChUrdfDoc {
     bool AddtoSystem(const std::shared_ptr<ChSystem>& sys, const ChCoordsys<>& init_coord);
     bool AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::shared_ptr<ChBody>& init_pos_body);
 
-    std::shared_ptr<chrono::ChSystem> GetSystem() const { return robot_system; }
+    const std::shared_ptr<chrono::ChSystem> GetSystem() const { return ch_system_; }
 
-    std::shared_ptr<chrono::ChSystem> robot_system;
-    urdf::ModelInterfaceSharedPtr urdf_robot;
-
-    const std::string& GetRobotName() const { return urdf_robot->getName(); }
+    const std::string& GetRobotName() const { return urdf_robot_->getName(); }
 
     const ChLinkBodies& GetLinkBodies(const std::string& name) const;
 
@@ -73,11 +70,13 @@ class ChUrdfDoc {
     // concatenates the urdf flie path and the relative path to the urdf file
     int link_idx_;
     std::string urdf_file_;
+    urdf::ModelInterfaceSharedPtr urdf_robot_;
+    std::shared_ptr<chrono::ChSystem> ch_system_;
     std::map<std::string, ChMatPair> ch_materials_;
     std::map<std::string, ChLinkBodies> ch_link_bodies_;
     std::shared_ptr<ChBody> ch_root_body_;
     // names of bodies that would use ChBodyAuxRef
-    std::unordered_set<std::string> *auxrefs = NULL;
+    std::unordered_set<std::string> *auxrefs_ = NULL;
 };
 
 }  // END_OF_NAMESPACE____

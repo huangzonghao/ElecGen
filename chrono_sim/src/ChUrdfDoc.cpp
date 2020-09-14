@@ -25,8 +25,8 @@ bool ChUrdfDoc::color_empty(const urdf::Color& test_color){
 }
 
 void ChUrdfDoc::convert_materials(){
-    for (auto u_mat_iter = urdf_robot->materials_.begin();
-         u_mat_iter != urdf_robot->materials_.end();
+    for (auto u_mat_iter = urdf_robot_->materials_.begin();
+         u_mat_iter != urdf_robot_->materials_.end();
          ++u_mat_iter){
 
         ChMatPair tmp_pair;
@@ -49,7 +49,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     urdf::JointSharedPtr u_parent_joint = u_link->parent_joint;
 
     std::shared_ptr<ChBody> ch_body;
-    if (auxrefs && auxrefs->find(u_link->name) != auxrefs->end()){
+    if (auxrefs_ && auxrefs_->find(u_link->name) != auxrefs_->end()){
         ch_body = chrono_types::make_shared<ChBodyAuxRef>();
     }
     else {
@@ -222,7 +222,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
         ch_body->SetCollide(true);
     }
 
-    robot_system->AddBody(ch_body);
+    ch_system_->AddBody(ch_body);
 
     // then process the joint with parent link
     // TODO: Chrono supports different types of joints, blindly choose ChLinkLock family for now
@@ -291,7 +291,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                 break;
         }
         ch_parent_link->SetNameString(u_parent_joint->name);
-        robot_system->AddLink(ch_parent_link);
+        ch_system_->AddLink(ch_parent_link);
 
         ch_link_bodies_.emplace(u_parent_joint->name, ChLinkBodies{ch_body, ch_parent_body, ch_parent_link});
     }
@@ -311,9 +311,9 @@ bool ChUrdfDoc::Load_URDF(const std::string& filename) {
         return true;
     }
     urdf_file_ = filename;
-    urdf_robot = urdf::parseURDFFile(filename);
+    urdf_robot_ = urdf::parseURDFFile(filename);
 
-    if (!urdf_robot){
+    if (!urdf_robot_){
         std::cerr << "ERROR: Model Parsing the xml failed" << std::endl;
         return false;
     }
@@ -335,16 +335,16 @@ bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const ChCoords
 }
 
 bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::shared_ptr<ChBody>& init_pos_body) {
-    if (!urdf_robot){
+    if (!urdf_robot_){
         std::cerr << "ERROR: No URDF loaded, call Load_URDF first" << std::endl;
         return false;
     }
-    std::cout << "robot name is: " << urdf_robot->getName() << std::endl;
-    robot_system = sys;
+    std::cout << "robot name is: " << urdf_robot_->getName() << std::endl;
+    ch_system_ = sys;
 
     convert_materials();
 
-    urdf::LinkConstSharedPtr root_link = urdf_robot->getRoot();
+    urdf::LinkConstSharedPtr root_link = urdf_robot_->getRoot();
     if (root_link){
         link_idx_ = 0;
         ch_root_body_ = convert_links(root_link, init_pos_body);
@@ -359,23 +359,23 @@ bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::sha
 
 const ChLinkBodies& ChUrdfDoc::GetLinkBodies(const std::string& name) const {
     if (ch_link_bodies_.find(name) == ch_link_bodies_.end()){
-        std::cerr << "Error: robot " << urdf_robot->getName() << " doesn't contain link " << name << std::endl;
+        std::cerr << "Error: robot " << urdf_robot_->getName() << " doesn't contain link " << name << std::endl;
         exit(EXIT_FAILURE);
     }
     return ch_link_bodies_.find(name)->second;
 }
 
 void ChUrdfDoc::SetAuxRef(std::unordered_set<std::string>& new_auxrefs){
-    auxrefs = &new_auxrefs;
+    auxrefs_ = &new_auxrefs;
 }
 
 const std::string& ChUrdfDoc::GetLinkBodyName(const std::string& link_name, int body_idx){
-    if (!urdf_robot){
+    if (!urdf_robot_){
         std::cerr << "ERROR: No URDF loaded, call Load_URDF first" << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    const urdf::JointConstSharedPtr& u_joint = urdf_robot->getJoint(link_name);
+    const urdf::JointConstSharedPtr& u_joint = urdf_robot_->getJoint(link_name);
     if (!u_joint){
         std::cerr << "ERROR: link " << link_name << "not found in " << GetRobotName() << std::endl;
         exit(EXIT_FAILURE);

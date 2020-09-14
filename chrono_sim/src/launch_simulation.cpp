@@ -27,10 +27,10 @@ void test_fourwheel(Eigen::MatrixXd waypoints){
         bool task_done = sm.RunSimulation();
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.motors[0]->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.motors[1]->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.motors[2]->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.motors[3]->max_torque << std::endl;
+        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
+        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
+        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
+        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
 
         sim_done = true;
     }
@@ -65,10 +65,10 @@ void test_fourleg(Eigen::MatrixXd waypoints){
         bool task_done = sm.RunSimulation();
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.motors[0]->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.motors[1]->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.motors[2]->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.motors[3]->max_torque << std::endl;
+        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
+        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
+        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
+        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
 
         sim_done = true;
     }
@@ -103,10 +103,10 @@ void test_fourleg2(Eigen::MatrixXd waypoints){
         // bool task_done = sm.RunSimulation(false);
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.motors[0]->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.motors[1]->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.motors[2]->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.motors[3]->max_torque << std::endl;
+        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
+        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
+        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
+        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
 
         sim_done = true;
     }
@@ -146,10 +146,10 @@ void test_fourleg3(Eigen::MatrixXd waypoints){
         // bool task_done = sm.RunSimulation(false);
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.motors[0]->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.motors[1]->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.motors[2]->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.motors[3]->max_torque << std::endl;
+        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
+        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
+        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
+        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
 
         sim_done = true;
     }

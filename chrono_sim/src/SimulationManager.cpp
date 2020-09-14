@@ -13,19 +13,19 @@ SimulationManager::SimulationManager(double step_size,
                                      double system_friction_k,
                                      double system_friction_s,
                                      SystemType system_type):
-    step_size(step_size), timeout(timeout),
-    system_friction_k(system_friction_k),
-    system_friction_s(system_friction_s),
-    system_type(NSC)
+    step_size_(step_size), timeout_(timeout),
+    k_friction_(system_friction_k),
+    s_friction_(system_friction_s),
+    system_type_(system_type)
 {
-    payloads.clear();
-    motors.clear();
-    waypoints.clear();
+    payloads_.clear();
+    motors_.clear();
+    waypoints_.clear();
     SetChronoDataPath(CHRONO_DATA_DIR);
 }
 
 void SimulationManager::SetUrdfFile(std::string filename){
-    urdf_doc = std::make_shared<ChUrdfDoc>(filename);
+    urdf_doc_ = std::make_shared<ChUrdfDoc>(filename);
 }
 
 void SimulationManager::SetEnv(std::string filename, double env_x, double env_y, double env_z){
@@ -36,48 +36,48 @@ void SimulationManager::SetEnv(std::string filename, double env_x, double env_y,
 }
 
 const std::string& SimulationManager::GetUrdfFileName(){
-    if(!urdf_doc){
+    if(!urdf_doc_){
         std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
         exit(EXIT_FAILURE);
     }
-    return urdf_doc->GetUrdfFileName();
+    return urdf_doc_->GetUrdfFileName();
 }
 
 void SimulationManager::AddPayload(const std::string& body_name, double mass,
                                    double size_x, double size_y, double size_z,
                                    double pos_x, double pos_y, double pos_z){
-    payloads.push_back(std::make_shared<SimPayload>(body_name, mass,
+    payloads_.push_back(std::make_shared<SimPayload>(body_name, mass,
                                                     size_x, size_y, size_z,
                                                     pos_x, pos_y, pos_z));
-    auxrefs.insert(body_name);
+    auxrefs_.insert(body_name);
 }
 
 void SimulationManager::AddMotor(const std::string& link_name,
                                  double mass, double size_x, double size_y, double size_z,
                                  double pos_x, double pos_y, double pos_z){
-    motors.push_back(std::make_shared<SimMotor>(link_name, mass,
+    motors_.push_back(std::make_shared<SimMotor>(link_name, mass,
                                                 size_x, size_y, size_z,
                                                 pos_x, pos_y, pos_z));
 
-    if (!urdf_doc){
+    if (!urdf_doc_){
         std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
         return;
     }
-    auto& body_name = urdf_doc->GetLinkBodyName(link_name, 2);
-    auxrefs.insert(body_name);
+    auto& body_name = urdf_doc_->GetLinkBodyName(link_name, 2);
+    auxrefs_.insert(body_name);
 }
 
 void SimulationManager::AddMotor(const std::string& body_name, const std::string& link_name,
                                  double mass, double size_x, double size_y, double size_z,
                                  double pos_x, double pos_y, double pos_z){
-    motors.push_back(std::make_shared<SimMotor>(body_name, link_name, mass,
+    motors_.push_back(std::make_shared<SimMotor>(body_name, link_name, mass,
                                                 size_x, size_y, size_z,
                                                 pos_x, pos_y, pos_z));
-    auxrefs.insert(body_name);
+    auxrefs_.insert(body_name);
 }
 
 void SimulationManager::AddWaypoint(double x, double y, double z){
-    waypoints.push_back(chrono::ChVector<>(x,y,z));
+    waypoints_.push_back(chrono::ChVector<>(x,y,z));
 }
 
 void SimulationManager::AddWaypoints(const Eigen::MatrixXd& waypoints_mat){
@@ -91,25 +91,25 @@ void SimulationManager::AddWaypoints(const Eigen::MatrixXd& waypoints_mat){
 }
 
 bool SimulationManager::RunSimulation(bool do_viz){
-    task_done = false;
+    task_done_ = false;
 
-    if (system_type == NSC){
-        sim_system = chrono_types::make_shared<ChSystemNSC>();
+    if (system_type_ == NSC){
+        ch_system_ = chrono_types::make_shared<ChSystemNSC>();
     }
-    else if (system_type == SMC){
-        sim_system = chrono_types::make_shared<ChSystemSMC>();
+    else if (system_type_ == SMC){
+        ch_system_ = chrono_types::make_shared<ChSystemSMC>();
     }
     else{
-        std::cerr << "Wrong system type: " << system_type << std::endl;
+        std::cerr << "Wrong system type: " << system_type_ << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    sim_system->Set_G_acc(ChVector<>(0, 0, -9.81));
-    sim_system->SetSolverMaxIterations(20);  // the higher, the easier to keep the constraints satisifed.
+    ch_system_->Set_G_acc(ChVector<>(0, 0, -9.81));
+    ch_system_->SetSolverMaxIterations(20);  // the higher, the easier to keep the constraints satisifed.
 
     auto ground_mat = chrono_types::make_shared<ChMaterialSurfaceNSC>();
-    ground_mat->SetSfriction(system_friction_s);
-    ground_mat->SetKfriction(system_friction_k);
+    ground_mat->SetSfriction(s_friction_);
+    ground_mat->SetKfriction(k_friction_);
     ground_mat->SetRestitution(0.01f);
 
     if (env_file_.empty()){
@@ -123,10 +123,10 @@ bool SimulationManager::RunSimulation(bool do_viz){
         auto ground_texture = chrono_types::make_shared<ChColorAsset>();
         ground_texture->SetColor(ChColor(0.2f, 0.2f, 0.2f));
         my_ground->AddAsset(ground_texture);
-        sim_system->AddBody(my_ground);
+        ch_system_->AddBody(my_ground);
     }
     else if (env_file_.find(".bmp") != std::string::npos){
-        vehicle::RigidTerrain terrain(sim_system.get());
+        vehicle::RigidTerrain terrain(ch_system_.get());
         auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(env_x_ / 2, env_y_ / 2, -0.5), Q_ROTATE_X_TO_Y),
                                       env_file_, "ground_mesh", env_x_, env_y_, 0, env_z_);
         std::cerr << "after" << std::endl;
@@ -134,7 +134,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
         terrain.Initialize();
     }
     else if (env_file_.find(".obj") != std::string::npos){
-        vehicle::RigidTerrain terrain(sim_system.get());
+        vehicle::RigidTerrain terrain(ch_system_.get());
         // TODO: need to set map pos offset, to make (0,0) appear at corner
         auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, 0, -0.5), Q_ROTATE_X_TO_Y),
                                       env_file_, "ground_mesh");
@@ -148,7 +148,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
         // auto x_text = chrono_types::make_shared<ChColorAsset>();
         // x_text->SetColor(ChColor(0.9f, 0.0f, 0.0f)); // red
         // x_box->AddAsset(x_text);
-        // sim_system->AddBody(x_box);
+        // ch_system_->AddBody(x_box);
 
         // auto y_box = chrono_types::make_shared<ChBodyEasyBox>(1, 20, 1, 1.0, true, true, ground_mat);
         // y_box->SetPos(ChVector<>(0, 10, 0.5));
@@ -156,7 +156,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
         // auto y_text = chrono_types::make_shared<ChColorAsset>();
         // y_text->SetColor(ChColor(0.0f, 0.9f, 0.0f)); // green
         // y_box->AddAsset(y_text);
-        // sim_system->AddBody(y_box);
+        // ch_system_->AddBody(y_box);
 
         // auto z_box = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 20, 1.0, true, true, ground_mat);
         // z_box->SetPos(ChVector<>(0, 0, 10));
@@ -164,22 +164,22 @@ bool SimulationManager::RunSimulation(bool do_viz){
         // auto z_text = chrono_types::make_shared<ChColorAsset>();
         // z_text->SetColor(ChColor(0.0f, 0.0f, 0.9f)); // blue
         // z_box->AddAsset(z_text);
-        // sim_system->AddBody(z_box);
+        // ch_system_->AddBody(z_box);
     }
     else {
         std::cerr << "Map file " << env_file_ << " not recognized, exiting" << std::endl;
         return 1;
     }
 
-    if (urdf_doc){
-        urdf_doc->SetAuxRef(auxrefs);
+    if (urdf_doc_){
+        urdf_doc_->SetAuxRef(auxrefs_);
 
         bool add_ok;
-        if (!waypoints.empty()){
-            add_ok = urdf_doc->AddtoSystem(sim_system, waypoints[0]);
+        if (!waypoints_.empty()){
+            add_ok = urdf_doc_->AddtoSystem(ch_system_, waypoints_[0]);
         }
         else{
-            add_ok = urdf_doc->AddtoSystem(sim_system, ChVector<>(0,0,0));
+            add_ok = urdf_doc_->AddtoSystem(ch_system_, ChVector<>(0,0,0));
         }
 
         if (!add_ok) {
@@ -195,52 +195,52 @@ bool SimulationManager::RunSimulation(bool do_viz){
     // add waypoint markers
     auto wp_color = chrono_types::make_shared<ChColorAsset>();
     wp_color->SetColor(ChColor(0.8f, 0.0f, 0.0f));
-    // for(auto waypoint : waypoints){
+    // for(auto waypoint : waypoints_){
     // TODO: put first waypoint marker on the ground
-    for(auto waypoint = waypoints.begin() + 1; waypoint != waypoints.end(); ++waypoint){
+    for(auto waypoint = waypoints_.begin() + 1; waypoint != waypoints_.end(); ++waypoint){
         auto wp_marker = chrono_types::make_shared<ChBodyEasyBox>(0.5, 0.5, 0.2, 1.0, true, false);
         wp_marker->SetPos(*waypoint);
         wp_marker->SetBodyFixed(true);
         wp_marker->AddAsset(wp_color);
-        sim_system->AddBody(wp_marker);
+        ch_system_->AddBody(wp_marker);
     }
 
     // Add motors and extra weights to system
-    for (auto payload : payloads) payload->AddtoSystem(sim_system);
-    for (auto motor : motors) motor->AddtoSystem(*urdf_doc);
+    for (auto payload : payloads_) payload->AddtoSystem(ch_system_);
+    for (auto motor : motors_) motor->AddtoSystem(*urdf_doc_);
 
     // init controller
-    if (urdf_doc->GetRobotName().find("manipulator") != std::string::npos) {
-        controller = std::make_shared<ManipulatorController>(&motors, &waypoints);
+    if (urdf_doc_->GetRobotName().find("manipulator") != std::string::npos) {
+        controller_ = std::make_shared<ManipulatorController>(&motors_, &waypoints_);
     }
-    else if (urdf_doc->GetRobotName().find("leg") != std::string::npos) {
-        controller = std::make_shared<LeggedController>(&motors, &waypoints, urdf_doc->GetRootBody());
-        if (urdf_doc->GetRobotName().find("2") != std::string::npos) {
-            std::dynamic_pointer_cast<LeggedController>(controller)->model = LeggedController::M2;
+    else if (urdf_doc_->GetRobotName().find("leg") != std::string::npos) {
+        controller_ = std::make_shared<LeggedController>(&motors_, &waypoints_, urdf_doc_->GetRootBody());
+        if (urdf_doc_->GetRobotName().find("2") != std::string::npos) {
+            std::dynamic_pointer_cast<LeggedController>(controller_)->model = LeggedController::M2;
         }
-        else if (urdf_doc->GetRobotName().find("3") != std::string::npos) {
-            std::dynamic_pointer_cast<LeggedController>(controller)->model = LeggedController::M3;
+        else if (urdf_doc_->GetRobotName().find("3") != std::string::npos) {
+            std::dynamic_pointer_cast<LeggedController>(controller_)->model = LeggedController::M3;
         }
         else{
-            std::dynamic_pointer_cast<LeggedController>(controller)->model = LeggedController::M1;
+            std::dynamic_pointer_cast<LeggedController>(controller_)->model = LeggedController::M1;
         }
 
     }
-    else if (urdf_doc->GetRobotName().find("wheel") != std::string::npos) {
-        controller = std::make_shared<WheelController>(&motors, &waypoints, urdf_doc->GetRootBody());
+    else if (urdf_doc_->GetRobotName().find("wheel") != std::string::npos) {
+        controller_ = std::make_shared<WheelController>(&motors_, &waypoints_, urdf_doc_->GetRootBody());
     }
     else {
-        std::cerr << "Need to specify controller type in robot name" << std::endl;
+        std::cerr << "Need to specify controller_ type in robot name" << std::endl;
     }
 
-    const std::shared_ptr<ChBody>& camera_body = urdf_doc->GetCameraBody();
+    const std::shared_ptr<ChBody>& camera_body = urdf_doc_->GetCameraBody();
 
     std::chrono::steady_clock::time_point tik;
     std::chrono::steady_clock::time_point tok;
     if(do_viz){
         using namespace chrono::irrlicht;
         using namespace irr::core;
-        ChIrrApp vis_app(sim_system.get(),
+        ChIrrApp vis_app(ch_system_.get(),
                          L"Auto-Electronics Simulation",
                          dimension2d<irr::u32>(640, 480), false);
 
@@ -252,17 +252,17 @@ bool SimulationManager::RunSimulation(bool do_viz){
         vis_app.AssetBindAll();
         vis_app.AssetUpdateAll();
 
-        vis_app.SetTimestep(step_size);
+        vis_app.SetTimestep(step_size_);
 
         tik = std::chrono::steady_clock::now();
-        while (sim_system->GetChTime() < timeout && !task_done && vis_app.GetDevice()->run()) {
+        while (ch_system_->GetChTime() < timeout_ && !task_done_ && vis_app.GetDevice()->run()) {
             vis_app.BeginScene(true, true, irr::video::SColor(255, 140, 161, 192));
             // vis_app.GetSceneManager()->getActiveCamera()->setTarget(vector3dfCH(camera_body->GetPos()));
             vis_app.DrawAll();
             vis_app.DoStep();
             vis_app.EndScene();
 
-            task_done = controller->Update();
+            task_done_ = controller_->Update();
         }
         tok = std::chrono::steady_clock::now();
 
@@ -271,16 +271,16 @@ bool SimulationManager::RunSimulation(bool do_viz){
         std::cout << "Simulating without visualization" << std::endl;
 
         tik = std::chrono::steady_clock::now();
-        while(sim_system->GetChTime() < timeout && !task_done) {
-            sim_system->DoStepDynamics(step_size);
+        while(ch_system_->GetChTime() < timeout_ && !task_done_) {
+            ch_system_->DoStepDynamics(step_size_);
 
-            task_done = controller->Update();
+            task_done_ = controller_->Update();
         }
         tok = std::chrono::steady_clock::now();
     }
 
     std::cout << "Simulation time: " << std::chrono::duration_cast<std::chrono::milliseconds>(tok - tik).count() << "[ms]" << std::endl;
-    std::cout << "Step count: " << sim_system->GetStepcount() << std::endl;
+    std::cout << "Step count: " << ch_system_->GetStepcount() << std::endl;
 
     return true;
 }
