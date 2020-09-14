@@ -28,6 +28,13 @@ void SimulationManager::SetUrdfFile(std::string filename){
     urdf_doc = std::make_shared<ChUrdfDoc>(filename);
 }
 
+void SimulationManager::SetEnv(std::string filename, double len_x, double len_y, double len_z){
+    env_file_ = filename;
+    env_x_ = len_x;
+    env_y_ = len_y;
+    env_z_ = len_z;
+}
+
 const std::string& SimulationManager::GetUrdfFileName(){
     if(!urdf_doc){
         std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
@@ -105,7 +112,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
     ground_mat->SetKfriction(system_friction_k);
     ground_mat->SetRestitution(0.01f);
 
-    if (env_file.empty()){
+    if (env_file_.empty()){
         std::cout << "Map file not initialized, building default ground" << std::endl;
         // ground body
         auto my_ground = chrono_types::make_shared<ChBodyEasyBox>(50, 50, 0.9, 1.0, true, true, ground_mat);
@@ -117,25 +124,25 @@ bool SimulationManager::RunSimulation(bool do_viz){
         my_ground->AddAsset(ground_texture);
         sim_system->AddBody(my_ground);
     }
-    else if (env_file.find(".bmp") != std::string::npos){
+    else if (env_file_.find(".bmp") != std::string::npos){
         vehicle::RigidTerrain terrain(sim_system.get());
         auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0), QUNIT),
-                                      env_file, "ground_mesh", 50, 50, 0, 2);
+                                      env_file_, "ground_mesh", env_x_, env_y_, 0, env_z_);
+        std::cerr << "after" << std::endl;
         patch->SetColor(ChColor(0.2, 0.2, 0.2));
         terrain.Initialize();
     }
-    else if (env_file.find(".obj") != std::string::npos){
+    else if (env_file_.find(".obj") != std::string::npos){
         vehicle::RigidTerrain terrain(sim_system.get());
         auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, -0.5, 0), QUNIT),
-                                      env_file, "ground_mesh");
+                                      env_file_, "ground_mesh");
         patch->SetColor(ChColor(0.2, 0.2, 0.2));
         terrain.Initialize();
     }
     else {
-        std::cerr << "Map file " << env_file << " not recognized, exiting" << std::endl;
+        std::cerr << "Map file " << env_file_ << " not recognized, exiting" << std::endl;
         return 1;
     }
-
 
     if (urdf_doc){
         urdf_doc->SetAuxRef(auxrefs);
@@ -161,9 +168,11 @@ bool SimulationManager::RunSimulation(bool do_viz){
     // add waypoint markers
     auto wp_color = chrono_types::make_shared<ChColorAsset>();
     wp_color->SetColor(ChColor(0.8f, 0.0f, 0.0f));
-    for(auto waypoint : waypoints){
+    // for(auto waypoint : waypoints){
+    // TODO: put first waypoint marker on the ground
+    for(auto waypoint = waypoints.begin() + 1; waypoint != waypoints.end(); ++waypoint){
         auto wp_marker = chrono_types::make_shared<ChBodyEasyBox>(0.5, 0.5, 0.2, 1.0, true, false);
-        wp_marker->SetPos(waypoint);
+        wp_marker->SetPos(*waypoint);
         wp_marker->SetBodyFixed(true);
         wp_marker->AddAsset(wp_color);
         sim_system->AddBody(wp_marker);

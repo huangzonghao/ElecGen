@@ -31,9 +31,6 @@ class  SimulationManager {
     std::shared_ptr<std::vector<double> > start_joint_pos;
     std::shared_ptr<std::vector<double> > goal_joint_pos;
 
-    std::string env_file;
-    chrono::ChVector<> env_size;
-
     std::shared_ptr<chrono::ChUrdfDoc> urdf_doc;
     std::shared_ptr<chrono::ChSystem> sim_system;
     std::shared_ptr<RobotController> controller;
@@ -57,7 +54,7 @@ class  SimulationManager {
 
     void SetSystemType(SystemType new_type){ system_type = new_type; }
     void SetUrdfFile(std::string filename);
-    void SetEnvFile(std::string filename){ env_file = filename; };
+    void SetEnv(std::string filename, double len_x=50, double len_y=50, double len_z=2.5);
     void SetFrictionS(double fs) {system_friction_s = fs;};
     void SetFrictionK(double fk) {system_friction_k = fk;};
 
@@ -77,6 +74,11 @@ class  SimulationManager {
 
     bool RunSimulation(bool do_viz=true);
     const std::string& GetUrdfFileName();
+  private:
+    std::string env_file_;
+    double env_x_ = 50;
+    double env_y_ = 50;
+    double env_z_ = 2.5;
 
 };
 
