@@ -50,6 +50,8 @@ class ChUrdfDoc {
     std::shared_ptr<ChBody> GetRootBody() const { return ch_root_body_; }
     std::shared_ptr<ChBody> GetCameraBody() const { return GetRootBody(); }
 
+    double GetRootMass() const { return ch_root_body_->GetMass(); }
+
     const std::string& GetLinkBodyName(const std::string& link_name, int body_idx);
 
   private:

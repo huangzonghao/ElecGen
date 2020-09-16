@@ -49,9 +49,9 @@ RobotAxes = makeAxes(RobotPanel, [0.05 0.05 0.7 0.9], 'robot');
 EnvAxes = makeAxes(EnvPanel, [0.05 0.05 0.9 0.9], 'environment');
 
 % data
-envFile = '';
+env_file = '';
 urdf_file = '';
-envMesh = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
+env_mesh = triangulation([1 2 3; 2 3 4], [0 0 0; 0 1 .01; 1 0 0; 1 1 0]);
 trajectory = zeros(0,3);
 traj_handle = []; traj_proj_handle = [];
 dist_thresh = 0.05; traj_zoffset = 0.01;
@@ -75,7 +75,7 @@ redrawEnv;
         % swap x y of each way point to align with x y of heightmap.
         sim_trajectory = trajectory(:, [2 1 3]);
         % pass trajectory as a 3xN matrix
-        mexRun(urdf_file, heightmap, sim_trajectory');
+        mexRun(urdf_file, env_file, heightmap, sim_trajectory');
 
         % displayOutput;
     end
@@ -176,7 +176,7 @@ redrawEnv;
             return;
         end
         
-        pt = findIntersection(EnvAxes.CurrentPoint, envMesh);
+        pt = findIntersection(EnvAxes.CurrentPoint, env_mesh);
         trajectory(end+1,:) = pt;
         redrawTrajectory;
     end
@@ -288,7 +288,7 @@ redrawEnv;
 
     function figureWindowButtonUpCallback(~, ~)
         if (mousedata.pressed && strcmp(mousedata.mouse_button, 'trajectory'))
-            pt = findIntersection(EnvAxes.CurrentPoint, envMesh);
+            pt = findIntersection(EnvAxes.CurrentPoint, env_mesh);
             trajectory(mousedata.traj_idx,:) = pt;
             redrawTrajectory;
         end
@@ -408,7 +408,7 @@ redrawEnv;
     function redrawEnv
         % redraw environment
         cla(EnvAxes)
-        trisurf(envMesh, 'Parent', EnvAxes, ...
+        trisurf(env_mesh, 'Parent', EnvAxes, ...
             'FaceColor', [.8, .8, .8], 'EdgeColor', 'none',...
             'SpecularStrength', .5, 'AmbientStrength', .5, 'ButtonDownFcn', @envClick);
         updateCamera(EnvAxes)
@@ -417,7 +417,7 @@ redrawEnv;
 
     function redrawTrajectory
         if size(trajectory,1) > 1
-            traj_proj = projectOnHeightMap(trajectory, envMesh);
+            traj_proj = projectOnHeightMap(trajectory, env_mesh);
         else
             traj_proj = zeros(0,3);
         end
@@ -475,7 +475,8 @@ redrawEnv;
         else
             disp(['Loading ' filename]);
             urdf_file = fullfile(pathname, filename);
-            [robotName, robotLinks, robotJoints] = loadURDF(urdf_file);
+            % TODO: fix loadURDF for multiple visual assets per link
+            % [robotName, robotLinks, robotJoints] = loadURDF(urdf_file);
             
             redrawRobot;
         end
@@ -499,15 +500,15 @@ redrawEnv;
             disp('No file selected')
         else
             [~,~,ext] = fileparts(filename);
-            envFile = fullfile(pathname, filename);
+            env_file = fullfile(pathname, filename);
             switch (ext)
                 case '.stl'
-                    envMesh = stlread(envFile);
+                    env_mesh = stlread(env_file);
                 case '.obj'
-                    obj = readObj(envFile);
-                    envMesh = triangulation(obj.f.v, obj.v);
+                    obj = readObj(env_file);
+                    env_mesh = triangulation(obj.f.v, obj.v);
                 case '.bmp'
-                    heightmap = imread(envFile);
+                    heightmap = imread(env_file);
                     if (size(heightmap,3) > 1)
                         heightmap = rgb2gray(heightmap);
                     end
@@ -515,10 +516,10 @@ redrawEnv;
                     [X, Y] = meshgrid(linspace(0,1,size(heightmap,1)), linspace(0,1,size(heightmap,2)));
                     faces = delaunay(X, Y);
                     heightmap = double(heightmap)/255*0.2;
-                    envMesh = triangulation(faces, X(:), Y(:), heightmap(:));
+                    env_mesh = triangulation(faces, X(:), Y(:), heightmap(:));
             end
             
-            V = envMesh.Points;
+            V = env_mesh.Points;
             dist = max(V,[],1)-min(V,[],1);
             dist_thresh = min(dist) / 20;
             

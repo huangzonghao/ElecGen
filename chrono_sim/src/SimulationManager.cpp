@@ -5,6 +5,7 @@
 
 #include "SimulationManager.h"
 #include "data_dir_path.h"
+#include "traj_optimizer.h"
 
 using namespace chrono;
 
@@ -20,7 +21,7 @@ SimulationManager::SimulationManager(double step_size,
 {
     payloads_.clear();
     motors_.clear();
-    waypoints_.clear();
+    ch_waypoints_.clear();
     SetChronoDataPath(CHRONO_DATA_DIR);
 }
 
@@ -33,6 +34,9 @@ void SimulationManager::SetEnv(std::string filename, double env_x, double env_y,
     env_x_ = env_x;
     env_y_ = env_y;
     env_z_ = env_z;
+}
+void SimulationManager::SetEigenHeightmap(const std::shared_ptr<const Eigen::MatrixXd>& heightmap){
+    heightmap_ = heightmap;
 }
 
 const std::string& SimulationManager::GetUrdfFileName(){
@@ -71,16 +75,18 @@ void SimulationManager::AddMotor(const std::string& body_name, const std::string
                                  double mass, double size_x, double size_y, double size_z,
                                  double pos_x, double pos_y, double pos_z){
     motors_.push_back(std::make_shared<SimMotor>(body_name, link_name, mass,
-                                                size_x, size_y, size_z,
-                                                pos_x, pos_y, pos_z));
+                                                 size_x, size_y, size_z,
+                                                 pos_x, pos_y, pos_z));
     auxrefs_.insert(body_name);
 }
 
 void SimulationManager::AddWaypoint(double x, double y, double z){
-    waypoints_.push_back(chrono::ChVector<>(x,y,z));
+    ch_waypoints_.push_back(chrono::ChVector<>(x,y,z));
 }
 
-void SimulationManager::AddWaypoints(const Eigen::MatrixXd& waypoints_mat){
+void SimulationManager::AddWaypoints(const std::shared_ptr<const Eigen::MatrixXd>& waypoints_ptr){
+    eigen_waypoints_ = waypoints_ptr;
+    auto& waypoints_mat = *waypoints_ptr;
     if (waypoints_mat.rows() != 3){
         std::cerr << "Error: waypoint matrix passed to SimulationManager::AddWaypoints should be 3xN matrix" << std::endl;
         exit(EXIT_FAILURE);
@@ -175,8 +181,8 @@ bool SimulationManager::RunSimulation(bool do_viz){
         urdf_doc_->SetAuxRef(auxrefs_);
 
         bool add_ok;
-        if (!waypoints_.empty()){
-            add_ok = urdf_doc_->AddtoSystem(ch_system_, waypoints_[0]);
+        if (!ch_waypoints_.empty()){
+            add_ok = urdf_doc_->AddtoSystem(ch_system_, ch_waypoints_[0]);
         }
         else{
             add_ok = urdf_doc_->AddtoSystem(ch_system_, ChVector<>(0,0,0));
@@ -195,9 +201,9 @@ bool SimulationManager::RunSimulation(bool do_viz){
     // add waypoint markers
     auto wp_color = chrono_types::make_shared<ChColorAsset>();
     wp_color->SetColor(ChColor(0.8f, 0.0f, 0.0f));
-    // for(auto waypoint : waypoints_){
+    // for(auto waypoint : ch_waypoints_){
     // TODO: put first waypoint marker on the ground
-    for(auto waypoint = waypoints_.begin() + 1; waypoint != waypoints_.end(); ++waypoint){
+    for(auto waypoint = ch_waypoints_.begin() + 1; waypoint != ch_waypoints_.end(); ++waypoint){
         auto wp_marker = chrono_types::make_shared<ChBodyEasyBox>(0.5, 0.5, 0.2, 1.0, true, false);
         wp_marker->SetPos(*waypoint);
         wp_marker->SetBodyFixed(true);
@@ -211,15 +217,58 @@ bool SimulationManager::RunSimulation(bool do_viz){
 
     // init controller
     if (urdf_doc_->GetRobotName().find("manipulator") != std::string::npos) {
-        controller_ = std::make_shared<ManipulatorController>(&motors_, &waypoints_);
+        controller_ = std::make_shared<ManipulatorController>(&motors_, &ch_waypoints_);
     }
     else if (urdf_doc_->GetRobotName().find("leg") != std::string::npos) {
-        controller_ = std::make_shared<LeggedController>(&motors_, &waypoints_, urdf_doc_->GetRootBody());
+        controller_ = std::make_shared<LeggedController>(&motors_, &ch_waypoints_, urdf_doc_->GetRootBody());
         if (urdf_doc_->GetRobotName().find("2") != std::string::npos) {
             std::dynamic_pointer_cast<LeggedController>(controller_)->model = LeggedController::M2;
         }
         else if (urdf_doc_->GetRobotName().find("3") != std::string::npos) {
             std::dynamic_pointer_cast<LeggedController>(controller_)->model = LeggedController::M3;
+            const auto& legged_controller = std::dynamic_pointer_cast<LeggedController>(controller_);
+            // Calculate IK and feet constraint boxes
+            // TODO: hard coded values
+            // TODO: decide number of steps based on the trajectory length
+            int num_ee = 4;
+            int num_steps = 10;
+            double env_x = 100;
+            double env_y = 100;
+            Eigen::Vector3d init_pos(ch_waypoints_[0].x(), ch_waypoints_[0].y(), ch_waypoints_[0].z());
+            Eigen::Vector3d goal_pos(ch_waypoints_[1].x(), ch_waypoints_[1].y(), ch_waypoints_[1].z());
+
+            TrajectoryOptimizer traj_opt(num_ee, urdf_doc_->GetRootMass(),
+                                         num_steps, heightmap_, env_x, env_y,
+                                         init_pos, Eigen::Vector3d::Zero(),
+                                         goal_pos, Eigen::Vector3d::Zero());
+
+            double l1 = 0.4;
+            double l2 = 0.4;
+            double l3 = 0.4;
+            double offset_x = 0.2;
+            double offset_y = 0.2;
+            double offset_z = 0.5;
+            double dev_x = 0.2;
+            double dev_y = 0.2;
+            double dev_z = 0.2;
+            legged_controller->SetKinematics(l1, l2, l3, offset_x, offset_y);
+
+            // world frame
+            traj_opt.set_ee_pos(legged_controller->GetFK_W(towr::LF, 0, 0, 0),
+                                legged_controller->GetFK_W(towr::LH, 0, 0, 0),
+                                legged_controller->GetFK_W(towr::RF, 0, 0, 0),
+                                legged_controller->GetFK_W(towr::RH, 0, 0, 0));
+
+            traj_opt.set_kinematic_model(offset_x, offset_y, offset_z,
+                                         dev_x, dev_y, dev_z);
+
+            // TODO: automatic derive inertia matrix
+            traj_opt.set_dynamic_model(1, 1, 1, 0, 0, 0);
+
+            traj_opt.optimize();
+
+            // pass the optimized trajectory to controller
+            legged_controller->AddTrajectory();
         }
         else{
             std::dynamic_pointer_cast<LeggedController>(controller_)->model = LeggedController::M1;
@@ -227,7 +276,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
 
     }
     else if (urdf_doc_->GetRobotName().find("wheel") != std::string::npos) {
-        controller_ = std::make_shared<WheelController>(&motors_, &waypoints_, urdf_doc_->GetRootBody());
+        controller_ = std::make_shared<WheelController>(&motors_, &ch_waypoints_, urdf_doc_->GetRootBody());
     }
     else {
         std::cerr << "Need to specify controller_ type in robot name" << std::endl;

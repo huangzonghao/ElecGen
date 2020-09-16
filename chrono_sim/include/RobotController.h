@@ -4,6 +4,7 @@
 #include "chrono/core/ChMathematics.h"
 #include "chrono/physics/ChBody.h"
 
+#include "quadrupedal_kinematics.h"
 #include "SimMotor.h"
 
 class RobotController {
@@ -70,6 +71,13 @@ class LeggedController : public RobotController {
     chrono::ChBody *robot_body;
 
     bool Update() override;
+    void AddTrajectory(int traj_ID=1);
+    void SetKinematics(double l1, double l2, double l3, double offset_x, double offset_y);
+    Eigen::Vector3d GetFK(int location, double q1, double q2, double q3);
+    Eigen::Vector3d GetFK_W(int location, double q1, double q2, double q3);
+    // xyz in CoM frame
+    Eigen::Vector3d GetIK(int location, double x, double y, double z);
+    Eigen::Vector3d GetIK_W(int location, double x, double y, double z);
 
   private:
     enum GAITS {FORWARD, BACKWARD, LEFT1, RIGHT1, LEFT2, RIGHT2, STAND} gait;
@@ -80,6 +88,8 @@ class LeggedController : public RobotController {
     // remaining steps to executate in the gait
     int gait_steps = 0;
     int update_counter = 0;
+    int trajectory_;
+    std::shared_ptr<QuadrupedalKinematics> kinematics_;
 };
 
 

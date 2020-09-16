@@ -5,12 +5,13 @@
 const double s_friction = 2.0;
 const double k_friction = 1.9;
 
-void test_fourwheel(Eigen::MatrixXd waypoints){
-    const std::string urdf_filename = "../data/robots/fourwheels.urdf";
+void test_fourwheel(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
+                    const std::string& env_file){
+    const std::string urdf_file = "../data/robots/fourwheels.urdf";
 
     SimulationManager sm;
-    sm.SetUrdfFile(urdf_filename);
-    sm.SetEnv(env_filename);
+    sm.SetUrdfFile(urdf_file);
+    sm.SetEnv(env_file);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
@@ -37,12 +38,12 @@ void test_fourwheel(Eigen::MatrixXd waypoints){
 
 }
 
-void test_fourleg(Eigen::MatrixXd waypoints){
-    const std::string urdf_filename = "../data/robots/fourleg.urdf";
+void test_fourleg(const std::shared_ptr<const Eigen::MatrixXd>& waypoints, const std::string& env_file){
+    const std::string urdf_file = "../data/robots/fourleg.urdf";
     // first init simulation manager
     SimulationManager sm;
-    sm.SetUrdfFile(urdf_filename);
-    sm.SetEnv(env_filename);
+    sm.SetUrdfFile(urdf_file);
+    sm.SetEnv(env_file);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
@@ -75,12 +76,12 @@ void test_fourleg(Eigen::MatrixXd waypoints){
 
 }
 
-void test_fourleg2(Eigen::MatrixXd waypoints){
-    const std::string urdf_filename = "../data/robots/fourleg2.urdf";
+void test_fourleg2(const std::shared_ptr<const Eigen::MatrixXd>& waypoints, const std::string& env_file){
+    const std::string urdf_file = "../data/robots/fourleg2.urdf";
     // first init simulation manager
     SimulationManager sm;
-    sm.SetUrdfFile(urdf_filename);
-    sm.SetEnv(env_filename);
+    sm.SetUrdfFile(urdf_file);
+    sm.SetEnv(env_file);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
@@ -113,12 +114,14 @@ void test_fourleg2(Eigen::MatrixXd waypoints){
 
 }
 
-void test_fourleg3(Eigen::MatrixXd waypoints){
-    const std::string urdf_filename = "../data/robots/fourleg3.urdf";
+void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
+                   const std::string& env_file,
+                   const std::shared_ptr<const Eigen::MatrixXd>& heightmap){
+    const std::string urdf_file = "../data/robots/fourleg3.urdf";
     // first init simulation manager
     SimulationManager sm;
-    sm.SetUrdfFile(urdf_filename);
-    sm.SetEnv(env_filename, 50, 50, 5);
+    sm.SetUrdfFile(urdf_file);
+    sm.SetEnv(env_file, 50, 50, 5);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
@@ -138,6 +141,7 @@ void test_fourleg3(Eigen::MatrixXd waypoints){
     sm.AddMotor("chassis", "br_upper-br_lower", 1,0.1,0.1,0.1);
 
     sm.AddWaypoints(waypoints);
+    sm.SetEigenHeightmap(heightmap);
 
     // use this loop for iterations
     bool sim_done = false;
@@ -155,14 +159,15 @@ void test_fourleg3(Eigen::MatrixXd waypoints){
     }
 
 }
-void launch_simulation(std::string urdf_filename,
-                       Eigen::MatrixXd heightmap,
-                       Eigen::MatrixXd waypoints){
+void launch_simulation(const std::string& urdf_file,
+                       const std::string& env_file,
+                       const std::shared_ptr<const Eigen::MatrixXd>& heightmap,
+                       const std::shared_ptr<const Eigen::MatrixXd>& waypoints) {
 
-    if      (urdf_filename.find("fourwheel") != std::string::npos) test_fourwheel(waypoints);
-    else if (urdf_filename.find("fourleg2")  != std::string::npos) test_fourleg2(waypoints);
-    else if (urdf_filename.find("fourleg3")  != std::string::npos) test_fourleg3(waypoints);
-    else if (urdf_filename.find("fourleg")   != std::string::npos) test_fourleg(waypoints);
-    else std::cout << "Error: unknown robot " << urdf_filename << std::endl;
+    if      (urdf_file.find("fourwheel") != std::string::npos) test_fourwheel(waypoints, env_file);
+    else if (urdf_file.find("fourleg2")  != std::string::npos) test_fourleg2(waypoints, env_file);
+    else if (urdf_file.find("fourleg3")  != std::string::npos) test_fourleg3(waypoints, env_file, heightmap);
+    else if (urdf_file.find("fourleg")   != std::string::npos) test_fourleg(waypoints, env_file);
+    else std::cout << "Error: unknown robot " << urdf_file << std::endl;
     return;
 }
