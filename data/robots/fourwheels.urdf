@@ -17,13 +17,13 @@
 <link name = "chassis">
     <visual>
         <geometry>
-            <box size="3 1 0.5"/>
+            <box size="3 2 0.5"/>
         </geometry>
-        <material name="red"/>
+        <!-- <material name="red"/> -->
     </visual>
     <collision>
         <geometry>
-            <box size="3 1 0.5"/>
+            <box size="3 2 0.5"/>
         </geometry>
     </collision>
     <inertial>
@@ -37,7 +37,7 @@
         <geometry>
             <cylinder length = "0.3" radius = "0.45"/>
         </geometry>
-        <material name="red"/>
+        <!-- <material name="red"/> -->
     </visual>
     <collision>
         <geometry>
@@ -55,7 +55,7 @@
         <geometry>
             <cylinder length = "0.3" radius = "0.45"/>
         </geometry>
-        <material name="red"/>
+        <!-- <material name="red"/> -->
     </visual>
     <collision>
         <geometry>
@@ -73,7 +73,7 @@
         <geometry>
             <cylinder length = "0.3" radius = "0.45"/>
         </geometry>
-        <material name="red"/>
+        <!-- <material name="red"/> -->
     </visual>
     <collision>
         <geometry>
@@ -91,7 +91,7 @@
         <geometry>
             <cylinder length = "0.3" radius = "0.45"/>
         </geometry>
-        <material name="red"/>
+        <!-- <material name="red"/> -->
     </visual>
     <collision>
         <geometry>

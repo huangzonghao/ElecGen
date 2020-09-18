@@ -14,7 +14,7 @@ class RobotController {
     RobotController(std::vector<std::shared_ptr<SimMotor> > *motors,
                     std::vector<chrono::ChVector<> > *waypoints,
                     ControllerType type);
-    virtual ~RobotController() = 0;
+    virtual ~RobotController() = default;
 
     virtual bool Update() = 0;
 

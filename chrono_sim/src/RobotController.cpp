@@ -6,8 +6,6 @@ RobotController::RobotController(std::vector<std::shared_ptr<SimMotor> > *motors
                                  ControllerType type):
     motors(motors), waypoints(waypoints), type(type){}
 
-RobotController::~RobotController(){}
-
 bool ManipulatorController::Update(){
     return true;
 }
