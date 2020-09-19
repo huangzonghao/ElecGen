@@ -377,7 +377,7 @@ const std::string& ChUrdfDoc::GetLinkBodyName(const std::string& link_name, int 
 
     const urdf::JointConstSharedPtr& u_joint = urdf_robot_->getJoint(link_name);
     if (!u_joint){
-        std::cerr << "ERROR: link " << link_name << "not found in " << GetRobotName() << std::endl;
+        std::cerr << "ERROR: link " << link_name << " not found in " << GetRobotName() << std::endl;
         exit(EXIT_FAILURE);
     }
 
