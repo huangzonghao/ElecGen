@@ -3,8 +3,8 @@ function out = lineSegmentIntersect(XY1,XY2)
 %   OUT = LINESEGMENTINTERSECT(XY1,XY2) finds the 2D Cartesian Coordinates of
 %   intersection points between the set of line segments given in XY1 and XY2.
 %
-%   XY1 and XY2 are N1x4 and N2x4 matrices. Rows correspond to line segments. 
-%   Each row is of the form [x1 y1 x2 y2] where (x1,y1) is the start point and 
+%   XY1 and XY2 are N1x4 and N2x4 matrices. Rows correspond to line segments.
+%   Each row is of the form [x1 y1 x2 y2] where (x1,y1) is the start point and
 %   (x2,y2) is the end point of a line segment:
 %
 %                  Line Segment

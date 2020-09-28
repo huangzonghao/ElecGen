@@ -88,7 +88,7 @@ redrawEnv;
         while ~feof(fid)
             tline = [tline fgets(fid)];
         end
-        
+
         outputText.String = tline;
     end
 
@@ -123,7 +123,7 @@ redrawEnv;
             case 'link'
                 values = robotLinks(selected.id(1)).buttonState(selected.id(2),:);
         end
-        
+
         for ibutton = 1:length(buttons)
             if strcmp(selected.type, 'joint') || ~FunctionType(ibutton)
                 buttons(ibutton).Enable = 'on';
@@ -138,9 +138,9 @@ redrawEnv;
             axesButtonDownCallback(src,event);
             return;
         end
-        
+
         drawDeselect;
-        
+
         if strcmp(selected.type, 'link') && all(selected.id == [ilink igroup])
             selected.type = 'none';
         else
@@ -156,9 +156,9 @@ redrawEnv;
             axesButtonDownCallback(src,event);
             return;
         end
-        
+
         drawDeselect;
-        
+
         if strcmp(selected.type, 'joint') && selected.id == ijoint
             selected.type = 'none';
         else
@@ -175,7 +175,7 @@ redrawEnv;
             axesButtonDownCallback(src,event);
             return;
         end
-        
+
         pt = findIntersection(EnvAxes.CurrentPoint, env_mesh);
         trajectory(end+1,:) = pt;
         redrawTrajectory;
@@ -193,7 +193,7 @@ redrawEnv;
         % modify the trajectory
         pt = evt.IntersectionPoint;
         pt(3) = pt(3) - traj_zoffset;
-        
+
         % find segment based on xy projection
         dir = trajectory(2:end,1:2)-trajectory(1:end-1,1:2);
         dist = sqrt(sum(dir.^2,2));
@@ -202,9 +202,9 @@ redrawEnv;
         proj(proj < 0) = 0; proj(proj > 1) = 1;
         perp = diff(1:end-1,:) - bsxfun(@times,proj,dir);
         [~,idx] = min(sum(perp.^2,2));
-        
+
         dist = sum(diff(idx:idx+1,:).^2,2);
-        
+
         if dist(1) > dist_thresh^2 && dist(2) > dist_thresh^2 && evt.Button == 1
             % where on the line is the point located?
             switch (idx)
@@ -216,7 +216,7 @@ redrawEnv;
                     trajectory = [trajectory(1:idx,:); pt; trajectory(idx+1:end,:)];
             end
         end
-        
+
         redrawTrajectory;
     end
 
@@ -224,10 +224,10 @@ redrawEnv;
         % modify the trajectory
         pt = evt.IntersectionPoint;
         pt(3) = pt(3) - traj_zoffset;
-        
+
         dist = sum((pt - trajectory(1:end,:)).^2,2);
         [~,idx] = min(dist);
-        
+
         switch (evt.Button)
             case 1 % normal
                 mousedata.pressed = true;
@@ -236,7 +236,7 @@ redrawEnv;
             case 3 % right click
                 trajectory(idx,:) = [];
         end
-        
+
         redrawTrajectory;
     end
 
@@ -245,7 +245,7 @@ redrawEnv;
         mousedata.pressed = true;
         mousedata.mouse_button = get(MainFigure, 'SelectionType');
         mousedata.position = get(0, 'PointerLocation');
-        
+
         switch (mousedata.mouse_button)
             case 'alt'    % right click
                 mousedata.mouse_button = 'rotate';
@@ -258,10 +258,10 @@ redrawEnv;
     function figureWindowButtonMoveCallback(~, ~)
         mousedata.position_last = mousedata.position;
         mousedata.position = get(0, 'PointerLocation');
-        
+
         if mousedata.pressed
             dp = mousedata.position_last - mousedata.position;
-            
+
             switch mousedata.mouse_button
                 case 'rotate'
                     UpVector = get(gca, 'CameraUpVector');
@@ -269,14 +269,14 @@ redrawEnv;
                     Camtar = get(gca,'CameraTarget');
                     Forward = (Camtar-XYZ) / norm(Camtar-XYZ);
                     ViewAngle = get(gca,'CameraViewAngle');
-                    
+
                     Mview = [UpVector; Forward; cross(UpVector, Forward)];
                     R = rotationMatrix([dp(1) 0 dp(2)]);
                     Mview = R'*Mview;
-                    
+
                     UpVector = Mview(1,1:3);
                     XYZ = Camtar - norm(Camtar-XYZ)*Mview(2,1:3);
-                    
+
                     set(gca,'CameraUpVector', UpVector);
                     set(gca,'CameraPosition', XYZ);
                     set(gca,'CameraTarget', Camtar);
@@ -292,7 +292,7 @@ redrawEnv;
             trajectory(mousedata.traj_idx,:) = pt;
             redrawTrajectory;
         end
-        
+
         mousedata.mouse_pressed = false;
         MainFigure.Pointer = 'arrow';
         mousedata.mouse_button = '';
@@ -317,14 +317,14 @@ redrawEnv;
 %% DRAWING ROBOT
     function redrawRobot
         % update robot drawing (called upon loading a new robot)
-        
+
         cla(RobotAxes);
-        
+
         if ~isempty(robotLinks)
             link_queue = [1; 0]; % assume link 1 is the root
             while ~isempty(link_queue)
                 i = link_queue(:,1); link_queue(:,1) = [];
-                
+
                 % transform mesh according to joint
                 mesh = robotLinks(i(1)).mesh;
                 pts = mesh.Points;
@@ -333,22 +333,22 @@ redrawEnv;
                     o = robotJoints(i(2)).origin;
                     rpy = robotJoints(i(2)).rpy;
                     rotm = eul2rotm(rpy, 'XYZ');
-                    
+
                     % draw link
                     pts = (rotm*pts')';
                     pts = bsxfun(@plus, pts, o+robotLinks(i(1)).origin);
                     mesh = triangulation(mesh.ConnectivityList, pts);
-                    
+
                     % draw joint
                     a = robotJoints(i(2)).axis;
                     a = (rotm*a')';
                     plot3([o(1)+.25*a(1) o(1)-.25*a(1)], [o(2)+.25*a(2) o(2)-.25*a(2)], [o(3)+.25*a(3) o(3)-.25*a(3)],...
                         '-', 'Color', jointColor_deselect,'LineWidth',3,'Parent',RobotAxes,...
                         'ButtonDownFcn', @(s,e)jointClick(s,e,i(2)));
-                    
+
                     robotJoints(i(2)).buttonState = false(1,length(ButtonFunctions));
                 end
-                
+
                 % draw link
                 [edges, grp_assign] = reduceEdges(mesh, pi/8);
                 for igroup = unique(grp_assign(:)')
@@ -361,46 +361,46 @@ redrawEnv;
                 end
                 robotLinks(i(1)).face_groups = grp_assign;
                 robotLinks(i(1)).buttonState = false(length(unique(grp_assign)),length(ButtonFunctions));
-                
+
                 plot3(reshape(pts(edges,1),[],2)',...
                     reshape(pts(edges,2),[],2)',...
                     reshape(pts(edges,3),[],2)',...
                     '-','Color',[0, 0, .5],'LineWidth',1.5,'Parent',RobotAxes);
-                
+
                 % get children
                 childjoints = robotLinks(i(1)).childjoints;
                 children = [robotJoints(childjoints).child];
                 link_queue(:, end+1:end+length(childjoints)) = [children; childjoints];
             end
         end
-        
+
         updateCamera(RobotAxes)
         updateLight(RobotAxes);
     end
 
     function drawSelect
         % highlight selected object
-        
+
         if strcmp(selected.type,'joint')
             % update plot
             selected.handle.Color = jointColor_select;
         elseif strcmp(selected.type, 'link')
             selected.handle.FaceColor = faceColor_select;
         end
-        
+
         activateButtons
     end
 
     function drawDeselect
         % unhighlight selected object
-        
+
         if strcmp(selected.type,'joint')
             % update plot
             selected.handle.Color = jointColor_deselect;
         elseif strcmp(selected.type, 'link')
             selected.handle.FaceColor = faceColor_deselect;
         end
-        
+
         deactivateButtons;
     end
 
@@ -428,7 +428,7 @@ redrawEnv;
         else
             set(traj_proj_handle , 'xdata', traj_proj(:,1), 'ydata', traj_proj(:,2), 'zdata', traj_proj(:,3)+traj_zoffset);
         end
-        
+
         if isempty(traj_handle)
             traj_handle = plot3(trajectory(:,1), trajectory(:,2), trajectory(:,3)+traj_zoffset, ...
                 '.r','markersize', 20, 'linewidth', 2, ...
@@ -464,7 +464,7 @@ redrawEnv;
 %% LOAD FUNCTIONALITY
     function loadrobot(~,~)
         % load a URDF robot
-        
+
         [filename, pathname] = uigetfile( ...
             {'*.urdf','URDF (*.urdf)';
             '*.*',  'All Files (*.*)'}, ...
@@ -477,17 +477,17 @@ redrawEnv;
             urdf_file = fullfile(pathname, filename);
             % TODO: fix loadURDF for multiple visual assets per link
             % [robotName, robotLinks, robotJoints] = loadURDF(urdf_file);
-            
+
             redrawRobot;
         end
-        
+
         selected.type = 'none';
         clearOutput
     end
 
     function loadenvironment(~,~)
         % load a STL environment
-        
+
         [filename, pathname] = uigetfile( ...
             {'*.bmp', 'Bitmap (*.bmp)';
             '*.stl','STL (*.stl)';
@@ -495,7 +495,7 @@ redrawEnv;
             '*.*',  'All Files (*.*)'}, ...
             'Select an environment to load.',...
             fullfile('..', 'data', 'maps'),'MultiSelect', 'off');
-        
+
         if isequal(filename,0)
             disp('No file selected')
         else
@@ -512,22 +512,22 @@ redrawEnv;
                     if (size(heightmap,3) > 1)
                         heightmap = rgb2gray(heightmap);
                     end
-                    
+
                     [X, Y] = meshgrid(linspace(0,1,size(heightmap,1)), linspace(0,1,size(heightmap,2)));
                     faces = delaunay(X, Y);
                     heightmap = double(heightmap)/255*0.2;
                     env_mesh = triangulation(faces, X(:), Y(:), heightmap(:));
             end
-            
+
             V = env_mesh.Points;
             dist = max(V,[],1)-min(V,[],1);
             dist_thresh = min(dist) / 20;
-            
+
             disp(['Loaded environment: ' filename]);
-            
+
             redrawEnv;
         end
-        
+
         clearTrajectory
         clearOutput
     end
@@ -545,7 +545,7 @@ redrawEnv;
             'Units', 'Normalized', 'Position', position,...
             'XColor','none', 'YColor','none', 'ZColor','none', ...
             'ButtonDownFcn', @axesButtonDownCallback);
-        
+
         % update axes: square, 3d rotate on, camera light
         axis(ax,'equal');
         axis(ax,'tight');
@@ -569,10 +569,10 @@ redrawEnv;
         margin_right = 0.02;
         ymargin = 0.05;
         height = (1-ymargin)/(Nbuttons+ymargin);
-        
+
         for ibutton = 1:Nbuttons
             buttonlbl = ['<html><center>' buttonnames{ibutton} '</center></html>'];
-            
+
             buttons(ibutton) = uicontrol(RobotPanel, 'Style', 'togglebutton', 'String', buttonlbl, ...
                 'units', 'normalized', 'position', [margin_left, 1-(ibutton*(1+ymargin))*height, 1-margin_left-margin_right, height], ...
                 'enable','off','fontsize', 10, 'callback', @(~,~)switchButtonState(ibutton));

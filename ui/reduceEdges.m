@@ -12,7 +12,7 @@ for i = 1:size(normals)
         if isnan(neigh(i,j))
             continue;
         end
-        
+
         if (grp_assign(i) ~= grp_assign(neigh(i,j)))
             if (acos(dot(normals(i,:), normals(neigh(i,j),:))) > threshold)
                 overlap = intersect(T(i,:),T(neigh(i,j),:))';

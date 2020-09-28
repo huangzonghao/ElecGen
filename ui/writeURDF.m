@@ -39,7 +39,7 @@ for i = 1:length(links)
         iface = on_face(isensor);
         location = findCentroid(links(i).mesh, find(links(i).face_groups==iface));
         ifunction = has_function(isensor);
-        
+
         % add sensor to the centroid of the selected face
         writeSensor(fid, [functionname{ifunction} '_' num2str(ipart)], links(i), location);
     end

@@ -32,21 +32,21 @@ while (~eof)
         [tline_new, eof] = getUntil(fid, '>');
         tline = [tline tline_new];
     end
-    
+
     b = find(tline=='<',1,'first');
     if (isempty(b))
         b = 0;
     end
-    
+
     i = find(tline=='>',1,'first');
     if (isempty(i))
         i = length(tline)+1;
     end
-    
+
     % separate line to analyze
     toanalyze = tline(b+1:i-1);
     tline = tline(i+1:end);
-    
+
     % are we in an ignore block?
     if (inignore)
         if strcmpi(toanalyze, ['/' ignoreword])
@@ -64,38 +64,38 @@ while (~eof)
                 break;
             end
         end
-        
+
         % parse objects
         if (~inignore)
             % object type
             type = sscanf(toanalyze, '%s',1);
-            
+
             switch(type)
                 case 'robot'
                     name = getvalue(toanalyze, 'name');
                 case 'link'
                     links(end+1).name = getvalue(toanalyze, 'name');
-                    
+
                     [tline_new, eof] = getUntil(fid, '/link');
                     tline = ['<' toanalyze tline tline_new];
-                    
+
                     rpy = str2num(getvalue(tline, 'rpy'));
                     if (isempty(rpy))
                        rpy = [0 0 0];
                     end
-                    
+
                     links(end).origin = str2num(getvalue(tline, 'xyz'));
                     if isempty(links(end).origin)
                        links(end).origin = [0 0 0];
                     end
-                    
+
                     scale = str2num(getvalue(tline, 'scale'));
                     if isempty(scale)
                        scale = 1;
                     end
-                    
+
                     stlname = getvalue(tline, 'filename');
-                    
+
                     if ~isempty(stlname)
                         [~,~,ext] = fileparts(stlname);
                         switch (ext)
@@ -113,7 +113,7 @@ while (~eof)
                         links(end).mesh = triangulation(mesh.ConnectivityList, pts);
                     else
                         geom = getblock(tline, 'geometry');
-                        
+
                         key_idx = find(geom==' ', 1, 'first');
                         switch (geom(2:key_idx-1))
                             case 'box'
@@ -139,23 +139,23 @@ while (~eof)
                         v = (rotm*v')';
                         links(end).mesh = triangulation(faces, v);
                     end
-                    
+
                     i = strfind(tline,'/link>');
                     links(end).text = tline(1:i+5);
                     tline = tline(i+6:end);
                 case 'joint'
                     joints(end+1).name = getvalue(toanalyze, 'name');
-                    
+
                     [tline_new, eof] = getUntil(fid, '/joint');
                     tline = ['<' toanalyze tline tline_new];
-                    
+
                     parent = getvalue(tline, 'parent');
                     joints(end).parent = find(contains({links.name},parent), 1, 'first');
                     links(joints(end).parent).childjoints(end+1) = length(joints);
-                    
+
                     child = getvalue(tline, 'child');
                     joints(end).child = find(contains({links.name},child), 1, 'first');
-                    
+
                     origin = getblock(tline, 'origin');
                     joints(end).origin = str2num(getvalue(origin, 'xyz'));
                     if (isempty(joints(end).origin))
@@ -165,11 +165,11 @@ while (~eof)
                     if (isempty(joints(end).rpy))
                        joints(end).rpy = [0 0 0];
                     end
-                    
+
                     a = str2num(getvalue(tline, 'axis'));
                     %a = a(:,[3 1 2]);
                     joints(end).axis = a;
-                    
+
                     i = strfind(tline,'/joint>');
                     joints(end).text = tline(1:i+6);
                     tline = tline(i+7:end);
@@ -208,7 +208,7 @@ if ~isempty(idx_start)
         idx_end = strfind(toanalyze(idx_start:end), '/>');
         idx_end = idx_start + idx_end(1) - 2;
     end
-    
+
     txt = strtrim(toanalyze((idx_start + length(key) + 2) : (idx_end - 1)));
 else
     txt = '';
