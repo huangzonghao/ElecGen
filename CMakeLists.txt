@@ -45,9 +45,7 @@ find_package(urdfdom QUIET)
 if (NOT urdfdom_FOUND)
     if( NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/.git" OR
         NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers/.git" OR
-        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/console_bridge/.git" OR
-        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/discreture/.git" OR
-        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/protobuf/.git")
+        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/console_bridge/.git")
 
         execute_process(COMMAND git submodule update --init --recursive --depth 1)
     endif()
@@ -132,6 +130,47 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_subdirectory(${CMAKE_SOURCE_DIR}/electronics/proto)
 include_directories(${PROTO_COMPILED_INCLUDE})
 
+find_package(towr QUIET)
+if (NOT towr_FOUND)
+    if( NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/Ipopt/.git" OR
+        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/ifopt/.git" OR
+        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/towr/.git")
+
+        execute_process(COMMAND git submodule update --init --recursive --depth 1)
+    endif()
+
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr
+                        ${CMAKE_BINARY_DIR}/thirdparty/ifopt
+                        ${CMAKE_BINARY_DIR}/thirdparty/Ipopt)
+
+    # TODO: Ipopt compilation on windows
+    if (NOT WIN32)
+    execute_process(COMMAND ${CMAKE_SOURCE_DIR}/thirdparty/Ipopt/configure --prefix ${PROJECT_DEP_INSTALL_DIR}
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/Ipopt)
+
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/Ipopt)
+    endif()
+
+    execute_process(COMMAND ${CMAKE_COMMAND}
+                            -DIPOPT_DIR:PATH=${PROJECT_DEP_INSTALL_DIR}
+                            -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
+                            ${CMAKE_SOURCE_DIR}/thirdparty/ifopt
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/ifopt)
+
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/ifopt)
+
+    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/towr/towr
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr)
+
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr)
+
+    find_package(towr QUIET)
+endif()
+include_directories(${towr_INCLUDE_DIRS})
+
 
 #--------------------------------------------------------------
 # Enable creation of "application bundles" on MacOSX.
@@ -189,15 +228,22 @@ set (CMAKE_CXX_STANDARD 17)
 # source files
 set(ELECTRONICS_PATH ${CMAKE_SOURCE_DIR}/electronics)
 set(CHRONOSIM_PATH ${CMAKE_SOURCE_DIR}/chrono_sim)
+set(TRAJECTORY_PATH ${CMAKE_SOURCE_DIR}/trajectory)
 
 set(ELECTRONICS_SRC_PATH ${ELECTRONICS_PATH}/src)
 set(CHRONOSIM_SRC_PATH ${CHRONOSIM_PATH}/src)
+set(TRAJECTORY_SRC_PATH ${TRAJECTORY_PATH})
 set(ELECTRONICS_INCLUDE_PATH ${ELECTRONICS_PATH}/include)
 set(CHRONOSIM_INCLUDE_PATH ${CHRONOSIM_PATH}/include)
+set(TRAJECTORY_INCLUDE_PATH ${TRAJECTORY_PATH})
 
 # include project headers
 include_directories(${ELECTRONICS_INCLUDE_PATH})
 include_directories(${CHRONOSIM_INCLUDE_PATH})
+include_directories(${TRAJECTORY_INCLUDE_PATH})
+if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/discreture/.git")
+    execute_process(COMMAND git submodule update --init --recursive --depth 1)
+endif()
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/discreture/include)
 
 set(DATA_DIRECTORY_PATH ${CMAKE_SOURCE_DIR}/data/)
@@ -219,15 +265,52 @@ set(CHRONOSIM_SOURCES
         ${CHRONOSIM_SRC_PATH}/SimMotor.cpp
         ${CHRONOSIM_SRC_PATH}/SimulationManager.cpp)
 
-# matlab_add_mex(NAME mexRun SRC src/mexRun.cpp src/ChUrdfDoc.cpp src/launch_simulation.cpp)
+set(TRAJECTORY_SOURCES
+        ${TRAJECTORY_SRC_PATH}/eigen_heightmap.cpp
+        ${TRAJECTORY_SRC_PATH}/quadrupedal_kinematics.cpp
+        ${TRAJECTORY_SRC_PATH}/traj_optimizer.cpp)
 
-# set_target_properties(mexRun PROPERTIES
+## Main Target of the project
+# ===========================================================
+matlab_add_mex(NAME mexRun SRC chrono_sim/src/mexRun.cpp chrono_sim/src/launch_simulation.cpp ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
+
+set_target_properties(mexRun PROPERTIES
+        COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+        COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+        LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+
+target_link_libraries(mexRun ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${towr_LIBRARIES})
+# ===========================================================
+
+## Full compilation target on windows
+# ===========================================================
+# add_executable(main_test electronics/src/main.cpp ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
+
+# set_target_properties(main_test PROPERTIES
         # COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
         # COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
         # LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+# if(MSVC)
+    # # to make protobuf run with dll
+    # target_compile_definitions(main_test PUBLIC PROTOBUF_USE_DLLS)
+# endif()
+# target_link_libraries(main_test ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${Gurobi_LIBRARIES} ${towr_LIBRARIES} ${Protobuf_LIBRARIES} component_structure)
+# ==========================================================
 
-# target_link_libraries(mexRun ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES})
+## Main test target on Linux
+# ===========================================================
+add_executable(executable ${CHRONOSIM_SRC_PATH}/test_iteration.cpp ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
 
+set_target_properties(executable PROPERTIES
+        COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+        COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+        LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+
+target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${towr_LIBRARIES})
+# ===========================================================
+
+# Single test target on Linux
+# ===========================================================
 # add_executable(executable src/testcpp.cpp src/ChUrdfDoc.cpp src/launch_simulation.cpp)
 
 # set_target_properties(executable PROPERTIES
@@ -236,27 +319,8 @@ set(CHRONOSIM_SOURCES
         # LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
 
 # target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES})
+# ===========================================================
 
-# add_executable(executable ${CHRONOSIM_SRC_PATH}/test_iteration.cpp ${CHRONOSIM_SOURCES})
-
-# set_target_properties(executable PROPERTIES
-#         COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-#         COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-#         LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
-
-# target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES})
-
-add_executable(main_test electronics/src/main.cpp ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
-
-set_target_properties(main_test PROPERTIES
-        COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-        COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-        LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
-if(MSVC)
-    # to make protobuf run with dll
-    target_compile_definitions(main_test PUBLIC PROTOBUF_USE_DLLS)
-endif()
-target_link_libraries(main_test ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${Gurobi_LIBRARIES} ${Protobuf_LIBRARIES} component_structure)
 
 # function implemented in ChronoConfig.cmake
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
