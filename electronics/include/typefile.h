@@ -57,7 +57,7 @@ using connection_relation_vec2d = std::vector<connection_relation_vec>;
 
 // file path
 const std::string data_root(std::string(DATA_DIRECTORY_PATH) + "/");
-const std::string elec_root(data_root + "Electronic_Components/");
+const std::string elec_root(data_root + "electronics/");
 
 const std::string
     dc_motor_path          (elec_root + "DC_MOTOR/"),
