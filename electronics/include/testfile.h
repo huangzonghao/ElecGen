@@ -34,6 +34,7 @@ void servo_micro_controller_voltage_regulator_battery_connect();
 void camera_voltage_regulator_micro_controller_battery_connect();
 void bluetooth_battery_micro_controller_connect();
 void encoder_battery_micro_controller_connect();
+void motor_encoder_hbridge_battery_connect();
 
 // SYSTEM TEST
 void system_test();

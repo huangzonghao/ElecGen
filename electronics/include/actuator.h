@@ -9,10 +9,6 @@
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include "component_structure.pb.h"
-// #include <fstream>;
-// #include <array>
-// #include <list>
-// #include <chrono>
 
 class Circuit;
 
@@ -33,7 +29,7 @@ namespace Component_Type {
 		Camera = "CAMERA",
 		Force_Sensor = "FORCE_SENSOR",
 		Servo = "SERVO",
-		Power_Supply = "POWER_SUPPLY", // general type
+		Power_Supply = "POWER_SUPPLY", // battery + voltage regulator
 		None = "";
 }
 
@@ -81,6 +77,9 @@ public:
 	std::string getComponentName() { return component_name; }
 	std::string getComponentType() { return component_type; }
 	std::string getComponentClass() { return component_class; }
+	double getPrice() { return component_price; }
+	double getWeight() { return component_weight; }
+	unsigned getPinNum() { return pins.size(); }
 	size_t getVarsSize() { return vars.size(); }
 	Eigen::MatrixXd getVarsBound() { return var_bound_mat; }
 	Eigen::MatrixXd getModelMat() { return model_mat; }
@@ -215,10 +214,13 @@ public:
 	stringvec getFuncInPinNames() override;
 	stringvec getFuncOutPinNames() override { return stringvec(); }
 	void getUsedVarsName(const stringvec &pin_names) override { 
-		used_var_names = var_names;
-		for (size_t i = 0; i < pins.size(); i++)
+		if (used_var_names.empty())
 		{
-			dependent_pins.push_back(&pins[i]);
+			used_var_names = var_names;
+			for (size_t i = 0; i < pins.size(); i++)
+			{
+				dependent_pins.push_back(&pins[i]);
+			}
 		}
 	}
 	unsigned getMainPowerIndex() override { return 0; }

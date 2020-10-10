@@ -29,16 +29,45 @@ unordered_map<string, Camera> CAMERA_MAP;
 unordered_map<string, Bluetooth> BLUETOOTH_MAP;
 unordered_map<string, Force_Sensor> FORCE_SENSOR_MAP;
 
+stringvec MOTOR_FILES, SERVO_FILES, H_BRIDGE_FILES, MICRO_CONTROLLER_FILES,
+VOLTAGE_REGULATOR_FILES, BATTERY_FILES, ENCODER_FILES, CAMERA_FILES,
+BLUETOOTH_FILES, FORCE_SENSOR_FILES;
+
 unordered_map<string, shared_ptr<Electrical_Component>> MOTOR_PART_MAP,
 H_BRIDDE_PART_MAP, MICRO_CONTROLLER_PART_MAP, VOLTAGE_REGULATOR_PART_MAP,
-BATTERY_PART_MAP, ENCODER_PART_MAP, CAMERA_PART_MAP, FORCE_SENSOR_PART_MAP, 
-BLUETOOTH_PART_MAP, SERVO_PART_MAP;
+BATTERY_PART_MAP, ENCODER_PART_MAP, CAMERA_PART_MAP, FORCE_SENSOR_PART_MAP,
+BLUETOOTH_PART_MAP, SERVO_PART_MAP, POWER_SUPPLY_PART_MAP;
 
 Electrical_Component::Electrical_Component(const string &file)
 {
-	Electronics::Component *base_component = read(file);
-	extractInfo(base_component);
-	delete base_component;
+	std::bitset<10> component_code;
+	isDCMotor(file) ? MOTOR_MAP.empty() ? 
+		component_code[0] = 0 : component_code[0] = 1 : component_code[0] = 0;
+	isHbridge(file) ? H_BRIDGE_MAP.empty() ? 
+		component_code[1] = 0 : component_code[1] = 1 : component_code[1] = 0;
+	isMicroController(file) ? MICRO_CONTROLLER_MAP.empty() ?
+		component_code[2] = 0 : component_code[2] = 1 : component_code[2] = 0;
+	isVoltageRegulator(file) ? VOLTAGE_REGULATOR_MAP.empty()? 
+		component_code[3] = 0 : component_code[3] = 1 : component_code[3] = 0;
+	isBattery(file) ? BATTERY_MAP.empty() ?
+		component_code[4] = 0 : component_code[4] = 1 : component_code[4] = 0;
+	isEncoder(file) ? ENCODER_MAP.empty() ?
+		component_code[5] = 0 : component_code[5] = 1 : component_code[5] = 0;
+	isCamera(file) ? CAMERA_MAP.empty() ?
+		component_code[6] = 0 : component_code[6] = 1 : component_code[6] = 0;
+	isForceSensor(file) ? FORCE_SENSOR_MAP.empty() ?
+		component_code[7] = 0 : component_code[7] = 1 : component_code[7] = 0;
+	isBluetooth(file) ? BLUETOOTH_MAP.empty() ?
+		component_code[8] = 0 : component_code[8] = 1 : component_code[8] = 0;
+	isServo(file) ? SERVO_MAP.empty() ?
+		component_code[9] = 0 : component_code[9] = 1 : component_code[9] = 0;
+
+	if (component_code == 0b0000000000)
+	{
+		Electronics::Component *base_component = read(file);
+		extractInfo(base_component);
+		delete base_component;
+	}
 }
 
 void Electrical_Component::setComponentName(const std::string & name)
@@ -850,6 +879,7 @@ void initializeAllMotors(const string &dir)
 		string component = entry.path().string();
 		motor_map[component] = Motor(component);
 		MOTOR_PART_MAP[component] = make_shared<Motor>(component);
+		MOTOR_FILES.push_back(component);
 	}
 	MOTOR_MAP = motor_map; // avoid conflict with constructor
 }
@@ -862,6 +892,7 @@ void initializeAllServos(const std::string &dir)
 		string component = entry.path().string();
 		servo_map[component] = Motor(component);
 		SERVO_PART_MAP[component] = make_shared<Motor>(component);
+		SERVO_FILES.push_back(component);
 	}
 	SERVO_MAP = servo_map; 
 }
@@ -874,6 +905,8 @@ void initializeAllVoltageRegulators(const string &dir)
 		string component = entry.path().string();
 		voltage_regulator_map[component] = Voltage_Regulator(component);
 		VOLTAGE_REGULATOR_PART_MAP[component] = make_shared<Voltage_Regulator>(component);
+		POWER_SUPPLY_PART_MAP[component] = make_shared<Voltage_Regulator>(component);
+		VOLTAGE_REGULATOR_FILES.push_back(component);
 	}
 	VOLTAGE_REGULATOR_MAP = voltage_regulator_map; 
 }
@@ -886,6 +919,7 @@ void initializeAllHBridges(const string &dir)
 		string component = entry.path().string();
 		h_bridge_map[component] = H_Bridge(component);
 		H_BRIDDE_PART_MAP[component] = make_shared<H_Bridge>(component);
+		H_BRIDGE_FILES.push_back(component);
 	}
 	H_BRIDGE_MAP = h_bridge_map;
 }
@@ -898,6 +932,7 @@ void initializeAllMicroController(const std::string &dir)
 		string component = entry.path().string();
 		micro_controller_map[component] = Micro_Controller(component);
 		MICRO_CONTROLLER_PART_MAP[component] = make_shared<Micro_Controller>(component);
+		MICRO_CONTROLLER_FILES.push_back(component);
 	}
 	MICRO_CONTROLLER_MAP = micro_controller_map;
 }
@@ -910,6 +945,8 @@ void initializeAllBatteries(const string &dir)
 		string component = entry.path().string();
 		battery_map[component] = Battery(component);
 		BATTERY_PART_MAP[component] = make_shared<Battery>(component);
+		POWER_SUPPLY_PART_MAP[component] = make_shared<Battery>(component);
+		BATTERY_FILES.push_back(component);
 	}
 	BATTERY_MAP = battery_map;
 }
@@ -922,6 +959,7 @@ void initializeAllEncoders(const string &dir)
 		string component = entry.path().string();
 		encoder_map[component] = Encoder(component);
 		ENCODER_PART_MAP[component] = make_shared<Encoder>(component);
+		ENCODER_FILES.push_back(component);
 	}
 	ENCODER_MAP = encoder_map;
 }
@@ -934,6 +972,7 @@ void initializeAllCameras(const string &dir)
 		string component = entry.path().string();
 		camera_map[component] = Camera(component);
 		CAMERA_PART_MAP[component] = make_shared<Camera>(component);
+		CAMERA_FILES.push_back(component);
 	}
 	CAMERA_MAP = camera_map;
 }
@@ -946,6 +985,7 @@ void initializeAllBluetooths(const string &dir)
 		string component = entry.path().string();
 		bluetooth_map[component] = Bluetooth(component);
 		BLUETOOTH_PART_MAP[component] = make_shared<Bluetooth>(component);
+		BLUETOOTH_FILES.push_back(component);
 	}
 	BLUETOOTH_MAP = bluetooth_map;
 }
@@ -958,6 +998,7 @@ void initializeAllForceSensors(const string &dir)
 		string component = entry.path().string();
 		force_sensor_map[component] = Force_Sensor(component);
 		FORCE_SENSOR_PART_MAP[component] = make_shared<Force_Sensor>(component);
+		FORCE_SENSOR_FILES.push_back(component);
 	}
 	FORCE_SENSOR_MAP = force_sensor_map;
 }
@@ -997,7 +1038,8 @@ doublevec Motor::getFuncInCurrentLimit()
 
 doublevec Motor::getPowerInCurrentLimit()
 {
-	return doublevec{ var_maps["I"]->get(GRB_DoubleAttr_X) };
+//	return doublevec{ var_maps["I"]->get(GRB_DoubleAttr_X) };
+	return doublevec{ this->i_bound_mat(0, 1) };
 }
 
 doublepairs Motor::getFuncInVolRange()

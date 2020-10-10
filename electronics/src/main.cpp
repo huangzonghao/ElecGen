@@ -13,6 +13,7 @@ const double k_friction = 1.9;
 
 // #include <limits>
 
+using namespace std;
 using namespace Eigen;
 
 int main() {
@@ -80,7 +81,7 @@ int main() {
 //	camera_voltage_regulator_micro_controller_battery_connect();
 //	bluetooth_battery_micro_controller_connect();
 //	encoder_battery_micro_controller_connect();
-
+//	motor_encoder_hbridge_battery_connect();
 
 	// SYSTEM TEST
 	system_test();
