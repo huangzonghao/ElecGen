@@ -4,15 +4,9 @@
     <visual>
         <origin rpy = "0 0 0" xyz = "0 0 0" />
         <geometry>
-            <box size="4.35 3 1.2"/>
+            <box size="0.16 0.06 0.05"/>
         </geometry>
     </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
-        <geometry>
-            <box size="4.35 3 1.2"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="20"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -22,35 +16,17 @@
 <joint name = "chassis-fl_cyl" type = "continuous">
     <parent link = "chassis"/>
     <child link = "fl_cyl"/>
-    <origin xyz = "1.2 1.7 0" rpy = "0 0 0" />
+    <origin xyz = "0.065 0.02 0" rpy = "0 0 0" />
     <axis xyz = "0 0 1" />
 </joint>
 
 <link name = "fl_cyl">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
+        <origin rpy = "0 0 0" xyz = "0 0.0175 0" />
         <geometry>
-            <cylinder radius="0.2" length="0.4"/>
+            <box size="0.028 0.035 0.002"/>
         </geometry>
     </visual>
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0.4 0" />
-        <geometry>
-            <box size="0.3 0.6 0.3"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
-        <geometry>
-            <cylinder radius="0.2" length="0.4"/>
-        </geometry>
-    </collision>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0.4 0" />
-        <geometry>
-            <box size="0.3 0.6 0.3"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="1"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -60,23 +36,17 @@
 <joint name = "fl_cyl-fl_upper" type = "continuous">
     <parent link = "fl_cyl"/>
     <child link = "fl_upper"/>
-    <origin xyz = "0 0.9 0" rpy = "0 0 0" />
+    <origin xyz = "0 0.035 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "fl_upper">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.35" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
+            <box size="0.018 0.018 0.06"/>
         </geometry>
     </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.35" />
-        <geometry>
-            <box size="0.3 0.3 1"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="1"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -86,33 +56,21 @@
 <joint name = "fl_upper-fl_lower" type = "continuous">
     <parent link = "fl_upper"/>
     <child link = "fl_lower"/>
-    <origin xyz = "0 0 -1" rpy = "0 0 0" />
+    <origin xyz = "0 0 -0.06" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "fl_lower">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
-        </geometry>
-    </visual>
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.9" />
-        <geometry>
-            <sphere radius = "0.15"/>
+            <box size="0.018 0.018 0.06"/>
         </geometry>
     </visual>
     <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.06" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
-        </geometry>
-    </collision>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.9" />
-        <geometry>
-            <sphere radius = "0.15"/>
+            <sphere radius = "0.009"/>
         </geometry>
     </collision>
     <inertial>
@@ -124,35 +82,17 @@
 <joint name = "chassis-fr_cyl" type = "continuous">
     <parent link = "chassis"/>
     <child link = "fr_cyl"/>
-    <origin xyz = "1.2 -1.7 0" rpy = "0 0 0" />
+    <origin xyz = "0.065 -0.02 0" rpy = "0 0 0" />
     <axis xyz = "0 0 1" />
 </joint>
 
 <link name = "fr_cyl">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
+        <origin rpy = "0 0 0" xyz = "0 -0.0175 0" />
         <geometry>
-            <cylinder radius="0.2" length="0.4"/>
+            <box size="0.028 0.035 0.002"/>
         </geometry>
     </visual>
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 -0.4 0" />
-        <geometry>
-            <box size="0.3 0.6 0.3"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
-        <geometry>
-            <cylinder radius="0.2" length="0.4"/>
-        </geometry>
-    </collision>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 -0.4 0" />
-        <geometry>
-            <box size="0.3 0.6 0.3"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="1"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -162,23 +102,17 @@
 <joint name = "fr_cyl-fr_upper" type = "continuous">
     <parent link = "fr_cyl"/>
     <child link = "fr_upper"/>
-    <origin xyz = "0 -0.9 0" rpy = "0 0 0" />
+    <origin xyz = "0 -0.035 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "fr_upper">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.35" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
+            <box size="0.018 0.018 0.06"/>
         </geometry>
     </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.35" />
-        <geometry>
-            <box size="0.3 0.3 1"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="1"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -188,33 +122,21 @@
 <joint name = "fr_upper-fr_lower" type = "continuous">
     <parent link = "fr_upper"/>
     <child link = "fr_lower"/>
-    <origin xyz = "0 0 -1" rpy = "0 0 0" />
+    <origin xyz = "0 0 -0.06" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "fr_lower">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
-        </geometry>
-    </visual>
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.9" />
-        <geometry>
-            <sphere radius = "0.15"/>
+            <box size="0.018 0.018 0.06"/>
         </geometry>
     </visual>
     <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.06" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
-        </geometry>
-    </collision>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.9" />
-        <geometry>
-            <sphere radius = "0.15"/>
+            <sphere radius = "0.009"/>
         </geometry>
     </collision>
     <inertial>
@@ -226,35 +148,17 @@
 <joint name = "chassis-bl_cyl" type = "continuous">
     <parent link = "chassis"/>
     <child link = "bl_cyl"/>
-    <origin xyz = "-1.2 1.7 0" rpy = "0 0 0" />
+    <origin xyz = "-0.065 0.02 0" rpy = "0 0 0" />
     <axis xyz = "0 0 1" />
 </joint>
 
 <link name = "bl_cyl">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
+        <origin rpy = "0 0 0" xyz = "0 0.0175 0" />
         <geometry>
-            <cylinder radius="0.2" length="0.4"/>
+            <box size="0.028 0.035 0.002"/>
         </geometry>
     </visual>
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0.4 0" />
-        <geometry>
-            <box size="0.3 0.6 0.3"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
-        <geometry>
-            <cylinder radius="0.2" length="0.4"/>
-        </geometry>
-    </collision>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0.4 0" />
-        <geometry>
-            <box size="0.3 0.6 0.3"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="1"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -264,23 +168,17 @@
 <joint name = "bl_cyl-bl_upper" type = "continuous">
     <parent link = "bl_cyl"/>
     <child link = "bl_upper"/>
-    <origin xyz = "0 0.9 0" rpy = "0 0 0" />
+    <origin xyz = "0 0.035 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "bl_upper">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.35" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
+            <box size="0.018 0.018 0.06"/>
         </geometry>
     </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.35" />
-        <geometry>
-            <box size="0.3 0.3 1"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="1"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -290,33 +188,21 @@
 <joint name = "bl_upper-bl_lower" type = "continuous">
     <parent link = "bl_upper"/>
     <child link = "bl_lower"/>
-    <origin xyz = "0 0 -1" rpy = "0 0 0" />
+    <origin xyz = "0 0 -0.06" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "bl_lower">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
-        </geometry>
-    </visual>
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.9" />
-        <geometry>
-            <sphere radius = "0.15"/>
+            <box size="0.018 0.018 0.06"/>
         </geometry>
     </visual>
     <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.06" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
-        </geometry>
-    </collision>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.9" />
-        <geometry>
-            <sphere radius = "0.15"/>
+            <sphere radius = "0.009"/>
         </geometry>
     </collision>
     <inertial>
@@ -328,35 +214,17 @@
 <joint name = "chassis-br_cyl" type = "continuous">
     <parent link = "chassis"/>
     <child link = "br_cyl"/>
-    <origin xyz = "-1.2 -1.7 0" rpy = "0 0 0" />
+    <origin xyz = "-0.065 -0.02 0" rpy = "0 0 0" />
     <axis xyz = "0 0 1" />
 </joint>
 
 <link name = "br_cyl">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
+        <origin rpy = "0 0 0" xyz = "0 -0.0175 0" />
         <geometry>
-            <cylinder radius="0.2" length="0.4"/>
+            <box size="0.028 0.035 0.002"/>
         </geometry>
     </visual>
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 -0.4 0" />
-        <geometry>
-            <box size="0.3 0.6 0.3"/>
-        </geometry>
-    </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 0" />
-        <geometry>
-            <cylinder radius="0.2" length="0.4"/>
-        </geometry>
-    </collision>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 -0.4 0" />
-        <geometry>
-            <box size="0.3 0.6 0.3"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="1"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -366,23 +234,17 @@
 <joint name = "br_cyl-br_upper" type = "continuous">
     <parent link = "br_cyl"/>
     <child link = "br_upper"/>
-    <origin xyz = "0 -0.9 0" rpy = "0 0 0" />
+    <origin xyz = "0 -0.035 0" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "br_upper">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.35" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
+            <box size="0.018 0.018 0.06"/>
         </geometry>
     </visual>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.35" />
-        <geometry>
-            <box size="0.3 0.3 1"/>
-        </geometry>
-    </collision>
     <inertial>
         <mass value="1"/>
         <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
@@ -392,33 +254,21 @@
 <joint name = "br_upper-br_lower" type = "continuous">
     <parent link = "br_upper"/>
     <child link = "br_lower"/>
-    <origin xyz = "0 0 -1" rpy = "0 0 0" />
+    <origin xyz = "0 0 -0.06" rpy = "0 0 0" />
     <axis xyz = "0 1 0" />
 </joint>
 
 <link name = "br_lower">
     <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
-        </geometry>
-    </visual>
-    <visual>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.9" />
-        <geometry>
-            <sphere radius = "0.15"/>
+            <box size="0.018 0.018 0.06"/>
         </geometry>
     </visual>
     <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.4" />
+        <origin rpy = "0 0 0" xyz = "0 0 -0.06" />
         <geometry>
-            <box size=" 0.3 0.3 1"/>
-        </geometry>
-    </collision>
-    <collision>
-        <origin rpy = "0 0 0" xyz = "0 0 -0.9" />
-        <geometry>
-            <sphere radius = "0.15"/>
+            <sphere radius = "0.009"/>
         </geometry>
     </collision>
     <inertial>

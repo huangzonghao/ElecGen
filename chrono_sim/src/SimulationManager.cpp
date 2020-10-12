@@ -121,9 +121,9 @@ bool SimulationManager::RunSimulation(bool do_viz){
     if (env_file_.empty()){
         std::cout << "Map file not initialized, building default ground" << std::endl;
         // ground body
-        auto my_ground = chrono_types::make_shared<ChBodyEasyBox>(50, 50, 0.9, 1.0, true, true, ground_mat);
+        auto my_ground = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 0.01, 1.0, true, true, ground_mat);
         // make sure (0,0) is at the corner of the environment
-        my_ground->SetPos(ChVector<>(25, 25, -0.5));
+        my_ground->SetPos(ChVector<>(0.5, 0.5, -0.005));
         my_ground->SetRot(Q_ROTATE_X_TO_Y);
         my_ground->SetBodyFixed(true);
         auto ground_texture = chrono_types::make_shared<ChColorAsset>();
@@ -204,7 +204,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
     // for(auto waypoint : ch_waypoints_){
     // TODO: put first waypoint marker on the ground
     for(auto waypoint = ch_waypoints_.begin() + 1; waypoint != ch_waypoints_.end(); ++waypoint){
-        auto wp_marker = chrono_types::make_shared<ChBodyEasyBox>(0.5, 0.5, 0.2, 1.0, true, false);
+        auto wp_marker = chrono_types::make_shared<ChBodyEasyBox>(0.01, 0.01, 0.005, 1.0, true, false);
         wp_marker->SetPos(*waypoint);
         wp_marker->SetBodyFixed(true);
         wp_marker->AddAsset(wp_color);
@@ -232,8 +232,8 @@ bool SimulationManager::RunSimulation(bool do_viz){
             // TODO: decide number of steps based on the trajectory length
             int num_ee = 4;
             int num_steps = 10;
-            double env_x = 100;
-            double env_y = 100;
+            double env_x = 1;
+            double env_y = 1;
             Eigen::Vector3d init_pos(ch_waypoints_[0].x(), ch_waypoints_[0].y(), ch_waypoints_[0].z());
             Eigen::Vector3d goal_pos(ch_waypoints_[1].x(), ch_waypoints_[1].y(), ch_waypoints_[1].z());
 
@@ -242,15 +242,16 @@ bool SimulationManager::RunSimulation(bool do_viz){
                                          init_pos, Eigen::Vector3d::Zero(),
                                          goal_pos, Eigen::Vector3d::Zero());
 
-            double l1 = 0.4;
-            double l2 = 0.4;
-            double l3 = 0.4;
-            double offset_x = 0.2;
-            double offset_y = 0.2;
-            double offset_z = 0.5;
-            double dev_x = 0.2;
-            double dev_y = 0.2;
-            double dev_z = 0.2;
+            double l1 = 0.035;
+            double l2 = 0.06;
+            double l3 = 0.06;
+            double offset_x = 0.065;
+            double offset_y = 0.02;
+            double offset_z = 0.12;
+            // TODO: more accurate deviation
+            double dev_x = 0.06;
+            double dev_y = 0.02;
+            double dev_z = 0.01;
             legged_controller->SetKinematics(l1, l2, l3, offset_x, offset_y);
 
             // world frame

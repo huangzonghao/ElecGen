@@ -476,7 +476,7 @@ redrawEnv;
             disp(['Loading ' filename]);
             urdf_file = fullfile(pathname, filename);
             % TODO: fix loadURDF for multiple visual assets per link
-            % [robotName, robotLinks, robotJoints] = loadURDF(urdf_file);
+            [robotName, robotLinks, robotJoints] = loadURDF(urdf_file);
 
             redrawRobot;
         end

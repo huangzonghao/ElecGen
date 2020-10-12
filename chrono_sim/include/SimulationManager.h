@@ -28,7 +28,7 @@ class  SimulationManager {
 
     void SetSystemType(SystemType new_type){ system_type_ = new_type; }
     void SetUrdfFile(std::string filename);
-    void SetEnv(std::string filename, double env_x=50, double env_y=50, double env_z=2.5);
+    void SetEnv(std::string filename, double env_x=1, double env_y=1, double env_z=0.08);
     // TODO: should be done within SetEnv, but currently having difficulty readin bitmap in c++
     void SetEigenHeightmap(const std::shared_ptr<const Eigen::MatrixXd>& heightmap);
     void SetFrictionS(double fs) {s_friction_ = fs;};
@@ -76,9 +76,10 @@ class  SimulationManager {
     double timeout_;
 
     std::string env_file_;
-    double env_x_ = 50;
-    double env_y_ = 50;
-    double env_z_ = 2.5;
+    // unit: m
+    double env_x_ = 1;
+    double env_y_ = 1;
+    double env_z_ = 0.08;
 
     // names of bodies that would use ChBodyAuxRef
     std::unordered_set<std::string> auxrefs_;
