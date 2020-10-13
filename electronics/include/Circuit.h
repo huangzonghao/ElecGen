@@ -5,7 +5,6 @@
 class Electrical_Component;
 
 std::vector<GRBLinExpr> operator*(Eigen::MatrixXd &, std::vector<GRBVar> &);
-stringpair separateNames(const std::string &);
 
 namespace OPT_METHOD {
 	const std::string NEWTON_RAPHSON = "NEWTON_RAPHSON",
@@ -26,6 +25,7 @@ public:
 	Circuit(std::vector<std::shared_ptr<Electrical_Component>> &, Pin_Connections & = Pin_Connections());
 
 	// methods
+	void minUpdateConnectionsSolve(GRBModel *);
 	void maxSolve(GRBModel *);
 	void checkVars(GRBModel *);
 	void verify(GRBModel *, verifyMode = min, const std::string & = OPT_METHOD::NEWTON_RAPHSON);
@@ -40,8 +40,9 @@ public:
 	doublevec getVals(unsigned &, unsigned &, unsigned &);
 	doublevec getMaxVals(unsigned &, unsigned &, unsigned &);
 	unsigned getComponentsSize() { return static_cast<unsigned>(components.size()); }
+
 //	std::vector<Electrical_Component*>& getComponents() { return components; }
-//	std::vector<Electrical_Component*> getComponents() const { return components; }
+	std::vector<std::shared_ptr<Electrical_Component>> getComponents() const { return components; }
 	
 	void syncVars(const GRBModel &);
 	unsigned getMotorNumber();
@@ -87,6 +88,7 @@ private:
 	Pin_Connections new_pin_connections;
 	std::vector<GRBConstr> cons; // constraint vector
 	std::vector<GRBConstr> model_cons;
+	stringvec model_cons_names;
 	std::vector<GRBConstr> lin_cons;
  	GRBLinExpr objective;
 	bool first_flag = true;

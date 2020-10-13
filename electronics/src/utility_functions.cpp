@@ -2,7 +2,11 @@
 
 using std::string;
 using std::vector;
-using std::filesystem::directory_iterator;
+using std::experimental::filesystem::directory_iterator;
+
+extern stringvec MOTOR_FILES, SERVO_FILES, H_BRIDGE_FILES, MICRO_CONTROLLER_FILES,
+VOLTAGE_REGULATOR_FILES, BATTERY_FILES, ENCODER_FILES, CAMERA_FILES,
+BLUETOOTH_FILES, FORCE_SENSOR_FILES;
 
 // function is used to determine whether two voltage rages have intersection,
 // first pair is input, second pair is output
@@ -32,7 +36,7 @@ doublepair getIntersect(const doublepair &range1, const doublepair &range2)
 
 bool fileInDirectory(const std::string &file, const std::string &directory)
 {
-	for (const auto &entry : std::filesystem::directory_iterator(directory))
+	for (const auto &entry : std::experimental::filesystem::directory_iterator(directory))
 	{
 		if (entry.path().string() == file)
 		{
@@ -119,11 +123,19 @@ string removeReplicate(const string &name)
 	}
 }
 
+stringpair separateNames(const std::string &pin_connection)
+{
+	size_t pos = pin_connection.find_first_of('.');
+	string component_name = pin_connection.substr(0, pos);
+	string pin_name = pin_connection.substr(pos + 1, pin_connection.size() - pos - 1);
+	return std::make_pair(component_name, pin_name);
+}
+
 unsigned getFileNumInDirectory(const std::string &path)
 {
 	unsigned cnt = 0;
-	std::filesystem::directory_iterator end;
-	for (auto &entry = std::filesystem::directory_iterator(path); entry != end; entry++)
+	std::experimental::filesystem::directory_iterator end;
+	for (auto &entry = std::experimental::filesystem::directory_iterator(path); entry != end; entry++)
 	{
 		cnt++;
 	}
@@ -480,64 +492,61 @@ int cover_size(intvec &cover)
 
 bool isBattery(const string &file)
 {
-	return isFileInFolder(file, battery_path);
+	return isFileInFolder(file, BATTERY_FILES);
 }
 
 bool isVoltageRegulator(const string &file)
 {
-	return isFileInFolder(file, voltage_regulator_path);
+	return isFileInFolder(file, VOLTAGE_REGULATOR_FILES);
 }
 
 bool isHbridge(const string &file)
 {
-	return isFileInFolder(file, h_bridge_path);
+	return isFileInFolder(file, H_BRIDGE_FILES);
 }
 
 bool isMicroController(const string &file)
 {
-	return isFileInFolder(file, micro_controller_path);
+	return isFileInFolder(file, MICRO_CONTROLLER_FILES);
 }
 
 bool isDCMotor(const string &file)
 {
-	return isFileInFolder(file, dc_motor_path);
+	return isFileInFolder(file, MOTOR_FILES);
 }
 
 bool isServo(const string &file)
 {
-	return isFileInFolder(file, servo_path);
+	return isFileInFolder(file, SERVO_FILES);
 }
 
 bool isBluetooth(const string &file)
 {
-	return isFileInFolder(file, bluetooth_path);
+	return isFileInFolder(file, BLUETOOTH_FILES);
 }
 
 bool isForceSensor(const string &file)
 {
-	return isFileInFolder(file, forcesensor_path);
+	return isFileInFolder(file, FORCE_SENSOR_FILES);
 }
 
 bool isCamera(const string &file)
 {
-	return isFileInFolder(file, camera_path);
+	return isFileInFolder(file, CAMERA_FILES);
 }
 
 bool isEncoder(const string &file)
 {
-	return isFileInFolder(file, encoder_path);
+	return isFileInFolder(file, ENCODER_FILES);
 }
 
-bool isFileInFolder(const string &file, const string &path)
+bool isFileInFolder(const string &file, const stringvec &files)
 {
 	bool indicator = false;
-	for (auto &entry : directory_iterator(path))
+	string file_name = removeComponentPostfix(file);
+	if (getPosInVec(file_name, files) != -1)
 	{
-		if (entry.path().string() == removeComponentPostfix(file))
-		{
-			indicator = true;
-			break;
-		}
+		indicator = true;
 	}
 	return indicator;
 }

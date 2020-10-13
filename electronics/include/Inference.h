@@ -1,15 +1,7 @@
 ﻿#pragma once
-// #include <memory>
 #include "Circuit.h"
-// #include <sstream>
-// #include <cstring>
-// #include <stdlib.h> 
-// #include <type_traits>
-// #include <iomanip>
-
 struct Infer_Node;
 struct BBNode;
-//using bbglobalmap = std::vector<std::tuple<BBNode, unsigned>>;
 
 using infernodevec = std::vector<Infer_Node>;
 using infernodevec2d = std::vector<infernodevec>;
@@ -17,9 +9,7 @@ using bbnodevec = std::vector<BBNode>;
 using cliqueindex = std::vector<intvec>;
 using cliqueindex2d = std::vector<cliqueindex>;
 
-static GRBEnv env = GRBEnv();
-// using compoundtype = std::tuple<std::vector<Electrical_Component*>, unsignedpairs, unsignedpairs, unsignedpairs>;
-// using compoundsettype = std::tuple<doublepairs, doublepairs, cliqueindex, cliqueindex, doublevec, doublepairs, doublepairs>;
+extern GRBEnv env;
 
 const int DC_MOTOR_OPT = 0b00000000001, HBRIDGE_OPT = 0b00000000010,
 MICRO_CONTROLLER_OPT = 0b00000000100, VOLTAGE_REGULATOR_OPT = 0b00000001000,
@@ -39,7 +29,6 @@ struct BBNode
 	infernodevec infer_nodes;
 	Circuit circuit;
 	GRBModel model = GRBModel(env);
-//	cctrackvec current_tracker_vec;
 	doublepairs2d vol_ranges;
 	cliqueindex2d vol_index;
 	cliqueindex2d vol_vol_index;
@@ -63,6 +52,7 @@ struct BBNode
 	static unsigned num_of_bbnodes;
 	static unsigned last_level;
 	static double best_metric_val;
+	static bool pruning_enable;
 //	static connection_relation final_connections;
 
 	stringvec next_types;
@@ -76,18 +66,20 @@ struct BBNode
 
 	bool operator==(const BBNode &bbnode) const { return id == bbnode.id; }
 
-//	void copyAttributes(const BBNode &);
+	void copyMetrics(const BBNode &);
 //	void getRangeNIndex(const doublepairs &, const doublepairs &, const cliqueindex &, const cliqueindex &, const doublevec &);
 	void evaluate();
+	void reevaluate();
 	void computeComponentNum();
-//	void computePinNum();
-//	void computeConnectionNum();
-//	void computePrice();
-//	void computeWeight();
+	void computePinNum();
+	void computeConnectionNum();
+	void computePrice();
+	void computeWeight();
 	void computeMetricVal();
-	//	void computePowerConsump (const doublepairs2d &, const doublepairs2d &);
+	void computePowerConsump();
 
 	void optimize();
+	void updateConnections(const Pin_Connections &);
 	bbnodevec branch();
 	void bound();
 	stringvec typeInfer();
@@ -124,6 +116,9 @@ struct Infer_Node
 	
 	std::string getType() const;
 	std::string getName() const;
+	double getPrice() const;
+	double getWeight() const;
+	unsigned getPinNum() const;
 	void setName(const std::string &name) { component->setComponentName(name); }
 	unsigned getId() const { return id; }
 	void getUsedVarsName(const stringvec &);
@@ -147,12 +142,16 @@ struct Infer_Node
 	doublevec getFuncInCurrent() const { return func_in_current; }
 	doublepairs getPowerInVolRange() const { return pow_in_vol_range; }
 	doublepairs getFuncInVolRange() const { return func_in_vol_range; }
+	doublepair getPowerOutVolRange() const;
+	doublepair getFuncOutVolRange() const;
 	unsigned getMainPowerIndex();
 	void computePowInCurrent(Pin_Connections &);
 	void computePowInPinNames();
 	void computePowOutPinNames();
 	void computeFuncInPinNames();
 	void computeFuncOutPinNames();
+	void setPowerExistVec(const size_t &) const;
+	void setFuncExistVec(const size_t &) const;
 	stringvec getPowInPinNames() const { return pow_in_pin_names; }
 	stringvec getPowOutPinNames() const { return pow_out_pin_names; }
 	stringvec getFuncInPinNames() const { return func_in_pin_names; }
@@ -169,6 +168,8 @@ private:
 	infernodevec next_nodes;
 	unsigned id;
 	bool visited = false;
+	mutable boolvec pow_in_exist_vec = boolvec();
+	mutable boolvec func_in_exist_vec = boolvec();
 	doublevec pow_in_current = doublevec();
 	doublevec func_in_current = doublevec();
 	doublepairs pow_in_vol_range = doublepairs();
@@ -184,8 +185,8 @@ private:
 	double getPowerOutLimit();
 	double getFuncInSize();
 	doublevec getPowerInVal();
-	doublepairs getFuncInVolRange();
-	doublepairs getPowerInVolRange();
+//	doublepairs getFuncInVolRange();
+//	doublepairs getPowerInVolRange();
 };
 
 
@@ -198,6 +199,9 @@ stringvec2d actuatorPreprocess(const stringvec &, const doublepairs & = doublepa
 infernodevec2d initialize(const stringvec2d &, const doublepairs & = doublepairs(),
 	const doublepairs & = doublepairs());
 bbnodevec initialize(const infernodevec2d &);
+std::vector<stringpair> postprocessing(const Pin_Connections &, const stringvec &, 
+	const unsignedvec &, const unsignedvec &);
+std::string replaceConnections(const std::string &, const std::string &);
 
 // version/number graph formulation function
 
@@ -226,8 +230,9 @@ double getCurrentVal(const std::string &, const doublevec & = doublevec());
 
  // infernodevec numberInfer(const std::string &, infernodevec &, const stringvec &,
 //	const cliqueindex &, const cliqueindex &);
- infernodevec numberInfer(const std::string &, infernodevec &, const stringvec &,
+infernodevec numberInfer(const std::string &, infernodevec &, const stringvec &,
 	 const cliqueindex &, const cliqueindex &);
+bool hasTwoVoltageRegulators(const std::string &, const std::string &);
 
 /*
 doublevec getCurrentClique(const cliqueindex &, const doublevec &);
@@ -247,9 +252,10 @@ connection_relation_vec sameLevelComponentsReduction(bbnodevec &);
 std::string indexComponent(std::string);
 // void writeTree(const nodeptrvec &, std::ofstream &, str_unsigned_uomap &);
 // void writeDesign(const nodeptrvec &, const Circuit &, str_unsigned_uomap &);
+*/
 void writeDesign(const BBNode &);
 void writeRawDesign(const BBNode &);
-
+/*
 // This function return different types of components and their indices as vector
 // std::tuple<nodeptrvec2d, unsignedvec2d, connection_relation_vec> identifyTypes(const nodeptrvec &, const connection_relation_vec &);
 // std::tuple<nodeptrvec2d, unsignedvec2d> identifyTypes(const nodeptrvec &);
@@ -263,16 +269,11 @@ infernodevec generateNodeptrVec(const std::string &, const stringvec &);
 // This function checks the inputs' validity
 bool inputsValidityCheck(const doublepairs &, const doublepairs &);
 
-int branchNBound(bbnodevec & = bbnodevec());
+std::shared_ptr<BBNode> branchNBound(bbnodevec & = bbnodevec());
 
 //void expandMap(const bbnodevec &, bbglobalmap &);
 
 // BBNode getOptimalDesign(const bbglobalmap &, const int &);
-
-void evaluate(bbnodevec &, connection_relation_vec2d & = connection_relation_vec2d(),
-	const doublepairs & = doublepairs(), const doublepairs & = doublepairs());
-void evaluate(BBNode &, connection_relation_vec & = connection_relation_vec(), 
-	const doublepairs & = doublepairs(), const doublepairs & = doublepairs());
 /*
 compstructptrvec getComponentConnections(infernodevec &);
 
@@ -282,10 +283,14 @@ void printConnections(const BBNode &, const bbnodevec &, const connection_relati
 std::vector<Actu_components> generateComponents(stringvec &, testinput &);
 */
 std::vector<Component_Pair> extractComponentPairs(infernodevec &);
-std::vector<Component_Pair> extractComponentPairs(infernodevec &, infernodevec &);
+std::vector<Component_Pair> extractComponentPairs(infernodevec &,
+	const unsignedpair &, const unsignedpair &);
+std::vector<Component_Pair> extractConsecutiveComponentPairs(infernodevec &, infernodevec &);
 Pin_Connections maxNodeMatch(BBNode &, infernodevec & = infernodevec());
 Pin_Connections nodeMatch(infernodevec &);
-Pin_Connections nodeMatch(infernodevec &, infernodevec &);
+Pin_Connections nodeMatch(infernodevec &, const unsignedpair &, const unsignedpair &);
+Pin_Connections consecutiveNodeMatch(infernodevec &, infernodevec &);
+ 
 void createLinks(infernodevec &, Pin_Connections &);
 void createLinks(infernodevec &, infernodevec &, Pin_Connections &);
 void getDependentPins(infernodevec &, Pin_Connections &);

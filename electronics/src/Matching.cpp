@@ -34,6 +34,7 @@ unordered_multimap<std::string, std::string> connection_map{
 	{Component_Type::Battery, Component_Type::Voltage_Regulator},
 	{Component_Type::Voltage_Regulator, Component_Type::Servo},
 	{Component_Type::Micro_Controller, Component_Type::Servo}, 
+	{Component_Type::Voltage_Regulator, Component_Type::Force_Sensor},
 	{Component_Type::Battery, Component_Type::Force_Sensor},
 };
 
@@ -78,6 +79,8 @@ unordered_map<stringpair, bitset<7>, hash_pair> connection_mask_map {
 	{{Component_Type::Battery, Component_Type::Bluetooth}, power_mask},
 	{{Component_Type::Battery, Component_Type::Force_Sensor},
 	power_mask},
+	{{Component_Type::Voltage_Regulator, Component_Type::Force_Sensor},
+	power_mask},
 	{{Component_Type::Micro_Controller, Component_Type::Force_Sensor},
 	func_mask},
 	{{Component_Type::Micro_Controller, Component_Type::Servo},
@@ -90,22 +93,39 @@ unordered_multimap<Electronics::FUNCTION_TYPE, Electronics::FUNCTION_TYPE>
 compatible_type_map{ 
 	{Electronics::DIGITAL, Electronics::ELECTRICAL },
 	{Electronics::PWM, Electronics::ELECTRICAL},
+	{Electronics::PWM, Electronics::DIGITAL},
 	{Electronics::DIGITAL_SPI_MOSI, Electronics::ELECTRICAL},
 	{Electronics::DIGITAL_SPI_MISO, Electronics::ELECTRICAL},
 	{Electronics::DIGITAL_SPI_SCK, Electronics::ELECTRICAL },
 	{Electronics::DIGITAL_SPI_SS, Electronics::ELECTRICAL },
+	{Electronics::DIGITAL_SPI_MOSI, Electronics::DIGITAL},
+	{Electronics::DIGITAL_SPI_MISO, Electronics::DIGITAL},
+	{Electronics::DIGITAL_SPI_SCK, Electronics::DIGITAL },
+	{Electronics::DIGITAL_SPI_SS, Electronics::DIGITAL },
 	{Electronics::DIGITAL_UART_RX, Electronics::ELECTRICAL},
 	{Electronics::DIGITAL_UART_TX, Electronics::ELECTRICAL},
+	{Electronics::DIGITAL_UART_RX, Electronics::DIGITAL},
+	{Electronics::DIGITAL_UART_TX, Electronics::DIGITAL},
 	{Electronics::DIGITAL_EXTERNAL_INTERRUPT, Electronics::ELECTRICAL}, 
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT, Electronics::DIGITAL},
 	{Electronics::PWM_SPI_MOSI, Electronics::ELECTRICAL},
 	{Electronics::PWM_SPI_MISO, Electronics::ELECTRICAL},
 	{Electronics::PWM_SPI_SCK, Electronics::ELECTRICAL},
 	{Electronics::PWM_SPI_SS, Electronics::ELECTRICAL},
+	{Electronics::PWM_SPI_MOSI, Electronics::DIGITAL},
+	{Electronics::PWM_SPI_MISO, Electronics::DIGITAL},
+	{Electronics::PWM_SPI_SCK, Electronics::DIGITAL},
+	{Electronics::PWM_SPI_SS, Electronics::DIGITAL},
 	{Electronics::PWM_EXTERNAL_INTERRUPT, Electronics::ELECTRICAL},
+	{Electronics::PWM_EXTERNAL_INTERRUPT, Electronics::DIGITAL},
 	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SDA, Electronics::ELECTRICAL},
 	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SCL, Electronics::ELECTRICAL},
 	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_TX, Electronics::ELECTRICAL},
 	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_RX, Electronics::ELECTRICAL},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SDA, Electronics::DIGITAL},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SCL, Electronics::DIGITAL},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_TX, Electronics::DIGITAL},
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_RX, Electronics::DIGITAL},
 	{Electronics::DIGITAL, Electronics::ENABLE },
 	{Electronics::PWM, Electronics::ENABLE},
 	{Electronics::DIGITAL_SPI_MOSI, Electronics::ENABLE},
@@ -445,65 +465,66 @@ Pin_Connections powerPinMatch(vector<Pin*> &left_pins, vector<Pin*> &right_pins,
 			pow_pin_list.insert(pow_connection);
 			if (pow_connection.first != "")
 			{
-				pow_pin_list.insert(matchDutyCycles(left_pins[i],
-					right_pins[j], component_pair));
+				pow_pin_list.insert(matchDutyCycles(pow_connection, component_pair));
 			}
 		}
 	}
 	return pow_pin_list;
 }
 
-Pin_Connections funcPinMatch(vector<Pin*> &left_pins, vector<Pin*> &right_pins, 
-	Component_Pair &component_pair)
-{
-	Pin_Connections func_pin_list;
-	for (size_t i = 0; i < left_pins.size(); i++)
-	{
-		for (size_t j = 0; j < right_pins.size(); j++)
-		{
-			func_pin_list.insert(grammer(left_pins[i], right_pins[j], 
-				component_pair));
-//			func_pin_list.insert(matchDutyCycles(left_pins[i], 
-//				right_pins[j], component_pair));
-		}
-	}
-	return func_pin_list;
-}
-
 stringpair grammer(Pin *left_pin, Pin *right_pin, 
 	Component_Pair &component_pair)
-{
-	int ALL_PASS = 0b11111;
+{			
+	// TO DO: terminate early
+//	int ALL_PASS = 0b11111;
 	stringpair power_pin_connection;
 	std::bitset<5> conditions_code;
 	
 	// conditions need to satisfy
-	// left pin in usable state (see dependents)
-	vector<Pin*> dependent_pins = component_pair.second->getDependentPins();
-	std::find(dependent_pins.begin(), dependent_pins.end(), right_pin) ==
-		dependent_pins.end() ? conditions_code[4] = 0 : conditions_code[4] = 1;
-	
 	// both pins in active state
 	(!right_pin->status || right_pin->connection == Electronics::CONNECTION::OTM) 
 		&& (!left_pin->status || left_pin->connection == 
-			Electronics::CONNECTION::OTM) ? conditions_code[3] = 1 : 
-		conditions_code[3] = 0;
-
-	// both pins in same physical shape
-	left_pin->phys_type == right_pin->phys_type ? conditions_code[2] = 1 : 
-		conditions_code[2] = 0;
-
-	// voltage ranges match
-	isIntersect(right_pin->v_bound, left_pin->v_bound) ? conditions_code[1] = 1 :
-		conditions_code[1] = 0;
-
-	// function type match
-	funcTypeCompare(left_pin->func_type, 
-		right_pin->func_type, component_pair ) ? conditions_code[0] = 1 :
+			Electronics::CONNECTION::OTM) ? conditions_code[0] = 1 : 
 		conditions_code[0] = 0;
 
-	if (conditions_code == ALL_PASS)
+	// both pins in same physical shape
+	if (conditions_code[0])
 	{
+		left_pin->phys_type == right_pin->phys_type ? conditions_code[1] = 1 :
+			conditions_code[1] = 0;
+	}
+
+	// voltage ranges match
+	if (conditions_code[1])
+	{
+		isIntersect(right_pin->v_bound, left_pin->v_bound) ? conditions_code[2] = 1 :
+			conditions_code[2] = 0;
+	}
+
+	// left pin in usable state (see dependents)
+	if (conditions_code[2])
+	{
+		vector<Pin*> dependent_pins = component_pair.second->getDependentPins();
+		getPosInVec(right_pin, dependent_pins) == -1 ? conditions_code[3] = 0 : conditions_code[3] = 1;
+	}
+
+	// function type match
+	pair<bool, Pin*> result_pair;
+	if (conditions_code[3])
+	{
+		result_pair = funcTypeCompare(left_pin->func_type,
+			right_pin->func_type, component_pair);
+		result_pair.first ? conditions_code[4] = 1 :
+			conditions_code[4] = 0;
+	}
+
+	if (conditions_code[4])
+	{
+		if (result_pair.second)
+		{
+			left_pin = result_pair.second;
+		}
+
 		power_pin_connection = make_pair(
 			createConnectionName(component_pair.first->getComponentName(), 
 				left_pin->name),
@@ -522,9 +543,10 @@ Pin_Connections removeEmptyConnections(Pin_Connections &pin_connections)
 	return pin_connections;
 }
 
-bool funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
+pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 	Electronics::FUNCTION_TYPE &right_type, Component_Pair &component_pair)
 {
+	Pin *matched_pin = nullptr;
 	unsigned result = false;
 	if (left_type == right_type)
 	{
@@ -551,7 +573,8 @@ bool funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 					compatible_type_map.find(pins[i]->func_type)->second
 					== right_type)
 				{
-					result = false;
+					result = true;
+					matched_pin = pins[i];
 					pwm_empty = false;
 					break;
 				}
@@ -575,7 +598,8 @@ bool funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 						compatible_type_map.find(pins[i]->func_type)->second
 						== right_type)
 					{
-						result = false;
+						result = true;
+						matched_pin = pins[i];
 						digital_empty = false;
 						break;
 					}
@@ -606,10 +630,10 @@ bool funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 			}
 		}
 	}
-	return result;
+	return make_pair(result, matched_pin);
 }
 
-stringpair matchDutyCycles(Pin *left_pin, Pin *right_pin, Component_Pair &component_pair)
+stringpair matchDutyCycles(const stringpair &connection, Component_Pair &component_pair)
 {
 	shared_ptr<Electrical_Component> left_component = component_pair.first,
 		right_component = component_pair.second;
@@ -627,8 +651,11 @@ stringpair matchDutyCycles(Pin *left_pin, Pin *right_pin, Component_Pair &compon
 			temp_h_bridge.getInDutyCycleMap(),
 			out_duty_cycle_map = temp_micro_controller.getOutDutyCycleMap();
 
-		auto &hbridge_iter = in_duty_cycle_map.find(right_pin->name);
-		auto &micro_controller_iter = out_duty_cycle_map.find(left_pin->name);
+		stringpair left_pair = separateNames(connection.first),
+			right_pair = separateNames(connection.second);
+
+		auto &hbridge_iter = in_duty_cycle_map.find(right_pair.second);
+		auto &micro_controller_iter = out_duty_cycle_map.find(left_pair.second);
 
 		if (hbridge_iter == in_duty_cycle_map.end() || 
 			micro_controller_iter == out_duty_cycle_map.end())
@@ -658,330 +685,4 @@ void printPinConnections(Pin_Connections &pin_connections)
 	}
 }
 
-/*
-void matching_test()
-{
-	//	matching_test1();
-	//	matching_test2();
-	//	matching_test3();
-	matching_test4();
-	//	matching_test5();
-	//	matching_test6();
-}
-
-void matching_test1()
-{
-	std::string battery_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\Computer_USB.txt",
-		battery_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\AmazonBasics_6LR61.txt",
-		h_bridge_file = std::experimental::filesystem::current_path().string() + "\\Connections\\H_BRIDGE\\A3909.txt",
-		micro_controller_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MICRO_CONTROLLER\\Arduino_UNO.txt",
-		motor_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MOTOR\\Pololu_1124.txt",
-		voltage_regulator_file = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-5.txt";
-
-	Connection_Structure battery1(battery_file1), battery2(battery_file2), h_bridge(h_bridge_file), micro_controller(micro_controller_file),
-		motor(motor_file), voltage_regulator(voltage_regulator_file);
-
-	std::vector<std::pair<Connection_Structure&, Connection_Structure&>> component_relations;
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(micro_controller, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery1, micro_controller));
-
-	Component_Connection TestConnection(component_relations);
-	TestConnection.components_matching();
-	TestConnection.netlist_print();
-}
-
-void matching_test2()
-{
-	std::string battery_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\Computer_USB.txt",
-		battery_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\AmazonBasics_6LR61.txt",
-		h_bridge_file = std::experimental::filesystem::current_path().string() + "\\Connections\\H_BRIDGE\\A3909.txt",
-		micro_controller_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MICRO_CONTROLLER\\Arduino_UNO.txt",
-		motor_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MOTOR\\Pololu_1124.txt",
-		voltage_regulator_file = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-5.txt";
-
-	Connection_Structure battery1(battery_file1), battery2(battery_file2), h_bridge(h_bridge_file), micro_controller(micro_controller_file),
-		motor1(motor_file), motor2(motor_file), voltage_regulator(voltage_regulator_file);
-
-	std::vector<std::pair<Connection_Structure&, Connection_Structure&>> component_relations;
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor1));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor2));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(micro_controller, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery1, micro_controller));
-
-	Component_Connection TestConnection(component_relations);
-	TestConnection.components_matching();
-	TestConnection.netlist_print();
-}
-
-void matching_test3()
-{
-	// components
-	std::string battery_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\Computer_USB.txt",
-		battery_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\AmazonBasics_6LR61.txt",
-		h_bridge_file = std::experimental::filesystem::current_path().string() + "\\Connections\\H_BRIDGE\\A3909.txt",
-		micro_controller_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MICRO_CONTROLLER\\Arduino_UNO.txt",
-		motor_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MOTOR\\Pololu_3060.txt",
-		voltage_regulator_file = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-ADJ.txt";
-
-	Connection_Structure battery1(battery_file1), battery2(battery_file2), h_bridge(h_bridge_file), micro_controller(micro_controller_file),
-		motor1(motor_file), voltage_regulator(voltage_regulator_file);
-
-	std::vector<std::pair<Connection_Structure&, Connection_Structure&>> component_relations;
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor1));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(micro_controller, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery1, micro_controller));
-
-	Component_Connection TestConnection(component_relations);
-	TestConnection.components_matching();
-	TestConnection.netlist_print();
-}
-
-void matching_test4()
-{
-	// components
-	std::string battery_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\Computer_USB.txt",
-		battery_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\AmazonBasics_6LR61.txt",
-		h_bridge_file = std::experimental::filesystem::current_path().string() + "\\Connections\\H_BRIDGE\\A3909.txt",
-		micro_controller_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MICRO_CONTROLLER\\Arduino_UNO.txt",
-		motor_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MOTOR\\Pololu_3060.txt",
-		voltage_regulator_file = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-ADJ.txt";
-
-	Connection_Structure battery1(battery_file1), battery2(battery_file2), h_bridge(h_bridge_file), micro_controller(micro_controller_file),
-		motor1(motor_file), motor2(motor_file), voltage_regulator(voltage_regulator_file);
-
-	std::vector<std::pair<Connection_Structure&, Connection_Structure&>> component_relations;
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor1));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor2));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(micro_controller, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery1, micro_controller));
-
-	Component_Connection TestConnection(component_relations);
-	TestConnection.components_matching();
-	TestConnection.netlist_print();
-}
-
-void matching_test5()
-{
-	std::string battery_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\Computer_USB.txt",
-		battery_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\AmazonBasics_6LR61.txt",
-		h_bridge_file = std::experimental::filesystem::current_path().string() + "\\Connections\\H_BRIDGE\\SN754410.txt",
-		micro_controller_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MICRO_CONTROLLER\\Arduino_UNO.txt",
-		motor_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MOTOR\\Pololu_3036.txt",
-		voltage_regulator_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-ADJ.txt",
-		voltage_regulator_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-5.txt";
-
-	Connection_Structure battery1(battery_file1), battery2(battery_file2), h_bridge(h_bridge_file), micro_controller(micro_controller_file),
-		motor1(motor_file), voltage_regulator1(voltage_regulator_file1), voltage_regulator2(voltage_regulator_file2);
-
-	std::vector<std::pair<Connection_Structure&, Connection_Structure&>> component_relations;
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor1));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator1, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator2, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator1));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator2));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(micro_controller, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery1, micro_controller));
-
-	Component_Connection TestConnection(component_relations);
-	TestConnection.components_matching();
-	TestConnection.netlist_print();
-}
-
-void matching_test6()
-{
-	std::string battery_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\Computer_USB.txt",
-		battery_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\AmazonBasics_6LR61.txt",
-		h_bridge_file = std::experimental::filesystem::current_path().string() + "\\Connections\\H_BRIDGE\\SN754410.txt",
-		micro_controller_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MICRO_CONTROLLER\\Arduino_UNO.txt",
-		motor_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MOTOR\\Pololu_3036.txt",
-		voltage_regulator_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-ADJ.txt",
-		voltage_regulator_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-5.txt";
-
-	Connection_Structure battery1(battery_file1), battery2(battery_file2), h_bridge(h_bridge_file), micro_controller(micro_controller_file),
-		motor1(motor_file), motor2(motor_file), voltage_regulator1(voltage_regulator_file1), voltage_regulator2(voltage_regulator_file2);
-
-	std::vector<std::pair<Connection_Structure&, Connection_Structure&>> component_relations;
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor1));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor2));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator1, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator2, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator1));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator2));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(micro_controller, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery1, micro_controller));
-
-	Component_Connection TestConnection(component_relations);
-	TestConnection.components_matching();
-	TestConnection.netlist_print();
-}
-Connection_Structure clearPinConnections(Connection_Structure &component)
-{
-	component.clearPinConnections();
-	return component;
-}
-
-std::vector<Connection_Structure> initializeConnectionVec(const std::string &path, stringvec &files)
-{
-	unsigned filenum = getFileNumInDirectory(path);
-	std::vector<Connection_Structure> vec(filenum);
-	files.resize(filenum);
-
-	auto &vbeg = vec.begin();
-	auto &fbeg = files.begin();
-	for (auto &entry: std::experimental::filesystem::directory_iterator(path))
-	{
-		std::string &file = entry.path().string();
-		*vbeg++ = Connection_Structure(file);
-		*fbeg++ = file;
-	}
-	return vec;
-}
-
-unsigned determineConnectionFolder(const std::string &file)
-{
-	if (file.find(battery_connection_path) != std::string::npos)
-	{
-		return IN_BATTERY_CONNECTION_FOLDER;
-	}
-	else if (file.find(voltage_regulator_connection_path) != std::string::npos)
-	{
-		return IN_VOLTAGE_REGULATOR_CONNECTION_FOLDER;
-	}
-	else if (file.find(hbridge_connection_path) != std::string::npos)
-	{
-		return IN_HBRIDGE_CONNECTION_FOLDER;
-	}
-	else if (file.find(micro_controller_connection_path) != std::string::npos)
-	{
-		return IN_MICRO_CONTROLLER_CONNECTION_FOLDER;
-	}
-	else if (file.find(motor_connection_path) != std::string::npos)
-	{
-		return IN_MOTOR_CONNECTION_FOLDER;
-	}
-}
-
-/*
-void matching_optimization_module_test()
-{
-	// matching_optimization_module_test1();
-	matching_optimization_module_test2();
-}
-
-void matching_optimization_module_test1()
-{
-	std::string battery_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\Computer_USB.txt",
-		battery_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\AmazonBasics_6LR61.txt",
-		h_bridge_file = std::experimental::filesystem::current_path().string() + "\\Connections\\H_BRIDGE\\A3909.txt",
-		micro_controller_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MICRO_CONTROLLER\\Arduino_UNO.txt",
-		motor_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MOTOR\\Pololu_1124.txt",
-		voltage_regulator_file = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-5.txt";
-
-	Connection_Structure battery1(battery_file1), battery2(battery_file2), h_bridge(h_bridge_file), micro_controller(micro_controller_file),
-		motor(motor_file), voltage_regulator(voltage_regulator_file);
-
-	std::vector<std::pair<Connection_Structure&, Connection_Structure&>> component_relations;
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(micro_controller, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery1, micro_controller));
-
-	Component_Connection TestConnection(component_relations);
-	TestConnection.components_matching();
-	TestConnection.netlist_print();
-	Component_Connection::Netlist relation = TestConnection.get_netlist();
-
-	try
-	{
-		GRBEnv env = GRBEnv();
-		GRBModel model = GRBModel(env);
-
-		Battery battery1_opt(path_convert(battery_file1)), battery2_opt(path_convert(battery_file2));
-		H_bridge h_bridge_opt(path_convert(h_bridge_file));
-		Micro_Controller micro_controller_opt(path_convert(micro_controller_file));
-		Motor motor_opt(path_convert(motor_file), 1e-3, 0.12);
-		V_regulator voltage_regulator_opt(path_convert(voltage_regulator_file));
-
-		std::vector<Actu_components> components{ battery1_opt, battery2_opt, h_bridge_opt, micro_controller_opt, motor_opt, voltage_regulator_opt };
-
-		// verification
-		Circuit circuit(components, relation);
-		circuit.verify(&model);
-		model.write(std::experimental::filesystem::current_path().string() + "\\Tests\\test1.mps");
-	}
-	catch (const GRBException &e)
-	{
-		std::cout << "ERROR CODE: " << e.getErrorCode() << std::endl;
-		std::cout << e.getMessage() << std::endl;
-	}
-	catch (const std::exception &e)
-	{
-		std::cout << "ERROR MESSAGE: " << e.what() << std::endl;
-	}
-}
-
-void matching_optimization_module_test2()
-{
-	std::string battery_file1 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\Computer_USB.txt",
-		battery_file2 = std::experimental::filesystem::current_path().string() + "\\Connections\\BATTERY\\AmazonBasics_6LR61.txt",
-		h_bridge_file = std::experimental::filesystem::current_path().string() + "\\Connections\\H_BRIDGE\\A3909.txt",
-		micro_controller_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MICRO_CONTROLLER\\Arduino_UNO.txt",
-		motor_file = std::experimental::filesystem::current_path().string() + "\\Connections\\MOTOR\\Pololu_1124.txt",
-		voltage_regulator_file = std::experimental::filesystem::current_path().string() + "\\Connections\\VOLTAGE_REGULATOR\\AZ1117-5.txt";
-
-	Connection_Structure battery1(battery_file1), battery2(battery_file2), h_bridge(h_bridge_file), micro_controller(micro_controller_file),
-		motor1(motor_file), motor2(motor_file), voltage_regulator(voltage_regulator_file);
-
-	std::vector<std::pair<Connection_Structure&, Connection_Structure&>> component_relations;
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor1));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(h_bridge, motor2));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(voltage_regulator, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery2, voltage_regulator));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(micro_controller, h_bridge));
-	component_relations.push_back(std::pair<Connection_Structure&, Connection_Structure&>(battery1, micro_controller));
-
-	Component_Connection TestConnection(component_relations);
-	TestConnection.components_matching();
-	TestConnection.netlist_print();
-	Component_Connection::Netlist relation = TestConnection.get_netlist();
-
-	try
-	{
-		GRBEnv env = GRBEnv();
-		GRBModel model = GRBModel(env);
-
-		Battery battery1_opt(path_convert(battery_file1)), battery2_opt(path_convert(battery_file2));
-		H_bridge h_bridge_opt(path_convert(h_bridge_file));
-		Micro_Controller micro_controller_opt(path_convert(micro_controller_file));
-		Motor motor1_opt(path_convert(motor_file), 1e-3, 0.12), motor2_opt(path_convert(motor_file), 1e-3, 0.12);
-		V_regulator voltage_regulator_opt(path_convert(voltage_regulator_file));
-
-		std::vector<Actu_components> components{ battery1_opt, battery2_opt, h_bridge_opt, micro_controller_opt, motor1_opt, motor2_opt, voltage_regulator_opt };
-
-		// verification
-		Circuit circuit(components, relation);
-		circuit.verify(&model);
-		model.write(std::experimental::filesystem::current_path().string() + "\\Tests\\test1.mps");
-	}
-	catch (const GRBException &e)
-	{
-		std::cout << "ERROR CODE: " << e.getErrorCode() << std::endl;
-		std::cout << e.getMessage() << std::endl;
-	}
-	catch (const std::exception &e)
-	{
-		std::cout << "ERROR MESSAGE: " << e.what() << std::endl;
-	}
-}
-*/
 

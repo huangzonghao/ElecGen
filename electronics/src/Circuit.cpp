@@ -79,7 +79,7 @@ void Circuit::addMinObjs(GRBModel *model)
 		{
 			if (isDutyCycle(used_var_names[j]))
 			{
-				objective -= components[i]->vars[j];
+				objective -= 10*components[i]->vars[j];
 			}
 			else
 			{
@@ -99,7 +99,7 @@ void Circuit::addMaxObjs(GRBModel *model)
 		{
 			if (isDutyCycle(used_var_names[j]))
 			{
-				objective -= components[i]->vars[j];
+				objective -= 10*components[i]->vars[j];
 			}
 			else
 			{
@@ -177,6 +177,61 @@ void Circuit::addCompositions(GRBModel *model) {
 		
 		model->addConstr(*left_component->var_maps[left_pair.second] == *right_component->var_maps[right_pair.second]);
 	}
+}
+
+void Circuit::minUpdateConnectionsSolve(GRBModel *model)
+{
+	updateMinObjs(model);
+	updateModelCons(model);
+	updateCompositions(model);
+	model->update();
+	model->optimize();
+	if (model->get(GRB_IntAttr_Status) == GRB_OPTIMAL)
+	{
+		vector<shared_ptr<Electrical_Component>> nonlin_components;
+		for (size_t i = 0; i < components.size(); i++)
+		{
+			if (components[i]->isNoninComponent())
+			{
+				nonlin_components.push_back(components[i]);
+			}
+		}
+
+		bool indicator = std::invoke(method_maps[OPT_METHOD::NEWTON_RAPHSON], this, nonlin_components, model);
+		if (indicator)
+		{
+			cout << MODEL_SOLVED << endl;
+		}
+		else
+		{
+			throw MODEL_IS_INFEASIBLE;
+		}
+	}
+	else
+	{
+		throw MODEL_IS_INFEASIBLE;
+	}
+
+	// update voltage bounds
+	for (size_t i = 0; i < components.size(); i++)
+	{
+		components[i]->updateUsedPinsVolLB();
+	}
+
+	// update dc motor/servo motor current bounds
+	for (size_t i = 0; i < components.size(); i++)
+	{
+		if (components[i]->component_type == Component_Type::Motor ||
+			components[i]->component_type == Component_Type::Servo)
+		{
+			double limit_current = components[i]->
+				var_maps["I"]->get(GRB_DoubleAttr_X);
+			components[i]->i_bound_mat(0, 1) = limit_current;
+		}
+	}
+	model->write("min_model.lp");
+	report();
+	return;
 }
 
 void Circuit::maxSolve(GRBModel *model)
@@ -259,7 +314,7 @@ void Circuit::updateObjs(GRBModel *model)
 			if (isDutyCycle(used_var_names[j]))
 			{
 				new_components[i]->var_maps[used_var_names[j]]->
-				set(GRB_DoubleAttr_Obj, -1);
+				set(GRB_DoubleAttr_Obj, -10);
 			}
 			else
 			{
@@ -315,8 +370,12 @@ void Circuit::updateModelCons(GRBModel *model)
 		for (size_t j = 0; j < used_index.size(); j++)
 		{
 			size_t row = used_index[j];
-			model_cons.push_back(model->addConstr(lin_exp[row],
-				model_relations[row], 0, model_names[row]));
+			if (getPosInVec(model_names[row], model_cons_names) == -1)
+			{
+				model_cons.push_back(model->addConstr(lin_exp[row],
+					model_relations[row], 0, model_names[row]));
+				model_cons_names.push_back(model_names[row]);
+			}
 		}
 	}
 }
@@ -481,6 +540,17 @@ void Circuit::updateVerify(GRBModel *model, verifyMode mode, const std::string &
 		components[i]->updateUsedPinsVolLB();
 	}
 
+	for (size_t i = 0; i < components.size(); i++)
+	{
+		if (components[i]->component_type == Component_Type::Motor ||
+			components[i]->component_type == Component_Type::Servo)
+		{
+			double limit_current = components[i]->
+				var_maps["I"]->get(GRB_DoubleAttr_X);
+			components[i]->i_bound_mat(0, 1) = limit_current;
+		}
+	}
+
 	report();
 	model->write("min_model.lp");
 	return;
@@ -518,81 +588,6 @@ void Circuit::updateConnections(const Pin_Connections &_pin_connections)
 {
 	pin_connections.insert(_pin_connections.begin(), _pin_connections.end());
 	new_pin_connections = _pin_connections;
-/*
-	str_strvec_uomap::iterator iter, riter;
-	componentpins = str_strvec_uomap();
-	for (auto &beg = _relations.begin(); beg != _relations.end(); beg++)
-	{
-		getComponentPins(componentpins, beg->first.first, beg->second.first);
-		getComponentPins(componentpins, beg->first.second, beg->second.second);
-	}
-
-	for (auto &beg = componentpins.begin(); beg != componentpins.end(); beg++)
-	{
-		for (auto &cbeg = components.begin(); cbeg != components.end(); cbeg++)
-		{
-			if (beg->first == cbeg->component_name && cbeg->pin_relation_mat.cols() != 0)
-			{
-				unsignedvec other_pins;
-				for (auto &pbeg = beg->second.begin(); pbeg != beg->second.end(); pbeg++)
-				{
-					auto &niter = std::find(cbeg->names.begin(), (cbeg->names.begin() + *cbeg->params.rbegin()), *pbeg);
-					if (niter != cbeg->names.begin() + *cbeg->params.rbegin())
-					{
-						unsigned row_idx = niter - cbeg->names.begin();
-						getCorresPins(cbeg->pin_relation_mat, row_idx, other_pins);
-					}
-				}
-
-				stringvec other_pin_names(other_pins.size());
-				auto &opbeg = other_pin_names.begin();
-				for (auto &obeg = other_pins.begin(); obeg != other_pins.end(); obeg++, opbeg++)
-				{
-					*opbeg = cbeg->names[*obeg];
-				}
-
-				// alreay exist pin, don't add
-				for (auto &opnbeg = other_pin_names.begin(); opnbeg != other_pin_names.end(); opnbeg++)
-				{
-					if (std::find(beg->second.begin(), beg->second.end(), *opnbeg) == beg->second.end())
-					{
-						beg->second.insert(beg->second.end(), *opnbeg);
-					}
-				}
-
-				// add usable pins here
-				for (auto &cbeg = component_connections.begin(); cbeg != component_connections.end(); cbeg++)
-				{
-					if ((*cbeg)->componentName == connection_path_convert(beg->first))
-					{
-						(*cbeg)->addUsablePins(other_pin_names);
-					}
-				}
-			}
-		}
-	}
-
-	// merge and copy
-	if (refer_componentpins.empty())
-	{
-		refer_componentpins = componentpins;
-	}
-	else
-	{
-		for (auto &beg = componentpins.begin(); beg != componentpins.end(); beg++)
-		{
-			riter = refer_componentpins.find(beg->first);
-			if (riter == refer_componentpins.end())
-			{
-				refer_componentpins.insert(*beg);
-			}
-			else
-			{
-				riter->second.insert(riter->second.end(), beg->second.begin(), beg->second.end());
-			}
-		}
-	}
-	*/
 }
 
 /*
@@ -752,13 +747,6 @@ std::vector<GRBLinExpr> operator*(Eigen::MatrixXd &mat, std::vector<GRBVar> &var
 	return model_cons;
 }
 
-stringpair separateNames(const std::string &pin_connection)
-{
-	size_t pos = pin_connection.find_first_of('.');
-	string component_name = pin_connection.substr(0, pos);
-	string pin_name = pin_connection.substr(pos + 1, pin_connection.size() - pos - 1);
-	return std::make_pair(component_name, pin_name);
-}
 bool isDutyCycle(const string &pin_name)
 {
 	string duty_cycle = "DUTY";

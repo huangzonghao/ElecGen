@@ -3,16 +3,19 @@
 #include <utility>
 #include <random>
 #include <iostream>
+#include <fstream>
 #include "typefile.h"
 #include <numeric>
 #include <memory>
 #include <discreture.hpp>
+#include <bitset>
 
 // check if two ranges intersect
 bool isIntersect(const doublepair &, const doublepair &);
 doublepair getIntersect(const doublepair &, const doublepair &);
 bool isInTol(double, double);
 std::string removeReplicate(const std::string &);
+stringpair separateNames(const std::string &);
 
 bool fileInDirectory(const std::string &, const std::string &);
 
@@ -107,4 +110,4 @@ bool isBluetooth(const std::string &);
 bool isForceSensor(const std::string &);
 bool isCamera(const std::string &);
 bool isEncoder(const std::string &);
-bool isFileInFolder(const std::string &, const std::string &);
+bool isFileInFolder(const std::string &, const stringvec &);
