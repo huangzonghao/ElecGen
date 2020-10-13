@@ -1501,20 +1501,39 @@ void motor_encoder_hbridge_battery_connect()
 void system_test()
 {
 	// pre-processing 
-//	stringvec input_types{ Component_Type::Motor, Component_Type::Motor, 
-//		Component_Type::Motor, Component_Type::Motor,
-//		Component_Type::Encoder, Component_Type::Encoder, 
-//		Component_Type::Encoder, Component_Type::Encoder };
-//	doublepairs input_torques{make_pair<double>(1e-3, 0.4), 
-//		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4), 
-//		make_pair<double>(1e-3, 0.4) };
-//	doublepairs input_velocities{make_pair<double>(1e-3, 6.0), 
-//		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0), 
-//		make_pair<double>(1e-3, 6.0)};
+	stringvec input_types{ 
+		Component_Type::Motor, Component_Type::Motor, 
+		Component_Type::Motor, Component_Type::Motor,
+		Component_Type::Motor, Component_Type::Motor,
+		Component_Type::Motor, Component_Type::Motor,
+		Component_Type::Servo, Component_Type::Servo,
+		Component_Type::Servo, Component_Type::Servo,
+		Component_Type::Encoder, Component_Type::Encoder, 
+		Component_Type::Encoder, Component_Type::Encoder,
+		Component_Type::Encoder, Component_Type::Encoder,
+		Component_Type::Encoder, Component_Type::Encoder,
+		Component_Type::Camera
+	};
+	doublepairs input_torques{
+		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4), 
+		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
+		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
+		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
+		make_pair<double>(1e-3, 0.14), make_pair<double>(1e-3, 0.14),
+		make_pair<double>(1e-3, 0.14), make_pair<double>(1e-3, 0.14),
+	};
+	doublepairs input_velocities{
+		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0), 
+		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
+		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
+		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
+		make_pair<double>(1e-3, 10.0), make_pair<double>(1e-3, 10.0),
+		make_pair<double>(1e-3, 10.0), make_pair<double>(1e-3, 10.0),
+	};
 
-//	stringvec2d component_versions = preprocess(input_types, input_torques, input_velocities);
-//	infernodevec2d infer_nodes_vec = initialize(component_versions, input_torques, input_velocities);
-//	bbnodevec bbnode_vec = initialize(infer_nodes_vec);
+	stringvec2d component_versions = preprocess(input_types, input_torques, input_velocities);
+	infernodevec2d infer_nodes_vec = initialize(component_versions, input_torques, input_velocities);
+	bbnodevec bbnodes = initialize(infer_nodes_vec);
 	
 	// SINGLE/MULTIPLE MOTOR TEST
 //	shared_ptr<Motor> dc_motor1 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
@@ -1604,54 +1623,54 @@ void system_test()
 //	shared_ptr<Bluetooth> bluetooth = make_shared<Bluetooth>(bluetooth_path + "Bluefruit_SPI.txt");
 
 	// dc motor*8 + encoder*8 + servo motor*4 + camera
-	shared_ptr<Motor> dc_motor1 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-	shared_ptr<Motor> dc_motor2 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-	shared_ptr<Motor> dc_motor3 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-	shared_ptr<Motor> dc_motor4 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-	shared_ptr<Motor> dc_motor5 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-	shared_ptr<Motor> dc_motor6 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-	shared_ptr<Motor> dc_motor7 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-	shared_ptr<Motor> dc_motor8 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-	dc_motor1->setWorkPoint(1e-3, 6.0);  
-	dc_motor2->setWorkPoint(1e-3, 6.0);
-	dc_motor3->setWorkPoint(1e-3, 6.0);
-	dc_motor4->setWorkPoint(1e-3, 6.0);
-	dc_motor5->setWorkPoint(1e-3, 6.0);
-	dc_motor6->setWorkPoint(1e-3, 6.0);
-	dc_motor7->setWorkPoint(1e-3, 6.0);
-	dc_motor8->setWorkPoint(1e-3, 6.0);
-	shared_ptr<Encoder> encoder1 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
-	shared_ptr<Encoder> encoder2 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
-	shared_ptr<Encoder> encoder3 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
-	shared_ptr<Encoder> encoder4 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
-	shared_ptr<Encoder> encoder5 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
-	shared_ptr<Encoder> encoder6 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
-	shared_ptr<Encoder> encoder7 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
-	shared_ptr<Encoder> encoder8 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+//	shared_ptr<Motor> dc_motor1 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor2 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor3 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor4 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor5 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor6 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor7 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	shared_ptr<Motor> dc_motor8 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
+//	dc_motor1->setWorkPoint(1e-3, 6.0);  
+//	dc_motor2->setWorkPoint(1e-3, 6.0);
+//	dc_motor3->setWorkPoint(1e-3, 6.0);
+//	dc_motor4->setWorkPoint(1e-3, 6.0);
+//	dc_motor5->setWorkPoint(1e-3, 6.0);
+//	dc_motor6->setWorkPoint(1e-3, 6.0);
+//	dc_motor7->setWorkPoint(1e-3, 6.0);
+//	dc_motor8->setWorkPoint(1e-3, 6.0);
+//	shared_ptr<Encoder> encoder1 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+//	shared_ptr<Encoder> encoder2 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+//	shared_ptr<Encoder> encoder3 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+//	shared_ptr<Encoder> encoder4 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+//	shared_ptr<Encoder> encoder5 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+//	shared_ptr<Encoder> encoder6 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+//	shared_ptr<Encoder> encoder7 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
+//	shared_ptr<Encoder> encoder8 = make_shared<Encoder>(encoder_path + "Pololu_3081.txt");
 
-	shared_ptr<Motor> servo_motor1 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
-	shared_ptr<Motor> servo_motor2 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
-	shared_ptr<Motor> servo_motor3 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
-	shared_ptr<Motor> servo_motor4 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
+//	shared_ptr<Motor> servo_motor1 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
+//	shared_ptr<Motor> servo_motor2 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
+//	shared_ptr<Motor> servo_motor3 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
+//	shared_ptr<Motor> servo_motor4 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
 	// HIGH SPEED - LOW TORQUE	
-	servo_motor1->setWorkPoint(1e-3, 10);
-	servo_motor2->setWorkPoint(1e-3, 10);
-	servo_motor3->setWorkPoint(1e-3, 10);
-	servo_motor4->setWorkPoint(1e-3, 10); 
+//	servo_motor1->setWorkPoint(1e-3, 10);
+//	servo_motor2->setWorkPoint(1e-3, 10);
+//	servo_motor3->setWorkPoint(1e-3, 10);
+//	servo_motor4->setWorkPoint(1e-3, 10); 
 
-	shared_ptr<Camera> camera = make_shared<Camera>(camera_path + "MU_Vision_Sensor.txt");
+//	shared_ptr<Camera> camera = make_shared<Camera>(camera_path + "MU_Vision_Sensor.txt");
 
-	Infer_Node infer_node1(dc_motor1), infer_node2(dc_motor2), infer_node3(dc_motor3), infer_node4(dc_motor4),
-		infer_node5(dc_motor5), infer_node6(dc_motor6), infer_node7(dc_motor7), infer_node8(dc_motor8),
-		infer_node9(encoder1), infer_node10(encoder2), infer_node11(encoder3), infer_node12(encoder4),
-		infer_node13(encoder5), infer_node14(encoder6), infer_node15(encoder7), infer_node16(encoder8),
-		infer_node17(servo_motor1), infer_node18(servo_motor2), infer_node19(servo_motor3), infer_node20(servo_motor4),
-		infer_node21(camera);
-	infernodevec infer_nodes{ infer_node1,  infer_node2, infer_node3, infer_node4, infer_node5, infer_node6,
-		infer_node7, infer_node8, infer_node9, infer_node10, infer_node11, infer_node12,  infer_node13, infer_node14,
-		infer_node15, infer_node16, infer_node17, infer_node18,  infer_node19, infer_node20, infer_node21 };
-	BBNode root(infer_nodes);
-	bbnodevec bbnodes{ root };
+//	Infer_Node infer_node1(dc_motor1), infer_node2(dc_motor2), infer_node3(dc_motor3), infer_node4(dc_motor4),
+//		infer_node5(dc_motor5), infer_node6(dc_motor6), infer_node7(dc_motor7), infer_node8(dc_motor8),
+//		infer_node9(encoder1), infer_node10(encoder2), infer_node11(encoder3), infer_node12(encoder4),
+//		infer_node13(encoder5), infer_node14(encoder6), infer_node15(encoder7), infer_node16(encoder8),
+//		infer_node17(servo_motor1), infer_node18(servo_motor2), infer_node19(servo_motor3), infer_node20(servo_motor4),
+//		infer_node21(camera);
+//	infernodevec infer_nodes{ infer_node1,  infer_node2, infer_node3, infer_node4, infer_node5, infer_node6,
+//		infer_node7, infer_node8, infer_node9, infer_node10, infer_node11, infer_node12,  infer_node13, infer_node14,
+//		infer_node15, infer_node16, infer_node17, infer_node18,  infer_node19, infer_node20, infer_node21 };
+//	BBNode root(infer_nodes);
+// 	bbnodevec bbnodes{ root };
 	shared_ptr<BBNode> best_node = branchNBound(bbnodes);
 	writeDesign(*best_node); 
  	int a = 1;

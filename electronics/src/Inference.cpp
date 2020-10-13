@@ -627,7 +627,7 @@ stringvec2d actuatorPreprocess(const stringvec &actuator_types, const doublepair
 	}
 	else
 	{
-		(dc_motor_versions.size() * servo_motor_versions.size()); // combinations
+		all_motor_versions.resize(dc_motor_versions.size() * servo_motor_versions.size()); // combinations
 		size_t k = 0;
 		for (size_t i = 0; i < dc_motor_versions.size(); i++)
 		{
