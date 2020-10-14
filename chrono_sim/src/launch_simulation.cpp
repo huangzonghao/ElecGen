@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Eigen/Core>
 #include "SimulationManager.h"
+#include "Inference.h"
 
 const double s_friction = 2.0;
 const double k_friction = 1.9;
@@ -127,6 +128,7 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
     // sm.timeout = 10;
     // try to use a wrong body name and see what happened
     // this part will be done by UI
+    // TODO: finalize mass of components
     sm.AddMotor("chassis", "chassis-fl_cyl", 1,0.1,0.1,0.1);
     sm.AddMotor("chassis", "fl_cyl-fl_upper", 1,0.1,0.1,0.1);
     sm.AddMotor("chassis", "fl_upper-fl_lower", 1,0.1,0.1,0.1);
@@ -139,26 +141,70 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
     sm.AddMotor("chassis", "chassis-br_cyl", 1,0.1,0.1,0.1);
     sm.AddMotor("chassis", "br_cyl-br_upper", 1,0.1,0.1,0.1);
     sm.AddMotor("chassis", "br_upper-br_lower", 1,0.1,0.1,0.1);
+    // encoder * 8 camera * 1
+    // sm.AddPayload();
+    // ...
+    // n + 1 vector: n for input components masses,
+    // 1 for sum of all other components mass
+    doublvec mass_vec;
+    stringvec input_types;
+    shared_ptr<BBNode> best_node;
 
     sm.AddWaypoints(waypoints);
     sm.SetEigenHeightmap(heightmap);
 
     // use this loop for iterations
     bool sim_done = false;
+    int cnt = 0;
     while (!sim_done){
         bool task_done = sm.RunSimulation(true);
-        // bool task_done = sm.RunSimulation(false);
+
+        if (task_done && !cnt)
+        {
+            input_types = sm.getComponentTypes();
+            doublepairs input_vels = sm.getActuatorVels(),
+                input_torqs = sm.getActuatorTorqs();
+
+            stringvec2d component_versions = preprocess(input_types, input_torqs, input_vels);
+            infernodevec2d infer_nodes_vec = initialize(component_versions, input_torqs, input_vels);
+            bbnodevec bbnodes = initialize(infer_nodes_vec);
+            best_node = branchNBound(bbnodes);
+            writeDesign(*best_node);
+        }
+        else if (task_done)
+        {
+            doublepairs input_vels = sm.getActuatorVels(),
+                input_torqs = sm.getActuatorTorqs();
+
+            // verify design
+            if (doubleCheck(best_node, input_vels, input_torqs))
+            {
+                sim_done = true;
+            }
+            else
+            {
+                stringvec2d component_versions = preprocess(input_types, input_torqs, input_vels);
+                infernodevec2d infer_nodes_vec = initialize(component_versions, input_torqs, input_vels);
+                bbnodevec bbnodes = initialize(infer_nodes_vec);
+                best_node = branchNBound(bbnodes);
+                writeDesign(*best_node);
+            }
+        }
+        mass_vec = best_node->getMassVec(); // feed this into dynamic simulation again
+        sm.updateMassInfo(mass_vec);
+        cnt++;
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
+        // std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
+        // std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
+        // std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
+        // std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
 
-        sim_done = true;
+        // TODO: exit condition?
+        // sim_done = true;
     }
-
 }
+
 void launch_simulation(const std::string& urdf_file,
                        const std::string& env_file,
                        const std::shared_ptr<const Eigen::MatrixXd>& heightmap,

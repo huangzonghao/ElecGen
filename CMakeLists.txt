@@ -263,23 +263,31 @@ set(CHRONOSIM_SOURCES
         ${CHRONOSIM_SRC_PATH}/ChUrdfDoc.cpp
         ${CHRONOSIM_SRC_PATH}/RobotController.cpp
         ${CHRONOSIM_SRC_PATH}/SimMotor.cpp
-        ${CHRONOSIM_SRC_PATH}/SimulationManager.cpp)
+        ${CHRONOSIM_SRC_PATH}/SimulationManager.cpp
+        ${CHRONOSIM_SRC_PATH}/launch_simulation.cpp)
 
 set(TRAJECTORY_SOURCES
         ${TRAJECTORY_SRC_PATH}/eigen_heightmap.cpp
         ${TRAJECTORY_SRC_PATH}/quadrupedal_kinematics.cpp
         ${TRAJECTORY_SRC_PATH}/traj_optimizer.cpp)
 
+set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp)
+
 ## Main Target of the project
 # ===========================================================
-matlab_add_mex(NAME mexRun SRC chrono_sim/src/mexRun.cpp chrono_sim/src/launch_simulation.cpp ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
+matlab_add_mex(NAME mexRun SRC ${MATLAB_CPP_GATEWAY} ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
 
 set_target_properties(mexRun PROPERTIES
         COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
         COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
         LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
 
-target_link_libraries(mexRun ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${towr_LIBRARIES})
+target_link_libraries(mexRun ${CHRONO_LIBRARIES}
+                             ${urdfdom_LIBRARIES}
+                             ${towr_LIBRARIES}
+                             ${Gurobi_LIBRARIES}
+                             ${Protobuf_LIBRARIES}
+                             component_structure)
 # ===========================================================
 
 ## Full compilation target on windows

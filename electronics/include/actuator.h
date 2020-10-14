@@ -3,7 +3,7 @@
 
 #include "gurobi_c++.h"
 #include "utility_functions.h"
-#include <Eigen\Dense>
+#include <Eigen/Dense>
 #include <io.h>
 #include <fcntl.h>
 #include <google/protobuf/text_format.h>
