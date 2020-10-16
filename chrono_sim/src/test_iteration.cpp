@@ -126,7 +126,7 @@ void test_fourleg3(){
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
-    sm.SetEnv(env_filename, 50, 50, 5);
+    sm.SetEnv(env_filename, 1, 1, 0.01);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
@@ -145,8 +145,8 @@ void test_fourleg3(){
     sm.AddMotor("chassis", "br_cyl-br_upper", 1,0.1,0.1,0.1);
     sm.AddMotor("chassis", "br_upper-br_lower", 1,0.1,0.1,0.1);
 
-    sm.AddWaypoint(0, 0, 2.5);
-    sm.AddWaypoint(8, 8, 1);
+    sm.AddWaypoint(0.1, 0.5, 0.15);
+    sm.AddWaypoint(8, 8, 0.02);
     sm.AddWaypoint(12, 0, 1);
 
     // use this loop for iterations

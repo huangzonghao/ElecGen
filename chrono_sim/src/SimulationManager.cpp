@@ -296,7 +296,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
         vis_app.AddTypicalLogo();
         vis_app.AddTypicalSky();
         vis_app.AddTypicalLights(vector3df(0., 0., 50.), vector3df(0., 0., -50));
-        vis_app.AddTypicalCamera(vector3df(0, -10, 10), vector3df(0, 0, 0));
+        vis_app.AddTypicalCamera(vector3df(0, -1, 1), vector3df(0, 0, 0));
 
         vis_app.AssetBindAll();
         vis_app.AssetUpdateAll();
