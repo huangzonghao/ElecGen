@@ -73,6 +73,7 @@ class ChUrdfDoc {
     int link_idx_;
     std::string urdf_file_;
     urdf::ModelInterfaceSharedPtr urdf_robot_;
+    urdf::LinkConstSharedPtr u_root_link_;
     std::shared_ptr<chrono::ChSystem> ch_system_;
     std::map<std::string, ChMatPair> ch_materials_;
     std::map<std::string, ChLinkBodies> ch_link_bodies_;

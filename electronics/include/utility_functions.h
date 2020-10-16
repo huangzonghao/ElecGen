@@ -54,7 +54,7 @@ template<class T>
 inline std::vector<T> getSubVector(const std::vector<T> &vec, 
 	const size_t &start, const size_t &end)
 {
-	return vector<T>(vec.begin() + start, vec.begin() + end);
+	return std::vector<T>(vec.begin() + start, vec.begin() + end);
 }
 
 template<class T>

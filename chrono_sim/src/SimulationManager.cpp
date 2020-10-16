@@ -51,8 +51,8 @@ void SimulationManager::AddPayload(const std::string& body_name, double mass,
                                    double size_x, double size_y, double size_z,
                                    double pos_x, double pos_y, double pos_z){
     payloads_.push_back(std::make_shared<SimPayload>(body_name, mass,
-                                                    size_x, size_y, size_z,
-                                                    pos_x, pos_y, pos_z));
+                                                     size_x, size_y, size_z,
+                                                     pos_x, pos_y, pos_z));
     auxrefs_.insert(body_name);
 }
 
@@ -60,8 +60,8 @@ void SimulationManager::AddMotor(const std::string& link_name,
                                  double mass, double size_x, double size_y, double size_z,
                                  double pos_x, double pos_y, double pos_z){
     motors_.push_back(std::make_shared<SimMotor>(link_name, mass,
-                                                size_x, size_y, size_z,
-                                                pos_x, pos_y, pos_z));
+                                                 size_x, size_y, size_z,
+                                                 pos_x, pos_y, pos_z));
 
     if (!urdf_doc_){
         std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
@@ -92,11 +92,16 @@ void SimulationManager::AddWaypoints(const std::shared_ptr<const Eigen::MatrixXd
         exit(EXIT_FAILURE);
     }
     for (int i = 0; i < waypoints_mat.cols(); ++i){
-        AddWaypoint(waypoints_mat(1,i), waypoints_mat(2,i), waypoints_mat(3,i));
+        AddWaypoint(waypoints_mat(0,i), waypoints_mat(1,i), waypoints_mat(2,i));
     }
 }
 
 bool SimulationManager::RunSimulation(bool do_viz){
+    if(!urdf_doc_){
+        std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     task_done_ = false;
 
     if (system_type_ == NSC){
@@ -177,24 +182,18 @@ bool SimulationManager::RunSimulation(bool do_viz){
         return 1;
     }
 
-    if (urdf_doc_){
-        urdf_doc_->SetAuxRef(auxrefs_);
+    urdf_doc_->SetAuxRef(auxrefs_);
 
-        bool add_ok;
-        if (!ch_waypoints_.empty()){
-            add_ok = urdf_doc_->AddtoSystem(ch_system_, ch_waypoints_[0]);
-        }
-        else{
-            add_ok = urdf_doc_->AddtoSystem(ch_system_, ChVector<>(0,0,0));
-        }
-
-        if (!add_ok) {
-            chrono::GetLog() << "Warning. Could not add urdf robot to ChSystem\n";
-            return false;
-        }
+    bool add_ok;
+    if (!ch_waypoints_.empty()){
+        add_ok = urdf_doc_->AddtoSystem(ch_system_, ch_waypoints_[0]);
     }
-    else {
-        std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
+    else{
+        add_ok = urdf_doc_->AddtoSystem(ch_system_, ChVector<>(0,0,0));
+    }
+
+    if (!add_ok) {
+        chrono::GetLog() << "Warning. Could not add urdf robot to ChSystem\n";
         return false;
     }
 
@@ -333,4 +332,42 @@ bool SimulationManager::RunSimulation(bool do_viz){
     std::cout << "Step count: " << ch_system_->GetStepcount() << std::endl;
 
     return true;
+}
+
+void SimulationManager::GetComponentTypes(std::vector<std::string> *types_container) const {
+    auto& types_vec = *types_container;
+    for (int i = 0; i < motors_.size(); ++i){
+        types_vec.push_back("MOTOR");
+    }
+}
+
+void SimulationManager::
+GetActuatorVels(std::vector<std::pair<double, double> > *vels_container) const {
+    auto& vels_vec = *vels_container;
+    if (vels_vec.size() != motors_.size()){
+        std::cerr<< "Error, simulation motor number is not equal to generation motor number" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    for (int i = 0; i < motors_.size(); ++i){
+        vels_vec[i].second = motors_[i]->GetMaxVel();
+    }
+}
+
+void SimulationManager::
+GetActuatorTorques(std::vector<std::pair<double, double> > *torqs_container) const {
+    auto& torqs_vec = *torqs_container;
+    if (torqs_vec.size() != motors_.size()){
+        std::cerr<< "Error, simulation motor number is not equal to generation motor number" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    for (int i = 0; i < motors_.size(); ++i){
+        torqs_vec[i].second = motors_[i]->GetMaxTorque();
+    }
+}
+
+void SimulationManager::UpdateMassInfo(const std::vector<double>& mass_vec){
+    for (int i = 0; i < mass_vec.size() - 1; ++i){
+
+    }
+    // the final mass update apply to body
 }

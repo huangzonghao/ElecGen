@@ -73,6 +73,10 @@ redrawEnv;
         % writeURDF(output_urdffile, robotName, robotLinks, robotJoints, ButtonFunctions, FunctionType);
 
         % swap x y of each way point to align with x y of heightmap.
+        if size(trajectory, 1) < 2
+            display('Need to at least assign a start and a goal point');
+            return;
+        end
         sim_trajectory = trajectory(:, [2 1 3]);
         % pass trajectory as a 3xN matrix
         mexRun(urdf_file, env_file, heightmap, sim_trajectory');

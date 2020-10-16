@@ -307,14 +307,14 @@ target_link_libraries(mexRun ${CHRONO_LIBRARIES}
 
 ## Main test target on Linux
 # ===========================================================
-add_executable(executable ${CHRONOSIM_SRC_PATH}/test_iteration.cpp ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
+# add_executable(executable ${CHRONOSIM_SRC_PATH}/test_iteration.cpp ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
 
-set_target_properties(executable PROPERTIES
-        COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-        COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-        LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+# set_target_properties(executable PROPERTIES
+        # COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+        # COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+        # LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
 
-target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${towr_LIBRARIES})
+# target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${towr_LIBRARIES})
 # ===========================================================
 
 # Single test target on Linux

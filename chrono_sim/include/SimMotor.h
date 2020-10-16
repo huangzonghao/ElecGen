@@ -24,7 +24,6 @@ class SimMotorController {
     enum Mode {POSITION, VELOCITY, PHASE} mode = VELOCITY;
 
     bool locked = false;
-    double max_pos_control_vel = 6;
 
     std::shared_ptr<chrono::ChControllerPID> vel_pid;
     std::shared_ptr<chrono::ChControllerPID> pos_pid;
@@ -33,14 +32,22 @@ class SimMotorController {
     SimMotorController(const std::shared_ptr<chrono::ChLinkMotorRotationTorque>& target_motor);
     ~SimMotorController(){};
 
-    void SetVel(double new_vel);
-    void SetPos(double new_pos);
-    void SetPhase(double new_phase);
-    double GetTorque();
+    void set_vel(double new_vel);
+    void set_pos(double new_pos);
+    void set_phase(double new_phase);
+    double get_torque();
     bool check_status();
+    void set_max_pos_control_vel(double pos_ctrl_vel){ max_pos_control_vel_ = pos_ctrl_vel; }
+    double get_max_torque(){ return max_torque_; }
+    double get_max_vel(){ return max_vel_; }
   private:
-    double target_pos = 0;
-    double target_vel = 0;
+    double max_pos_control_vel_ = 6;
+    double target_pos_ = 0;
+    double target_vel_ = 0;
+    double target_torque_ = 0;
+    double max_torque_ = 0;
+    double max_vel_ = 0;
+
 };
 
 
@@ -54,6 +61,7 @@ class SimPayload {
     double mass;
     bool visible;
     bool check_collision;
+    void SetMass(double new_mass) { mass = new_mass; }
     SimPayload();
     SimPayload(double mass,
                double size_x, double size_y, double size_z,
@@ -72,7 +80,6 @@ class SimMotor : public SimPayload {
   public:
 
     std::string link_name;
-    double max_torque = 0;
 
     std::shared_ptr<SimMotorController> motor_controller;
 
@@ -100,6 +107,9 @@ class SimMotor : public SimPayload {
     void printrot(){
         std::cout << ch_motor->GetMotorRotPeriodic() << std::endl;
     }
+
+    double GetMaxTorque(){ return motor_controller->get_max_torque(); }
+    double GetMaxVel(){ return motor_controller->get_max_vel(); }
 
   private:
     const chrono::ChLinkBodies *chlinkbody;

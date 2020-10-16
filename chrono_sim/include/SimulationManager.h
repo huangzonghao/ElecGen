@@ -52,6 +52,14 @@ class  SimulationManager {
 
     bool RunSimulation(bool do_viz=true);
     const std::string& GetUrdfFileName();
+
+    /** Interface functions **/
+    void GetComponentTypes(std::vector<std::string> *types_container) const;
+    void GetActuatorVels(std::vector<std::pair<double, double> > *vels_container) const;
+    void GetActuatorTorques(std::vector<std::pair<double, double> > *torqs_container) const;
+    void UpdateMassInfo(const std::vector<double>& mass_vec);
+    int GetMotorNumber() { return motors_.size(); }
+    int GetComponentNumber() { return motors_.size() + payloads_.size(); }
   private:
     SystemType  system_type_;
     double k_friction_;

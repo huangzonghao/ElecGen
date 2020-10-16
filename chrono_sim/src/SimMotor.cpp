@@ -20,9 +20,9 @@ SimMotorController::SimMotorController(const std::shared_ptr<chrono::ChLinkMotor
     pos_pid->D = pos_D;
 }
 
-void SimMotorController::SetVel(double new_vel){
+void SimMotorController::set_vel(double new_vel){
     if (mode == VELOCITY){
-        if (target_vel == new_vel)
+        if (target_vel_ == new_vel)
             return;
     }
     else {
@@ -30,25 +30,25 @@ void SimMotorController::SetVel(double new_vel){
         vel_pid->I = vel_I;
         vel_pid->D = vel_D;
     }
-    target_vel = new_vel;
+    target_vel_ = new_vel;
     vel_pid->Reset();
 }
 
 // accumulation behavior
-void SimMotorController::SetPos(double new_pos){
+void SimMotorController::set_pos(double new_pos){
     if (mode == VELOCITY){
         vel_pid->I = 0;
         vel_pid->D = 0;
         vel_pid->Reset();
     }
-    target_pos = new_pos + ch_motor->GetMotorRot();
+    target_pos_ = new_pos + ch_motor->GetMotorRot();
     mode = POSITION;
     pos_pid->Reset();
 }
 
-void SimMotorController::SetPhase(double new_phase){
+void SimMotorController::set_phase(double new_phase){
     if (mode == PHASE){
-        if (target_pos == new_phase)
+        if (target_pos_ == new_phase)
             return;
     }
     else{
@@ -59,35 +59,38 @@ void SimMotorController::SetPhase(double new_phase){
         }
         mode = PHASE;
     }
-    target_pos = new_phase;
+    target_pos_ = new_phase;
     pos_pid->Reset();
 }
 
 bool SimMotorController::check_status(){
-    if (mode == POSITION && std::abs(target_pos - ch_motor->GetMotorRot()) > pos_thresh){
+    if (mode == POSITION && std::abs(target_pos_ - ch_motor->GetMotorRot()) > pos_thresh){
         return false;
     }
-    else if (mode == PHASE && std::abs(target_pos - ch_motor->GetMotorRotPeriodic()) > pos_thresh){
+    else if (mode == PHASE && std::abs(target_pos_ - ch_motor->GetMotorRotPeriodic()) > pos_thresh){
         return false;
     }
     return true;
 }
 
-double SimMotorController::GetTorque(){
+double SimMotorController::get_torque(){
     switch(mode){
         case POSITION:
-            target_vel = std::clamp(pos_pid->Get_Out(target_pos - ch_motor->GetMotorRot(), ch_motor->GetChTime()),
-                                    -max_pos_control_vel,
-                                    max_pos_control_vel);
+            target_vel_ = std::clamp(pos_pid->Get_Out(target_pos_ - ch_motor->GetMotorRot(), ch_motor->GetChTime()),
+                                     -max_pos_control_vel_,
+                                     max_pos_control_vel_);
             break;
         case PHASE:
-            target_vel = std::clamp(pos_pid->Get_Out(target_pos - ch_motor->GetMotorRotPeriodic(), ch_motor->GetChTime()),
-                                    -max_pos_control_vel,
-                                    max_pos_control_vel);
+            target_vel_ = std::clamp(pos_pid->Get_Out(target_pos_ - ch_motor->GetMotorRotPeriodic(), ch_motor->GetChTime()),
+                                     -max_pos_control_vel_,
+                                     max_pos_control_vel_);
             break;
     }
 
-    return vel_pid->Get_Out(target_vel - ch_motor->GetMotorRot_dt(), ch_motor->GetChTime());
+    target_torque_ =  vel_pid->Get_Out(target_vel_ - ch_motor->GetMotorRot_dt(), ch_motor->GetChTime());
+    if (target_vel_ > max_vel_) max_vel_ = target_vel_;
+    if (target_torque_  >max_torque_) max_torque_ = target_torque_;
+    return target_torque_;
 }
 
 SimPayload::SimPayload()
@@ -188,11 +191,11 @@ void SimMotor::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
 }
 
 void SimMotor::SetVel(double new_vel){
-    motor_controller->SetVel(new_vel);
+    motor_controller->set_vel(new_vel);
 }
 
 void SimMotor::SetPos(double new_pos){
-    motor_controller->SetPos(new_pos);
+    motor_controller->set_pos(new_pos);
 }
 
 // in Chrono, phase is between [0, 2pi], and [0, -2pi] when rotating negatively
@@ -214,10 +217,9 @@ void SimMotor::SetPhase(double new_phase){
         new_phase -= chrono::CH_C_2PI;
     }
 
-    motor_controller->SetPos(new_phase);
+    motor_controller->set_pos(new_phase);
 }
 
 void SimMotor::UpdateTorque(){
-    ch_func->SetSetpoint(motor_controller->GetTorque(), ch_motor->GetChTime());
-    max_torque = std::max(max_torque, motor_controller->GetTorque());
+    ch_func->SetSetpoint(motor_controller->get_torque(), ch_motor->GetChTime());
 }

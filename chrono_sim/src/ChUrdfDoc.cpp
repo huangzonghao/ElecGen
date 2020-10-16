@@ -312,6 +312,7 @@ bool ChUrdfDoc::Load_URDF(const std::string& filename) {
     }
     urdf_file_ = filename;
     urdf_robot_ = urdf::parseURDFFile(filename);
+    u_root_link_ = urdf_robot_->getRoot();
 
     if (!urdf_robot_){
         std::cerr << "ERROR: Model Parsing the xml failed" << std::endl;
@@ -344,10 +345,9 @@ bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::sha
 
     convert_materials();
 
-    urdf::LinkConstSharedPtr root_link = urdf_robot_->getRoot();
-    if (root_link){
+    if (u_root_link_){
         link_idx_ = 0;
-        ch_root_body_ = convert_links(root_link, init_pos_body);
+        ch_root_body_ = convert_links(u_root_link_, init_pos_body);
     }
     else{
         std::cerr << "ERROR: Could not find root link in file " << urdf_file_ << std::endl;

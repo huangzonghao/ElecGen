@@ -31,10 +31,10 @@ void test_fourwheel(){
         bool task_done = sm.RunSimulation();
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
+        std::cout << "motor 1 torque " << sm.GetMotor(0)->GetMaxTorque() << std::endl;
+        std::cout << "motor 2 torque " << sm.GetMotor(1)->GetMaxTorque() << std::endl;
+        std::cout << "motor 3 torque " << sm.GetMotor(2)->GetMaxTorque() << std::endl;
+        std::cout << "motor 4 torque " << sm.GetMotor(3)->GetMaxTorque() << std::endl;
 
         sim_done = true;
     }
@@ -72,10 +72,10 @@ void test_fourleg(){
         bool task_done = sm.RunSimulation();
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
+        std::cout << "motor 1 torque " << sm.GetMotor(0)->GetMaxTorque() << std::endl;
+        std::cout << "motor 2 torque " << sm.GetMotor(1)->GetMaxTorque() << std::endl;
+        std::cout << "motor 3 torque " << sm.GetMotor(2)->GetMaxTorque() << std::endl;
+        std::cout << "motor 4 torque " << sm.GetMotor(3)->GetMaxTorque() << std::endl;
 
         sim_done = true;
     }
@@ -111,10 +111,10 @@ void test_fourleg2(){
         // bool task_done = sm.RunSimulation(false);
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
+        std::cout << "motor 1 torque " << sm.GetMotor(0)->GetMaxTorque() << std::endl;
+        std::cout << "motor 2 torque " << sm.GetMotor(1)->GetMaxTorque() << std::endl;
+        std::cout << "motor 3 torque " << sm.GetMotor(2)->GetMaxTorque() << std::endl;
+        std::cout << "motor 4 torque " << sm.GetMotor(3)->GetMaxTorque() << std::endl;
 
         sim_done = true;
     }
@@ -156,10 +156,10 @@ void test_fourleg3(){
         // bool task_done = sm.RunSimulation(false);
 
         // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.GetMotor(0)->max_torque << std::endl;
-        std::cout << "motor 2 torque " << sm.GetMotor(1)->max_torque << std::endl;
-        std::cout << "motor 3 torque " << sm.GetMotor(2)->max_torque << std::endl;
-        std::cout << "motor 4 torque " << sm.GetMotor(3)->max_torque << std::endl;
+        std::cout << "motor 1 torque " << sm.GetMotor(0)->GetMaxTorque() << std::endl;
+        std::cout << "motor 2 torque " << sm.GetMotor(1)->GetMaxTorque() << std::endl;
+        std::cout << "motor 3 torque " << sm.GetMotor(2)->GetMaxTorque() << std::endl;
+        std::cout << "motor 4 torque " << sm.GetMotor(3)->GetMaxTorque() << std::endl;
 
         sim_done = true;
     }
