@@ -176,7 +176,7 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
              sm.GetActuatorTorques(&input_torqs);
 
             // verify design
-            if (doubleCheck(best_node, input_vels, input_torqs)) {
+            if (doubleCheck(*best_node, input_torqs, input_vels)) {
                 sim_done = true;
             }
             else {
@@ -187,7 +187,7 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
                 writeDesign(*best_node);
             }
         }
-        sm.UpdateMassInfo(best_node->getMassVec());
+        sm.UpdateMassInfo(getMassVec(*best_node, input_torqs.size()));
         cnt++;
 
         // now the torques are ready to read
