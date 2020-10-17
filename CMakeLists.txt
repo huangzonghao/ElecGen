@@ -8,11 +8,19 @@ list(APPEND CMAKE_PREFIX_PATH ${PROJECT_DEP_INSTALL_DIR})
 
 # first take care of external dependencies
 message(STATUS "Looking for external dependencies")
+
+set( EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}" CACHE PATH "Eigen3 root directory")
 find_package(Chrono
              COMPONENTS Irrlicht Vehicle
              CONFIG QUIET)
 find_package(Gurobi QUIET)
 find_package(Boost QUIET)
+
+if (NOT EIGEN3_INCLUDE_DIR )
+    message(SEND_ERROR "Error: Could not find Eigen3")
+	message("  Set EIGEN3_INCLUDE_DIR to the root directory of your unzipped eigen library")
+    set(NEED_TO_RETURN True)
+endif()
 
 if (NOT Chrono_FOUND)
     message(SEND_ERROR "Error: Could not find Chrono or one of its required modules.")
@@ -37,6 +45,7 @@ if (NEED_TO_RETURN)
     return()
 endif()
 
+include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${CHRONO_INCLUDE_DIRS})
 include_directories(${Gurobi_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
