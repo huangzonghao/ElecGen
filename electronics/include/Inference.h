@@ -11,11 +11,11 @@ using cliqueindex2d = std::vector<cliqueindex>;
 
 extern GRBEnv env;
 
-const int DC_MOTOR_OPT = 0b00000000001, HBRIDGE_OPT = 0b00000000010,
-MICRO_CONTROLLER_OPT = 0b00000000100, VOLTAGE_REGULATOR_OPT = 0b00000001000,
-BATTERY_OPT = 0b00000010000, ENCODER_OPT = 0b00000100000,
-CAMERA_OPT = 0b00010000000, FORCE_SENSOT_OPT = 0b00100000000,
-BLUETOOTH_OPT = 0b01000000000, SERVO_OPT = 0b10000000000;
+const int DC_MOTOR_OPT = 0b0000000001, HBRIDGE_OPT = 0b0000000010,
+MICRO_CONTROLLER_OPT = 0b0000000100, VOLTAGE_REGULATOR_OPT = 0b0000001000,
+BATTERY_OPT = 0b0000010000, ENCODER_OPT = 0b0000100000,
+CAMERA_OPT = 0b0001000000, FORCE_SENSOT_OPT = 0b0010000000,
+BLUETOOTH_OPT = 0b0100000000, SERVO_OPT = 0b1000000000;
 
 const stringvec end_components{ Component_Type::Motor, Component_Type::Encoder,
 Component_Type::Camera, Component_Type::Bluetooth, Component_Type::Servo, 
@@ -97,7 +97,6 @@ struct BBNode
 	double getPrice() const { return price; }
 	double getWeight() const { return weight; }
 	double getPowerConsump() const { return power_consumption; }
-//	void getMotorMass();
 	double getMetricVal() const;
 	bool empty() const { return infer_nodes.empty(); }
 
@@ -202,6 +201,8 @@ bbnodevec initialize(const infernodevec2d &);
 std::vector<stringpair> postprocessing(const Pin_Connections &, const stringvec &, 
 	const unsignedvec &, const unsignedvec &);
 std::string replaceConnections(const std::string &, const std::string &);
+doublevec getMassVec(const BBNode &, const unsigned &);
+bool doubleCheck(BBNode &, const doublepairs &, const doublepairs &);
 
 // version/number graph formulation function
 

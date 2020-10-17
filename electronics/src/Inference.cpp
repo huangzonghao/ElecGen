@@ -472,26 +472,25 @@ compoundsettype generateNeedSet(Circuit &circuit, GRBModel &model, compstructptr
 		throw "OPTIMIZATION FAILED";
 	}
 }
+*/
 
-bool doubleCheck(const doublepairs &torq_range, const doublepairs &vel_range, Circuit &circuit, GRBModel &model)
+bool doubleCheck(Circuit &circuit, GRBModel &model, 
+	const doublepairs &torqs, const doublepairs &vels)
 {
 	bool success;
-	auto &vbeg = vel_range.begin();
 	circuit.syncVars(model);
-	for (auto &tbeg = torq_range.begin(); tbeg != torq_range.end(); tbeg++, vbeg++)
-	{
-		circuit.changeMotorWorkingPoint(tbeg->first, vbeg->second, tbeg - torq_range.begin(), &model);
-	}
+	circuit.setMotorWorkPoint(&model, torqs, vels);
 	model.optimize();
-	model.get(GRB_IntAttr_Status) == GRB_OPTIMAL ? success = true : success = false;
+	model.get(GRB_IntAttr_Status) == GRB_OPTIMAL ? success = true : 
+		success = false;
 	return success;
 }
 
-bool doubleCheck(const doublepairs &torq_range, const doublepairs &vel_range, BBNode &design)
+bool doubleCheck(BBNode &node, const doublepairs &torqs, const doublepairs &vels)
 {
-	return doubleCheck(torq_range, vel_range, design.circuit, design.model);
+	return doubleCheck(node.circuit, node.model, torqs, vels);
 }
-*/
+
 
 stringvec2d preprocess(const stringvec &component_types, const doublepairs &torqs, const doublepairs &vels)
 {
@@ -627,7 +626,7 @@ stringvec2d actuatorPreprocess(const stringvec &actuator_types, const doublepair
 	}
 	else
 	{
-		(dc_motor_versions.size() * servo_motor_versions.size()); // combinations
+		all_motor_versions.resize(dc_motor_versions.size() * servo_motor_versions.size()); // combinations
 		size_t k = 0;
 		for (size_t i = 0; i < dc_motor_versions.size(); i++)
 		{
@@ -681,7 +680,7 @@ bbnodevec initialize(const infernodevec2d &infer_nodes_vec)
 }
 
 vector<stringpair> postprocessing(const Pin_Connections &connections, 
-	const stringvec &component_names, const unsignedvec &motor_index, 
+	const stringvec &component_names, const unsignedvec &motor_index,
 	const unsignedvec &encoder_index)
 {
 	vector<stringpair> processed_connections, final_connections;
@@ -723,21 +722,22 @@ vector<stringpair> postprocessing(const Pin_Connections &connections,
 	}
 
 	// replace dc motor with encoder connections
-//	for (size_t i = 0; i < connection_group_index.size(); i++)
-//	{
-//		if (connection_group_index[i].first != 0 || 
-//			connection_group_index[i].second != 0)
-//		{
-//			for (size_t j = connection_group_index[i].first; 
-//				j < connection_group_index[i].second; j++)
-//			{
-//				string replace_name = replaceConnections(final_connections[j].second, 
-//					component_names[encoder_index[j]]);
-//				final_connections[j].second = replace_name;
-//			}
-//			break;
-//		}
-//	}
+	for (size_t i = 0; i < connection_group_index.size(); i++)
+	{
+		for (size_t j = connection_group_index[i].first; 
+			j < connection_group_index[i].second; j++)
+		{
+			stringpair name_pair = separateNames(final_connections[j].second);
+			unsigned right_name_index = getPosInVec(name_pair.first, component_names),
+				matched_index = getPosInVec(right_name_index, motor_index);
+			if (matched_index != -1)
+			{
+				string replace_name = replaceConnections(final_connections[j].second,
+					component_names[encoder_index[matched_index]]);
+				final_connections[j].second = replace_name;
+			}
+		}
+	}
 
 	return final_connections;
 }
@@ -754,6 +754,26 @@ std::string replaceConnections(const std::string &origin,
 	{
 		return replacement + ".M2";
 	}
+}
+
+doublevec getMassVec(const BBNode &node, 
+	const unsigned &input_size)
+{
+	doublevec mass_vec(input_size + 1);
+	vector<shared_ptr<Electrical_Component>> components = 
+		node.circuit.getComponents();
+	for (size_t i = 0; i < components.size(); i++)
+	{
+		if (i < input_size)
+		{
+			mass_vec[i] = components[i]->getWeight();
+		}
+		else
+		{
+			mass_vec[input_size] += components[i]->getWeight();
+		}
+	}
+	return mass_vec;
 }
 
 bool backTrack(BBNode &bbnode)
@@ -1319,20 +1339,21 @@ void writeDesign(const BBNode &bbnode)
 	design << endl;
 
 	// connection list
+	vector<shared_ptr<Electrical_Component>> components = bbnode.circuit.getComponents();
 	unsignedvec motor_index, encoder_index;
-	for (size_t i = 0; i < bbnode.infer_nodes.size(); i++)
+	for (size_t i = 0; i < components.size(); i++)
 	{
-		if (bbnode.infer_nodes[i].getType() == Component_Type::Motor)
-		{
-			motor_index.push_back(i);
-		}
-		else if (bbnode.infer_nodes[i].getType() == Component_Type::Encoder)
+		if (components[i]->getComponentType() == Component_Type::Encoder)
 		{
 			encoder_index.push_back(i);
 		}
+		else if (components[i]->getComponentType() == Component_Type::Motor)
+		{
+			motor_index.push_back(i);
+		}
 	}
 	Pin_Connections connections = bbnode.circuit.getComponentRelations();
-	vector<stringpair> processed_connections = postprocessing(connections, bbnode.component_names, 
+	vector<stringpair> processed_connections = postprocessing(connections, bbnode.component_names,
 		motor_index, encoder_index);
 	for (auto &beg = processed_connections.begin(); beg != processed_connections.end(); beg++)
 	{
@@ -1343,62 +1364,12 @@ void writeDesign(const BBNode &bbnode)
 	design << "METRICS:" << endl;
 	design << "NUM OF COMPONENTS: " << bbnode.getComponenetNum() << endl;
 	design << "NUM OF COMPONENT PINS: " << bbnode.getPinNum() << endl;
-	design << "NUM OF CONNECTIONS: " << bbnode.getConnectionsNum() << endl;
+	design << "NUM OF CONNECTIONS: " << processed_connections.size() << endl;
 	design << "PRICE:  " << bbnode.getPrice() << endl;
 	design << "WEIGHT: " << bbnode.getWeight() << endl;
 	design << "POWER: " << bbnode.getPowerConsump() << endl;
 	design << endl;
 
-	// TO DO: 1. output list of components 
-	//        2. orgnize pin connections  
-	/*
-	std::vector<Actu_components> components = bbnode.circuit.getComponents();
-	for (auto &cbeg = components.begin(); cbeg != components.end(); cbeg++)
-	{
-		std::string component_name = removeComponentPrePostfix(cbeg->getName());
-		auto &iter = components_map.find(component_name);
-		if (iter == components_map.end())
-		{
-			components_map.insert(std::make_pair(component_name, 1));
-		}
-		else
-		{
-			iter->second++;
-		}
-	}
-
-	for (auto &cmbeg = components_map.begin(); cmbeg != components_map.end(); cmbeg++)
-	{
-		if (cmbeg->second != 1)
-		{
-			design << "COMMENTS: For multiple same components in the file, " <<
-				"they are differentiated by index in the end" << std::endl;
-			design << std::endl;
-			break;
-		}
-	}
-
-	design << "COMPONENTS: \n";
-	design << std::setw(20) << std::left << "Version" << "|" << std::setw(20) << std::right << "Number \n";
-	design << sline + "\n";
-	for (auto &cmbeg = components_map.begin(); cmbeg != components_map.end(); cmbeg++)
-	{
-		design << std::setw(20) << std::left << cmbeg->first << "|" << std::setw(15) << std::right << cmbeg->second << std::endl;
-	}
-
-	design << "\n";
-	design << "CONNECTIONS: \n";
-	auto &relations = bbnode.final_connections;
-	for (auto &relation = relations.begin(); relation != relations.end(); relation++)
-	{
-		if (relation->second.first.substr(0, 4) != duty && relation->second.second.substr(0, 4) != duty)
-		{
-			design << std::setw(25) << std::left << indexComponent(relation->first.first) + ": " + relation->second.first
-				<< "--------"
-				<< std::setw(25) << std::right << indexComponent(relation->first.second) + ": " + relation->second.second << "\n";
-		}
-	}
-	*/
 	design.close();
 }
 /*
@@ -1628,6 +1599,7 @@ shared_ptr<BBNode> branchNBound(bbnodevec &roots)
 					// get best node
 					best_node =  make_shared<BBNode>(roots[i].infer_nodes, roots[i].circuit,
 						roots[i].model, roots[i].prev_bbnode);
+					best_node->copyMetrics(roots[i]);
 					roots[i].prev_bbnode->next_bbnodes.pop_back();
 					first_branch = false;
 				}
@@ -1639,6 +1611,7 @@ shared_ptr<BBNode> branchNBound(bbnodevec &roots)
 						BBNode::best_metric_val = roots[i].getMetricVal();
 						best_node = make_shared<BBNode>(roots[i].infer_nodes, roots[i].circuit,
 							roots[i].model, roots[i].prev_bbnode);
+						best_node->copyMetrics(roots[i]);
 						roots[i].prev_bbnode->next_bbnodes.pop_back();
 					}
 				}

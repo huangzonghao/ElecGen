@@ -36,12 +36,13 @@ public:
 	void report();
 	void updateComponents(const std::vector<std::shared_ptr<Electrical_Component>> &_components);
 	void updateConnections(const Pin_Connections &);
-//	void changeMotorWorkingPoint(const double &, const double &, const unsigned &, GRBModel *);
+	void setMotorWorkPoint(GRBModel *, const doublepairs &, const doublepairs &);
 	doublevec getVals(unsigned &, unsigned &, unsigned &);
 	doublevec getMaxVals(unsigned &, unsigned &, unsigned &);
 	unsigned getComponentsSize() { return static_cast<unsigned>(components.size()); }
+
 //	std::vector<Electrical_Component*>& getComponents() { return components; }
-//	std::vector<Electrical_Component*> getComponents() const { return components; }
+	std::vector<std::shared_ptr<Electrical_Component>> getComponents() const { return components; }
 	
 	void syncVars(const GRBModel &);
 	unsigned getMotorNumber();
@@ -97,18 +98,5 @@ private:
 	{OPT_METHOD::STOC, &Circuit::stochastic_optimize} };
 };
 bool isDutyCycle(const std::string &);
-// doublevec reinitialize_in_repeated_case(doublevec);
-// doublevec reinitialize_in_infeasible_case(doublevec);
-// void changeObj(const std::vector<GRBVar*> &);
-
-// void optimization_module_test();
-// std::tuple<std::vector<Actu_components>, connection_relation> testcase1();
-// std::tuple<std::vector<Actu_components>, connection_relation> testcase2();
-// std::tuple<std::vector<Actu_components>, connection_relation> testcase3();
-// std::tuple<std::vector<Actu_components>, connection_relation> testcase4();
-// std::tuple<std::vector<Actu_components>, connection_relation> testcase5();
-// std::tuple<std::vector<Actu_components>, connection_relation> testcase6();
-// std::tuple<std::vector<Actu_components>, connection_relation> testcase7();
-// std::tuple<std::vector<Actu_components>, connection_relation> testcase8();
 #endif // !CIRCUIT
 
