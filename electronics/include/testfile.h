@@ -3,7 +3,7 @@
 #include "Matching.h"
 #include "Inference.h"
 
-// READING TEST 
+// READING TEST
 void motor_read();
 void h_bridge_read();
 void battery_read();

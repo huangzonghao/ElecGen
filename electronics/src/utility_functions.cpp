@@ -18,11 +18,11 @@ bool isIntersect(const doublepair &range1, const doublepair &range2)
 	return isInTol(min, max);
 }
 
-// function is used to compute intersected range of two voltage ranges, 
+// function is used to compute intersected range of two voltage ranges,
 // first is input, second is output
 doublepair getIntersect(const doublepair &range1, const doublepair &range2)
 {
-	double min = std::max(range1.first, range2.first), 
+	double min = std::max(range1.first, range2.first),
 		max = std::min(range1.second, range2.second);
 	if (isInTol(min, max))
 	{
@@ -48,8 +48,8 @@ bool fileInDirectory(const std::string &file, const std::string &directory)
 doublepairs makePairs(const doublevec &vec1, const doublevec &vec2)
 {
 	doublepairs pairs(vec1.size());
-	auto &v1beg = vec1.begin(), &v2beg = vec2.begin();
-	for (auto &pbeg = pairs.begin(); pbeg != pairs.end(); pbeg++, v1beg++, v2beg++)
+	auto v1beg = vec1.begin(), v2beg = vec2.begin();
+	for (auto pbeg = pairs.begin(); pbeg != pairs.end(); pbeg++, v1beg++, v2beg++)
 	{
 		pbeg->first = *v1beg;
 		pbeg->second = *v2beg;
@@ -66,7 +66,7 @@ doublevec sample(const double &lb, const double &ub, const unsigned &num)
 	std::uniform_real_distribution<double> distribution(lb, ub);
 
 	// assign every element in the vector with a randome value
-	for (auto &beg = samples.begin(); beg != samples.end(); beg++)
+	for (auto beg = samples.begin(); beg != samples.end(); beg++)
 	{
 		*beg = distribution(generator);
 	}
@@ -135,7 +135,7 @@ unsigned getFileNumInDirectory(const std::string &path)
 {
 	unsigned cnt = 0;
 	std::filesystem::directory_iterator end;
-	for (auto &entry = std::filesystem::directory_iterator(path); entry != end; entry++)
+	for (auto entry = std::filesystem::directory_iterator(path); entry != end; entry++)
 	{
 		cnt++;
 	}
@@ -147,12 +147,12 @@ doublepairs generateIntersections(const unsignedvec2d &indices, const doublepair
 {
 	doublepairs intersected_ranges(indices.size());
 	auto irbeg = intersected_ranges.begin();
-	for (auto &ivbeg = indices.begin(); ivbeg != indices.end(); ivbeg++)
+	for (auto ivbeg = indices.begin(); ivbeg != indices.end(); ivbeg++)
 	{
 		doublepair intersect_range;
 		if (ivbeg->size() != 1)
 		{
-			for (auto &ibeg = ivbeg->begin() + 1; ibeg != ivbeg->end(); ibeg++)
+			for (auto ibeg = ivbeg->begin() + 1; ibeg != ivbeg->end(); ibeg++)
 			{
 				if (ibeg == ivbeg->begin() + 1)
 				{

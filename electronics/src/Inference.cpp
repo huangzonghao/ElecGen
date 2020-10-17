@@ -30,7 +30,7 @@ using std::make_unique;
 extern unordered_map<string, shared_ptr<Electrical_Component>> MOTOR_PART_MAP,
 H_BRIDDE_PART_MAP, MICRO_CONTROLLER_PART_MAP, VOLTAGE_REGULATOR_PART_MAP,
 BATTERY_PART_MAP, ENCODER_PART_MAP, CAMERA_PART_MAP, FORCE_SENSOR_PART_MAP,
-BLUETOOTH_PART_MAP, SERVO_PART_MAP, POWER_SUPPLY_PART_MAP;	
+BLUETOOTH_PART_MAP, SERVO_PART_MAP, POWER_SUPPLY_PART_MAP;
 
 extern unordered_multimap<string, string> connection_map;
 
@@ -76,11 +76,11 @@ unordered_map<stringpair, Electronics::CLASS, hash_pair> in_vol_map{
 	{{Component_Type::Camera, Component_Type::Power_Supply }, Electronics::POWER},
 	{{Component_Type::Bluetooth, Component_Type::Micro_Controller},
 	Electronics::CLASS::FUNCTION},
-	{{Component_Type::Bluetooth, Component_Type::Voltage_Regulator}, 
+	{{Component_Type::Bluetooth, Component_Type::Voltage_Regulator},
 	Electronics::POWER},
 	{{Component_Type::Bluetooth, Component_Type::Battery}, Electronics::POWER},
 	{{Component_Type::Bluetooth, Component_Type::Power_Supply}, Electronics::POWER},
-	{{Component_Type::Force_Sensor, Component_Type::Micro_Controller}, 
+	{{Component_Type::Force_Sensor, Component_Type::Micro_Controller},
 	Electronics::CLASS::FUNCTION},
 	{{Component_Type::Force_Sensor, Component_Type::Battery},
 	Electronics::CLASS::POWER},
@@ -88,7 +88,7 @@ unordered_map<stringpair, Electronics::CLASS, hash_pair> in_vol_map{
 	Electronics::CLASS::POWER},
 	{{Component_Type::Force_Sensor, Component_Type::Power_Supply},
 	Electronics::CLASS::POWER},
-	{{Component_Type::Servo, Component_Type::Micro_Controller}, 
+	{{Component_Type::Servo, Component_Type::Micro_Controller},
 	Electronics::CLASS::FUNCTION},
 	{{Component_Type::Servo, Component_Type::Voltage_Regulator}, Electronics::POWER },
 	{{Component_Type::Servo, Component_Type::Battery}, Electronics::POWER },
@@ -159,25 +159,25 @@ unordered_map<string, double(*)(const doublevec &)> in_current_map{
 	{Component_Type::Voltage_Regulator, Current_Operation::add},
 	{Component_Type::Battery, Current_Operation::add},
 	{Component_Type::Power_Supply, Current_Operation::add},
-	{Component_Type::Motor, Current_Operation::max}	
+	{Component_Type::Motor, Current_Operation::max}
 };
 
-str_strvec_map type_infer_map{ 
+str_strvec_map type_infer_map{
 	{Component_Type::Motor, stringvec{Component_Type::H_Bridge}},
-	{Component_Type::H_Bridge, stringvec{Component_Type::Power_Supply, 
+	{Component_Type::H_Bridge, stringvec{Component_Type::Power_Supply,
 	Component_Type::Micro_Controller}},
 	{Component_Type::Micro_Controller, stringvec{Component_Type::Power_Supply}},
 	{Component_Type::Voltage_Regulator, stringvec{Component_Type::Power_Supply}},
 	{Component_Type::Battery, stringvec{Component_Type::None}},
 	{Component_Type::Encoder, stringvec{
 	Component_Type::Power_Supply, Component_Type::Micro_Controller}},
-	{Component_Type::Camera, stringvec{Component_Type::Power_Supply, 
+	{Component_Type::Camera, stringvec{Component_Type::Power_Supply,
 	Component_Type::Micro_Controller}},
-	{Component_Type::Bluetooth, stringvec{Component_Type::Power_Supply, 
+	{Component_Type::Bluetooth, stringvec{Component_Type::Power_Supply,
 	Component_Type::Micro_Controller}},
-	{Component_Type::Force_Sensor, stringvec{Component_Type::Power_Supply, 
-	Component_Type::Micro_Controller}}, 
-	{Component_Type::Servo, stringvec{Component_Type::Power_Supply, 
+	{Component_Type::Force_Sensor, stringvec{Component_Type::Power_Supply,
+	Component_Type::Micro_Controller}},
+	{Component_Type::Servo, stringvec{Component_Type::Power_Supply,
 	Component_Type::Micro_Controller}}
 };
 
@@ -200,9 +200,9 @@ unordered_map<string, string> sensor_path_map{
 	{Component_Type::Bluetooth, bluetooth_path},
 	{Component_Type::Force_Sensor, forcesensor_path}
 };
- 
 
-stringvec2d getMotorVersions(const std::string &type, 
+
+stringvec2d getMotorVersions(const std::string &type,
 	const vector<pair<doublepair, doublepair>> &torq_vels)
 {
 	stringvec2d versions(torq_vels.size());
@@ -213,14 +213,14 @@ stringvec2d getMotorVersions(const std::string &type,
 	return versions;
 }
 
-stringvec getMotorVersions(const string &type, 
+stringvec getMotorVersions(const string &type,
 	const pair<doublepair, doublepair> &torq_vel)
 {
 	doublepair torq = torq_vel.first, vel = torq_vel.second;
 	string obj_path;
 	stringvec component_names;
 	double max_torq, max_vel, vel_h, vel_l;
-	type == Component_Type::Motor ? obj_path = dc_motor_path : 
+	type == Component_Type::Motor ? obj_path = dc_motor_path :
 		obj_path = servo_path;
 	for (auto &entry : directory_iterator(obj_path))
 	{
@@ -474,14 +474,14 @@ compoundsettype generateNeedSet(Circuit &circuit, GRBModel &model, compstructptr
 }
 */
 
-bool doubleCheck(Circuit &circuit, GRBModel &model, 
+bool doubleCheck(Circuit &circuit, GRBModel &model,
 	const doublepairs &torqs, const doublepairs &vels)
 {
 	bool success;
 	circuit.syncVars(model);
 	circuit.setMotorWorkPoint(&model, torqs, vels);
 	model.optimize();
-	model.get(GRB_IntAttr_Status) == GRB_OPTIMAL ? success = true : 
+	model.get(GRB_IntAttr_Status) == GRB_OPTIMAL ? success = true :
 		success = false;
 	return success;
 }
@@ -494,7 +494,7 @@ bool doubleCheck(BBNode &node, const doublepairs &torqs, const doublepairs &vels
 
 stringvec2d preprocess(const stringvec &component_types, const doublepairs &torqs, const doublepairs &vels)
 {
-	stringvec actuator_types(torqs.size()), 
+	stringvec actuator_types(torqs.size()),
 		sensor_types(component_types.size() - torqs.size());
 	for (size_t i = 0; i < component_types.size(); i++)
 	{
@@ -566,7 +566,7 @@ stringvec2d sensorPreprocess(const stringvec &sensor_types)
 	return all_versions;
 }
 
-stringvec2d actuatorPreprocess(const stringvec &actuator_types, const doublepairs &torqs, 
+stringvec2d actuatorPreprocess(const stringvec &actuator_types, const doublepairs &torqs,
 	 const doublepairs &vels)
 {
 	vector<pair<doublepair, doublepair>> torq_vels(torqs.size()),
@@ -577,7 +577,7 @@ stringvec2d actuatorPreprocess(const stringvec &actuator_types, const doublepair
 	{
 		torq_vels[i] = make_pair(torqs[i], vels[i]);
 		for (size_t j = 0; j < uniq_types.size(); j++)
-		{	
+		{
 			if (uniq_types[j] == actuator_types[i])
 			{
 				occur_num[j]++;
@@ -644,7 +644,7 @@ stringvec2d actuatorPreprocess(const stringvec &actuator_types, const doublepair
 	return all_motor_versions;
 }
 
-infernodevec2d initialize(const stringvec2d &component_versions, 
+infernodevec2d initialize(const stringvec2d &component_versions,
 	const doublepairs &torqs, const doublepairs &vels)
 {
 	infernodevec2d infer_nodes_vec(component_versions.size());
@@ -679,7 +679,7 @@ bbnodevec initialize(const infernodevec2d &infer_nodes_vec)
 	return bbnodes;
 }
 
-vector<stringpair> postprocessing(const Pin_Connections &connections, 
+vector<stringpair> postprocessing(const Pin_Connections &connections,
 	const stringvec &component_names, const unsignedvec &motor_index,
 	const unsignedvec &encoder_index)
 {
@@ -687,14 +687,14 @@ vector<stringpair> postprocessing(const Pin_Connections &connections,
 	unsignedpairs connection_group_index(component_names.size());
 
 	// reorder left side connections
-	unsigned cnt = 0; 
+	unsigned cnt = 0;
 	for (unsigned i = 0; i < component_names.size(); i++)
 	{
 		connection_group_index[i].first = cnt;
-		for (auto &beg = connections.begin(); beg != connections.end(); beg++)
+		for (auto beg = connections.begin(); beg != connections.end(); beg++)
 		{
 			stringpair name_pair = separateNames(beg->first);
-			if (component_names[i] == name_pair.first && 
+			if (component_names[i] == name_pair.first &&
 				!isDutyCycle(name_pair.second))
 			{
 				processed_connections.push_back(*beg);
@@ -724,7 +724,7 @@ vector<stringpair> postprocessing(const Pin_Connections &connections,
 	// replace dc motor with encoder connections
 	for (size_t i = 0; i < connection_group_index.size(); i++)
 	{
-		for (size_t j = connection_group_index[i].first; 
+		for (size_t j = connection_group_index[i].first;
 			j < connection_group_index[i].second; j++)
 		{
 			stringpair name_pair = separateNames(final_connections[j].second);
@@ -742,7 +742,7 @@ vector<stringpair> postprocessing(const Pin_Connections &connections,
 	return final_connections;
 }
 
-std::string replaceConnections(const std::string &origin, 
+std::string replaceConnections(const std::string &origin,
 	const std::string &replacement)
 {
 	stringpair name_pair = separateNames(origin);
@@ -756,11 +756,11 @@ std::string replaceConnections(const std::string &origin,
 	}
 }
 
-doublevec getMassVec(const BBNode &node, 
+doublevec getMassVec(const BBNode &node,
 	const unsigned &input_size)
 {
 	doublevec mass_vec(input_size + 1);
-	vector<shared_ptr<Electrical_Component>> components = 
+	vector<shared_ptr<Electrical_Component>> components =
 		node.circuit.getComponents();
 	for (size_t i = 0; i < components.size(); i++)
 	{
@@ -788,11 +788,11 @@ stringvec typeInfer(const Infer_Node &node)
 
 stringvec typeInfer(const std::string &type)
 {
-	auto &iter = type_infer_map.find(type);
+	const auto &iter = type_infer_map.find(type);
 	return type_infer_map.find(type)->second;
 }
 
-stringvec removeEmptyTypes(stringvec &types)
+stringvec removeEmptyTypes(const stringvec &types)
 {
 	stringvec non_empty_types;
 	for (size_t i = 0; i < types.size(); i++)
@@ -802,11 +802,11 @@ stringvec removeEmptyTypes(stringvec &types)
 			non_empty_types.push_back(types[i]);
 		}
 	}
-	
+
 	return non_empty_types;
 }
 
-boolvec hasMatchComponents(const stringvec &types, const infernodevec &next_nodes, 
+boolvec hasMatchComponents(const stringvec &types, const infernodevec &next_nodes,
 	const Infer_Node &node, const Pin_Connections &pin_connections)
 {
 	boolvec type_vec(types.size());
@@ -830,8 +830,8 @@ boolvec hasMatchComponents(const stringvec &types, const infernodevec &next_node
 		for (size_t j = 0; j < next_nodes.size(); j++)
 		{
 			if (next_nodes[j].getType() == types[i] ||
-				(next_nodes[j].getType() == Component_Type::Battery 
-					&& types[i] == Component_Type::Power_Supply) || 
+				(next_nodes[j].getType() == Component_Type::Battery
+					&& types[i] == Component_Type::Power_Supply) ||
 				(next_nodes[j].getType() == Component_Type::Voltage_Regulator
 					&& types[i] == Component_Type::Power_Supply))
 			{
@@ -844,14 +844,14 @@ boolvec hasMatchComponents(const stringvec &types, const infernodevec &next_node
 					{
 						string left = createConnectionName(next_nodes[j].getName(), out_pins[k]),
 							right = createConnectionName(node.getName(), in_pins[l]);
-						auto &range = pin_connections.equal_range(left);
-						for (auto &beg = range.first; beg != range.second; beg++)
+						const auto &range = pin_connections.equal_range(left);
+						for (auto beg = range.first; beg != range.second; beg++)
 						{
 							if (beg->second == right) {
 								if (next_power_component)
 								{
 									doublepair power_out_vol_range = next_nodes[j].getPowerOutVolRange();
-									for (auto &beg = power_in_vol_ranges.begin(); 
+									for (auto beg = power_in_vol_ranges.begin();
 										beg != power_in_vol_ranges.end(); beg++)
 									{
 										if (isIntersect(*beg, power_out_vol_range))
@@ -863,7 +863,7 @@ boolvec hasMatchComponents(const stringvec &types, const infernodevec &next_node
 								else
 								{
 									doublepair func_out_vol_range = next_nodes[j].getFuncOutVolRange();
-									for (auto &beg = func_in_vol_ranges.begin();
+									for (auto beg = func_in_vol_ranges.begin();
 										beg != func_in_vol_ranges.end(); beg++)
 									{
 										if (isIntersect(*beg, func_out_vol_range))
@@ -891,25 +891,25 @@ boolvec hasMatchComponents(const stringvec &types, const infernodevec &next_node
 	return type_vec;
 }
 /*
-stringvec2d versionInfer(const string &type, 
-	const doublepairs &pow_vol_ranges, const doublepairs &func_vol_ranges, 
+stringvec2d versionInfer(const string &type,
+	const doublepairs &pow_vol_ranges, const doublepairs &func_vol_ranges,
 	const doublevec &current_set)
 {
 	unordered_map<string, pair<doublepairs, doublevec>> infer_code;
-	infer_code[Component_Type::H_Bridge] = make_pair(pow_vol_ranges, 
+	infer_code[Component_Type::H_Bridge] = make_pair(pow_vol_ranges,
 		current_set);
 	infer_code[Component_Type::Micro_Controller] = make_pair(func_vol_ranges,
 		current_set);
-	infer_code[Component_Type::Voltage_Regulator] = make_pair(pow_vol_ranges, 
+	infer_code[Component_Type::Voltage_Regulator] = make_pair(pow_vol_ranges,
 		current_set);
-	infer_code[Component_Type::Battery] = make_pair(pow_vol_ranges, 
+	infer_code[Component_Type::Battery] = make_pair(pow_vol_ranges,
 		current_set);
-	
-	return versionInfer(type, infer_code[type].first, 
+
+	return versionInfer(type, infer_code[type].first,
 		infer_code[type].second);
 }
 */
-stringvec2d versionInfer(const string &type, const doublepairs &vol_ranges, 
+stringvec2d versionInfer(const string &type, const doublepairs &vol_ranges,
 	const doublevec2d &current_set)
 {
 	stringvec2d versions(vol_ranges.size());
@@ -940,18 +940,18 @@ stringvec versionInfer(const string &type, const doublepair &vol_range, const do
 		{Component_Type::Power_Supply, POWER_SUPPLY_PART_MAP}
 	};
 
-	unordered_map<string, shared_ptr<Electrical_Component>> components = 
+	unordered_map<string, shared_ptr<Electrical_Component>> components =
 		all_component_map[type];
 
-	for (auto &beg = components.begin(); beg != components.end(); beg++)
+	for (auto beg = components.begin(); beg != components.end(); beg++)
 	{
 		vol_output_range = beg->second->getOutVolRange(out_vol_map[type]);
 		current_limit = beg->second->getOutCurrentLimit(out_vol_map[type]);
 
-		if (isIntersect(vol_range, vol_output_range) && 
+		if (isIntersect(vol_range, vol_output_range) &&
 			in_current_map[type](currents) <= current_limit)
 		{
-			versions.push_back(beg->first);		
+			versions.push_back(beg->first);
 		}
 	}
 
@@ -959,7 +959,7 @@ stringvec versionInfer(const string &type, const doublepair &vol_range, const do
 }
 
 // infernodevec numberInfer(const string &type, infernodevec &prev_nodes,
-//	const stringvec &versions, const cliqueindex &power_clique_index, 
+//	const stringvec &versions, const cliqueindex &power_clique_index,
 //	const cliqueindex &func_clique_index)
 // {
 
@@ -971,8 +971,8 @@ stringvec versionInfer(const string &type, const doublepair &vol_range, const do
 //	return numberInfer(type, prev_nodes, versions, index_code[type]);
 // }
 
-infernodevec numberInfer(const string &type, infernodevec &prev_nodes, 
-	const stringvec &versions, const cliqueindex &nodes_index, 
+infernodevec numberInfer(const string &type, infernodevec &prev_nodes,
+	const stringvec &versions, const cliqueindex &nodes_index,
 	const cliqueindex &vol_vol_index)
 {
 	infernodevec next_infer_nodes;
@@ -987,8 +987,8 @@ infernodevec numberInfer(const string &type, infernodevec &prev_nodes,
 		}
 		next_infer_nodes.push_back(infer_node);
 		prev_nodes[nodes_index[i][0]].addNextNode(*next_infer_nodes.rbegin());
-		
-		// for actuators: input 
+
+		// for actuators: input
 		// for sensors: input, output: digital/uart/spi/i2c
 
 		next_val = next_infer_nodes.rbegin()->getOutVal(out_vol_map[type]);
@@ -998,7 +998,7 @@ infernodevec numberInfer(const string &type, infernodevec &prev_nodes,
 			if (prev_val > next_val)
 			{
 				Infer_Node infer_node = Infer_Node(versions[i]);
-				if (!BBNode::pruning_enable && 
+				if (!BBNode::pruning_enable &&
 					hasTwoVoltageRegulators(versions[i], prev_nodes[nodes_index[i][j]].getType()))
 				{
 					return infernodevec();
@@ -1011,7 +1011,7 @@ infernodevec numberInfer(const string &type, infernodevec &prev_nodes,
 			{
 				if (j != 0)
 				{
-					if (!BBNode::pruning_enable && 
+					if (!BBNode::pruning_enable &&
 						hasTwoVoltageRegulators(versions[i], prev_nodes[nodes_index[i][j]].getType()))
 					{
 						return infernodevec();
@@ -1035,12 +1035,12 @@ cliquetype exactrRangeCover(const doublepairs &ranges)
 
 		for (size_t clique_size = ranges.size(); clique_size != 1; clique_size--)
 		{
-			auto &X = discreture::combinations(num_sequence, clique_size);
+			const auto &X = discreture::combinations(num_sequence, clique_size);
 			for (auto &&x : X)
 			{
 				doublepairs temppairs(x.size());
-				auto &tpbeg = temppairs.begin();
-				for (auto &beg = x.begin(); beg != x.end(); beg++)
+				auto tpbeg = temppairs.begin();
+				for (auto beg = x.begin(); beg != x.end(); beg++)
 				{
 					*tpbeg++ = ranges[*beg];
 				}
@@ -1068,7 +1068,7 @@ cliquetype exactrRangeCover(const doublepairs &ranges)
 			}
 		}
 
-		for (auto &beg = num_sequence.begin(); beg != num_sequence.end(); beg++)
+		for (auto beg = num_sequence.begin(); beg != num_sequence.end(); beg++)
 		{
 			cliquerange.insert(cliquerange.end(), ranges[*beg]);
 			cliqueindex.insert(cliqueindex.end(), intvec{ *beg });
@@ -1330,7 +1330,7 @@ void writeDesign(const BBNode &bbnode)
 	std::ofstream design;
 	design.open(design_path + design_pf + "_" + std::to_string(getFileNumInDirectory(design_path)) + text_pf);
 
-	// component list 
+	// component list
 	design << "COMPONENT LIST: " << endl;
 	for (size_t i = 0; i < bbnode.component_names.size(); i++)
 	{
@@ -1355,7 +1355,7 @@ void writeDesign(const BBNode &bbnode)
 	Pin_Connections connections = bbnode.circuit.getComponentRelations();
 	vector<stringpair> processed_connections = postprocessing(connections, bbnode.component_names,
 		motor_index, encoder_index);
-	for (auto &beg = processed_connections.begin(); beg != processed_connections.end(); beg++)
+	for (auto beg = processed_connections.begin(); beg != processed_connections.end(); beg++)
 	{
 		design << beg->first << " -- "  << beg->second << "\n";
 	}
@@ -1391,7 +1391,7 @@ void writeRawDesign(const BBNode &bbnode)
 	auto &relations = bbnode.final_connections;
 	for (auto &relation = relations.begin(); relation != relations.end(); relation++)
 	{
-		design << relation->first.first + " " + relation->first.second << " " << 
+		design << relation->first.first + " " + relation->first.second << " " <<
 		 relation->second.first + " "  + relation->second.second << std::endl;
 	}
 	design.close();
@@ -1603,8 +1603,8 @@ shared_ptr<BBNode> branchNBound(bbnodevec &roots)
 					roots[i].prev_bbnode->next_bbnodes.pop_back();
 					first_branch = false;
 				}
-				else if (roots[i].feasibility) 
-				{	
+				else if (roots[i].feasibility)
+				{
 					roots[i].reevaluate();
 					if (BBNode::best_metric_val > roots[i].getMetricVal())
 					{
@@ -1672,22 +1672,22 @@ Pin_Connections maxNodeMatch(BBNode &bbnode, infernodevec &infer_nodes)
 	}
 
 	infernodevec all_infer_nodes = infer_nodes;
-	all_infer_nodes.insert(all_infer_nodes.end(), 
+	all_infer_nodes.insert(all_infer_nodes.end(),
 		bbnode.infer_nodes.begin(), bbnode.infer_nodes.end());
 	unsignedpair prev_ranges = make_pair(infer_nodes.size(), all_infer_nodes.size())
 		, ranges = make_pair(0, infer_nodes.size());
-	
+
 
 	// TO DO: break into 2 parts: 1. previous nodes - current nodes
-	//                            2. cuurent nodes - current nodes      
-	
+	//                            2. cuurent nodes - current nodes
+
 	pin_connections = nodeMatch(all_infer_nodes, prev_ranges, ranges);
-	getDependentPins(all_infer_nodes, pin_connections);    
-	infer_nodes = infernodevec(all_infer_nodes.begin(), 
+	getDependentPins(all_infer_nodes, pin_connections);
+	infer_nodes = infernodevec(all_infer_nodes.begin(),
 		all_infer_nodes.begin() + infer_nodes.size());
-	bbnode.infer_nodes = infernodevec(all_infer_nodes.begin() + 
+	bbnode.infer_nodes = infernodevec(all_infer_nodes.begin() +
 		infer_nodes.size(), all_infer_nodes.end());
-	
+
 	pin_connections.insert(prev_pin_connections.begin(), prev_pin_connections.end());
 	return pin_connections;
 }
@@ -1703,8 +1703,8 @@ vector<Component_Pair> extractComponentPairs(infernodevec &infer_nodes)
 
 	for (size_t i = 0; i < component_types.size(); i++)
 	{
-		auto &range = connection_map.equal_range(component_types[i]);
-		for (auto &beg = range.first; beg != range.second; beg++)
+		const auto &range = connection_map.equal_range(component_types[i]);
+		for (auto beg = range.first; beg != range.second; beg++)
 		{
 			for (size_t j = 0; j < component_types.size(); j++)
 			{
@@ -1736,13 +1736,13 @@ std::vector<Component_Pair> extractComponentPairs(infernodevec &infer_nodes,
 
 	for (size_t i = 0; i < component_types.size(); i++)
 	{
-		auto &range = connection_map.equal_range(component_types[i]);
-		for (auto &beg = range.first; beg != range.second; beg++)
+		const auto &range = connection_map.equal_range(component_types[i]);
+		for (auto beg = range.first; beg != range.second; beg++)
 		{
 			for (size_t j = 0; j < component_types.size(); j++)
 			{
 				if ((!(prev_ranges.first <= i && i <= prev_ranges.second) ||
-					!(prev_ranges.first <= j && j <= prev_ranges.second)) && 
+					!(prev_ranges.first <= j && j <= prev_ranges.second)) &&
 					beg->second == component_types[j])
 				{
 					component_pairs.push_back(make_pair(infer_nodes[i].getComponent(),
@@ -1764,7 +1764,7 @@ vector<Component_Pair> extractConsecutiveComponentPairs(infernodevec &prev_infer
 	vector<Component_Pair> component_pairs;
 	for (size_t i = 0; i < infer_nodes.size(); i++)
 	{
-		infernodevec &ancestors = infer_nodes[i].getAncestors();
+		const infernodevec &ancestors = infer_nodes[i].getAncestors();
 		for (size_t j = 0; j < ancestors.size(); j++)
 		{
 			size_t pos = getPosInVec(ancestors[j], prev_infer_nodes);
@@ -1785,15 +1785,15 @@ vector<Component_Pair> extractConsecutiveComponentPairs(infernodevec &prev_infer
 
 Pin_Connections nodeMatch(infernodevec &infer_nodes)
 {
-	// add relations 
-	vector<Component_Pair> component_pairs = 
+	// add relations
+	vector<Component_Pair> component_pairs =
 		extractComponentPairs(infer_nodes);
 	Pin_Connections pin_connections = groupMatch(component_pairs);
 	createLinks(infer_nodes, pin_connections);
 	return pin_connections;
 }
 
-Pin_Connections nodeMatch(infernodevec &infer_nodes, 
+Pin_Connections nodeMatch(infernodevec &infer_nodes,
 	const unsignedpair &prev_ranges, const unsignedpair &ranges)
 {
 	vector<Component_Pair> component_pairs =
@@ -1803,7 +1803,7 @@ Pin_Connections nodeMatch(infernodevec &infer_nodes,
 	return pin_connections;
 }
 
-Pin_Connections consecutiveNodeMatch(infernodevec &prev_infer_nodes, 
+Pin_Connections consecutiveNodeMatch(infernodevec &prev_infer_nodes,
 	infernodevec &infer_nodes)
 {
 	vector<Component_Pair> component_pairs =
@@ -1813,7 +1813,7 @@ Pin_Connections consecutiveNodeMatch(infernodevec &prev_infer_nodes,
 	return pin_connections;
 }
 
-void createLinks(infernodevec &infer_nodes, Pin_Connections &pin_connections) 
+void createLinks(infernodevec &infer_nodes, Pin_Connections &pin_connections)
 {
 	stringvec component_names(infer_nodes.size());
 	for (size_t i = 0; i < component_names.size(); i++)
@@ -1821,7 +1821,7 @@ void createLinks(infernodevec &infer_nodes, Pin_Connections &pin_connections)
 		component_names[i] = infer_nodes[i].getName();
 	}
 
-	for (auto &beg = pin_connections.begin(); beg != pin_connections.end();
+	for (auto beg = pin_connections.begin(); beg != pin_connections.end();
 			beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1830,7 +1830,7 @@ void createLinks(infernodevec &infer_nodes, Pin_Connections &pin_connections)
 		{
 			if (component_names[i] == left_pair.first)
 			{
-				size_t component_pos = getPosInVec(right_pair.first, 
+				size_t component_pos = getPosInVec(right_pair.first,
 					component_names);
 				size_t ancestor_pos = getPosInVec(infer_nodes[component_pos],
 					infer_nodes[i].getAncestors());
@@ -1845,11 +1845,11 @@ void createLinks(infernodevec &infer_nodes, Pin_Connections &pin_connections)
 	}
 }
 
-void createLinks(infernodevec &prev_infer_nodes, infernodevec &infer_nodes, 
+void createLinks(infernodevec &prev_infer_nodes, infernodevec &infer_nodes,
 	Pin_Connections &pin_connections)
 {
 	infernodevec all_infer_nodes = infer_nodes;
-	all_infer_nodes.insert(all_infer_nodes.end(), prev_infer_nodes.begin(), 
+	all_infer_nodes.insert(all_infer_nodes.end(), prev_infer_nodes.begin(),
 		prev_infer_nodes.end());
 
 	createLinks(all_infer_nodes, pin_connections);
@@ -1863,7 +1863,7 @@ void getDependentPins(infernodevec &infer_nodes, Pin_Connections &pin_connection
 {
 	stringvec2d pins_vec(infer_nodes.size());
 	// process connections
-	for (auto &beg = pin_connections.begin(); beg != pin_connections.end();
+	for (auto beg = pin_connections.begin(); beg != pin_connections.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1883,7 +1883,7 @@ void getDependentPins(infernodevec &infer_nodes, Pin_Connections &pin_connection
 	}
 
 	for (size_t i = 0; i < infer_nodes.size(); i++)
-	{ 
+	{
 		infer_nodes[i].getUsedNonLinVarNames(pins_vec[i]);
 		infer_nodes[i].getUsedVarsName(pins_vec[i]);
 	}
@@ -1896,7 +1896,7 @@ infernodevec getAllAnscenstor(BBNode &bbnode)
 	{
 		anscentors = bbnode.prev_bbnode->infer_nodes;
 		prev_anscenstors = getAllAnscenstor(*bbnode.prev_bbnode);
-		anscentors.insert(anscentors.end(), prev_anscenstors.begin(), 
+		anscentors.insert(anscentors.end(), prev_anscenstors.begin(),
 			prev_anscenstors.end());
 	}
 	return anscentors;
@@ -2045,34 +2045,34 @@ shared_ptr<Electrical_Component> creatComponent(const string &file)
 	shared_ptr<Electrical_Component> component = nullptr;
 	switch (component_code.to_ulong())
 	{
-	case DC_MOTOR_OPT: component = 
+	case DC_MOTOR_OPT: component =
 		make_shared<Motor>(file);
 		break;
-	case HBRIDGE_OPT: component = 
+	case HBRIDGE_OPT: component =
 		make_shared<H_Bridge>(file);
 		break;
-	case MICRO_CONTROLLER_OPT: component = 
+	case MICRO_CONTROLLER_OPT: component =
 		make_shared<Micro_Controller>(file);
 		break;
-	case VOLTAGE_REGULATOR_OPT: component = 
+	case VOLTAGE_REGULATOR_OPT: component =
 		make_shared<Voltage_Regulator>(file);
 		break;
-	case BATTERY_OPT: component = 
-		make_shared<Battery>(file);	
+	case BATTERY_OPT: component =
+		make_shared<Battery>(file);
 		break;
 	case ENCODER_OPT: component =
 		make_shared<Encoder>(file);
 		break;
-	case CAMERA_OPT: component = 
+	case CAMERA_OPT: component =
 		make_shared<Camera>(file);
 		break;
-	case FORCE_SENSOT_OPT: component = 
+	case FORCE_SENSOT_OPT: component =
 		make_shared<Force_Sensor>(file);
 		break;
-	case BLUETOOTH_OPT: component = 
+	case BLUETOOTH_OPT: component =
 		make_shared<Bluetooth>(file);
 		break;
-	case SERVO_OPT: component = 
+	case SERVO_OPT: component =
 		make_shared<Motor>(file);
 		break;
 	default: throw COMPONENT_NOT_FOUND;
@@ -2097,7 +2097,7 @@ stringvec getAllVersions(const string &dir)
 	return versions;
 }
 
-stringvec2d getAllActuatorVersions(const string &type, 
+stringvec2d getAllActuatorVersions(const string &type,
 	const vector<pair<doublepair, doublepair>> &torq_vels)
 {
 	vector<pair<doublepair, doublepair>> uniq_torq_vels =
@@ -2216,7 +2216,7 @@ void BBNode::computePowerConsump()
 void BBNode::computeMetricVal()
 {
 	eval_metric = 0;
-	doublevec var_vals{ static_cast<double>(component_num), 
+	doublevec var_vals{ static_cast<double>(component_num),
 		static_cast<double>(pin_num), static_cast<double>(connection_num),
 		price, weight, power_consumption };
 	for (size_t i = 0; i < coefficients.size(); i++)
@@ -2244,8 +2244,8 @@ void BBNode::updateConnections(const Pin_Connections &connections)
 bbnodevec BBNode::branch()
 {
 	this->clearPinConnections();
-	// connection 
-	// TO DO: use lower current and check the limit of battery current 
+	// connection
+	// TO DO: use lower current and check the limit of battery current
 	this->pin_connections = consecutiveNodeMatch(this->prev_bbnode->infer_nodes,
 		this->infer_nodes);
 	this->optimize();
@@ -2262,12 +2262,12 @@ bbnodevec BBNode::branch()
 	}
 //	printPinConnections(connections);
 	this->pin_connections.insert(connections.begin(), connections.end());
- 	this->updateConnections(connections); 
+ 	this->updateConnections(connections);
 
 	// get vals
 	std::sort(infer_nodes.begin(), infer_nodes.end(),
 		[](Infer_Node &left, Infer_Node &right) {
-		return precedence_map[left.getType()] < 
+		return precedence_map[left.getType()] <
 		precedence_map[right.getType()]; });
 
 	for (size_t i = 0; i < infer_nodes.size(); i++)
@@ -2286,7 +2286,7 @@ bbnodevec BBNode::branch()
 			infer_nodes[i].updateNextNode(infer_nodes[j]);
 		}
 	}
-			
+
 	bbnodevec next_nodes;
 	this->typeInfer();
 	if (infer_nodes.size() >= 4 && infer_nodes[3].getName() == "L4931-33")
@@ -2324,8 +2324,8 @@ stringvec BBNode::typeInfer()
 	stringvec2d types_vec;
 	for (size_t i = 0; i < infer_nodes.size(); i++)
 	{
-		stringvec types = ::typeInfer(infer_nodes[i]);	
-		boolvec has_types = hasMatchComponents(types, 
+		stringvec types = ::typeInfer(infer_nodes[i]);
+		boolvec has_types = hasMatchComponents(types,
 			infer_nodes[i].getDescendants(), infer_nodes[i], pin_connections);
 		for (size_t j = 0; j < has_types.size(); j++)
 		{
@@ -2379,10 +2379,10 @@ infernodevec2d BBNode::numberInfer(const stringvec2d &versions_vec)
 		infernodevec sub_infer_nodes;
 		for (size_t j = 0; j < next_types.size(); j++)
 		{
-			stringvec sub_versions = getSubVector(versions_vec[i], 
-				next_version_map[next_types[j]].first, 
+			stringvec sub_versions = getSubVector(versions_vec[i],
+				next_version_map[next_types[j]].first,
 				next_version_map[next_types[j]].second);
-			infernodevec next_infer_nodes = ::numberInfer(next_types[j], 
+			infernodevec next_infer_nodes = ::numberInfer(next_types[j],
 				infer_nodes, sub_versions, vol_index[j], vol_vol_index[j]);
 
 			if (next_infer_nodes.empty())
@@ -2424,12 +2424,12 @@ bool hasTwoVoltageRegulators(const string &version, const string &type)
 
 void BBNode::minCliqueCover()
 {
-	for (auto &beg = next_type_map.begin(); beg != next_type_map.end(); beg++)
+	for (auto beg = next_type_map.begin(); beg != next_type_map.end(); beg++)
 	{
 		unordered_map<unsigned, unsigned> component_vol_index_map, vol_vol_index_map;
 		doublepairs all_vol_ranges;
 		unsigned vol_cnt = 0;
-		for (auto &ibeg = beg->second.begin(); ibeg != beg->second.end();
+		for (auto ibeg = beg->second.begin(); ibeg != beg->second.end();
 			ibeg++)
 		{
 			doublepairs in_vol_ranges = infer_nodes[*ibeg].getInVolRange(beg->first);
@@ -2439,7 +2439,7 @@ void BBNode::minCliqueCover()
 				vol_vol_index_map[vol_cnt + i] = i;
 			}
 			vol_cnt += in_vol_ranges.size();
-			all_vol_ranges.insert(all_vol_ranges.end(), in_vol_ranges.begin(), 
+			all_vol_ranges.insert(all_vol_ranges.end(), in_vol_ranges.begin(),
 				in_vol_ranges.end());
 		}
 		// TO DO: figure out the best possible cover for two voltage regulators
@@ -2504,7 +2504,7 @@ void BBNode::clearPinConnections()
 
 		// clear previous component connection
 		stringvec2d pins_vec(components.size());
-		for (auto &beg = prev_pin_connections.begin(); beg != prev_pin_connections.end();
+		for (auto beg = prev_pin_connections.begin(); beg != prev_pin_connections.end();
 			beg++)
 		{
 			stringpair right_pair = separateNames(beg->second);
@@ -2532,7 +2532,7 @@ void BBNode::makeReplicates()
 {
 	for (size_t i = 0; i < infer_nodes.size(); i++)
 	{
-		string new_name = makeReplicate(infer_nodes[i].getName(), 
+		string new_name = makeReplicate(infer_nodes[i].getName(),
 			component_names);
 		infer_nodes[i].setName(new_name);
 		component_names.push_back(new_name);
@@ -2635,7 +2635,7 @@ std::string Infer_Node::getType() const
 
 std::string Infer_Node::getName() const
 {
-	return component->getComponentName(); 
+	return component->getComponentName();
 }
 
 double Infer_Node::getPrice() const
@@ -2663,10 +2663,32 @@ void Infer_Node::getUsedNonLinVarNames(const stringvec &pin_names)
 	component->getUsedNonLinVarNames(pin_names);
 }
 
+Infer_Node::Infer_Node(const string &file)
+{
+	id = num_of_nodes++;
+	component = creatComponent(file);
+    const Infer_Node& prev_node = Infer_Node();
+	if (!prev_node.empty())
+	{
+		prev_node_ids.push_back(prev_node.id);
+	}
+}
+
 Infer_Node::Infer_Node(const string &file, Infer_Node &prev_node)
 {
 	id = num_of_nodes++;
 	component = creatComponent(file);
+	if (!prev_node.empty())
+	{
+		prev_node_ids.push_back(prev_node.id);
+	}
+}
+
+Infer_Node::Infer_Node(shared_ptr<Electrical_Component> _component):
+	component(_component)
+{
+	id = num_of_nodes++;
+    const Infer_Node& prev_node = Infer_Node();
 	if (!prev_node.empty())
 	{
 		prev_node_ids.push_back(prev_node.id);
@@ -2683,9 +2705,9 @@ Infer_Node::Infer_Node(shared_ptr<Electrical_Component> _component, Infer_Node &
 	}
 }
 
-bool Infer_Node::empty()
+bool Infer_Node::empty() const
 {
-	return component == nullptr; 
+	return component == nullptr;
 }
 
 void Infer_Node::addPrevNode(Infer_Node &prev_node)
@@ -2723,7 +2745,7 @@ void Infer_Node::computeElectricProperties(Pin_Connections &pin_connections)
 
 doublevec Infer_Node::getInVal(const string &next_type)
 {
-	if (in_metric_map[make_pair(getType(), next_type)] == 
+	if (in_metric_map[make_pair(getType(), next_type)] ==
 		Electronics::CLASS::POWER)
 	{
 		return getPowerInVal();
@@ -2749,7 +2771,7 @@ double Infer_Node::getOutVal(const Electronics::CLASS &pin_class)
 doublepairs Infer_Node::getInVolRange(const string &next_type)
 {
 	doublepairs valid_in_vol_ranges;
-	if (in_vol_map[make_pair(getType(), next_type)] == 
+	if (in_vol_map[make_pair(getType(), next_type)] ==
 		Electronics::CLASS::POWER)
 	{
 		for (size_t i = 0; i < pow_in_vol_range.size(); i++)
@@ -2775,7 +2797,7 @@ doublepairs Infer_Node::getInVolRange(const string &next_type)
 
 doublevec Infer_Node::getInCurrentLimit(const string &next_type)
 {
-	if (in_vol_map[make_pair(getType(), next_type)] == 
+	if (in_vol_map[make_pair(getType(), next_type)] ==
 		Electronics::CLASS::POWER)
 	{
 		return pow_in_current;
@@ -2824,7 +2846,7 @@ doublepair Infer_Node::getFuncOutVolRange() const
 
 unsigned Infer_Node::getMainPowerIndex()
 {
-	return component->getMainPowerIndex(); 
+	return component->getMainPowerIndex();
 }
 
 void Infer_Node::computePowInCurrent(Pin_Connections &pin_connections)
@@ -2845,12 +2867,12 @@ void Infer_Node::computePowInCurrent(Pin_Connections &pin_connections)
 			{
 				for (size_t k = 0; k < in_pins.size(); k++)
 				{
-					string left = createConnectionName(this->getName(), 
+					string left = createConnectionName(this->getName(),
 						out_pins[j]),
 						right = createConnectionName(prev_node.getName(),
 							in_pins[k]);
-					auto &range = pin_connections.equal_range(left);
-					for (auto &beg = range.first; beg != range.second; beg++)
+					const auto &range = pin_connections.equal_range(left);
+					for (auto beg = range.first; beg != range.second; beg++)
 					{
 						if (beg->second == right)
 						{
@@ -2873,22 +2895,22 @@ void Infer_Node::computePowInCurrent(Pin_Connections &pin_connections)
 
 void Infer_Node::computePowInPinNames()
 {
-	pow_in_pin_names = component->getPowerInPinNames(); 
+	pow_in_pin_names = component->getPowerInPinNames();
 }
 
 void Infer_Node::computePowOutPinNames()
 {
-	pow_out_pin_names = component->getPowerOutPinNames(); 
+	pow_out_pin_names = component->getPowerOutPinNames();
 }
 
 void Infer_Node::computeFuncInPinNames()
 {
-	func_in_pin_names = component->getFuncInPinNames(); 
+	func_in_pin_names = component->getFuncInPinNames();
 }
 
 void Infer_Node::computeFuncOutPinNames()
 {
-	func_out_pin_names = component->getFuncOutPinNames(); 
+	func_out_pin_names = component->getFuncOutPinNames();
 }
 
 void Infer_Node::setPowerExistVec(const size_t &pos) const
@@ -2964,10 +2986,14 @@ doublevec Infer_Node::getPowerInVal()
 	return pow_in_current;
 }
 
-BBNode::BBNode(const infernodevec &_infer_nodes, BBNode *_prev_bbnode): 
-	 prev_bbnode(_prev_bbnode)
+BBNode::BBNode(const infernodevec &_infer_nodes, BBNode *_prev_bbnode)
 {
-
+    if (!_prev_bbnode){
+        this->prev_bbnode = new BBNode;
+    }
+    else {
+        this->prev_bbnode = _prev_bbnode;
+    }
 //	this->model.set(GRB_IntParam_LogToConsole, 0);
 	this->id = num_of_bbnodes++;
 	this->level = _prev_bbnode->level + 1;
@@ -2982,7 +3008,12 @@ BBNode::BBNode(const infernodevec &_infer_nodes, BBNode *_prev_bbnode):
 BBNode::BBNode(const infernodevec &_infer_nodes, const Circuit &_circuit,
 	GRBModel &_model, BBNode *_prev_bbnode) : circuit(_circuit), model(_model)
 {
-
+    if (!_prev_bbnode){
+        this->prev_bbnode = new BBNode;
+    }
+    else {
+        this->prev_bbnode = _prev_bbnode;
+    }
 //	this->model.set(GRB_IntParam_LogToConsole, 0);
 	this->id = num_of_bbnodes++;
 	this->level = _prev_bbnode->level + 1;
@@ -2990,7 +3021,6 @@ BBNode::BBNode(const infernodevec &_infer_nodes, const Circuit &_circuit,
 	this->component_names = _prev_bbnode->component_names;
 	this->copyMetrics(*_prev_bbnode);
 	this->makeReplicates();
-	this->prev_bbnode = _prev_bbnode;
 	this->prev_bbnode->next_bbnodes.push_back(*this);
 	::addInferNodeMap(infer_nodes);
 }

@@ -18,10 +18,10 @@ CAMERA_OPT = 0b0001000000, FORCE_SENSOT_OPT = 0b0010000000,
 BLUETOOTH_OPT = 0b0100000000, SERVO_OPT = 0b1000000000;
 
 const stringvec end_components{ Component_Type::Motor, Component_Type::Encoder,
-Component_Type::Camera, Component_Type::Bluetooth, Component_Type::Servo, 
+Component_Type::Camera, Component_Type::Bluetooth, Component_Type::Servo,
 Component_Type::Micro_Controller };
 
-const stringvec add_components{ Component_Type::H_Bridge, 
+const stringvec add_components{ Component_Type::H_Bridge,
 Component_Type::Voltage_Regulator, Component_Type::Battery };
 
 struct BBNode
@@ -61,8 +61,8 @@ struct BBNode
 	Pin_Connections pin_connections;
 
 	BBNode() = default;
-	BBNode(const infernodevec &, BBNode * = new BBNode);
-	BBNode(const infernodevec &, const Circuit &, GRBModel &, BBNode * = new BBNode);
+	BBNode(const infernodevec &, BBNode * = NULL);
+	BBNode(const infernodevec &, const Circuit &, GRBModel &, BBNode * = NULL);
 
 	bool operator==(const BBNode &bbnode) const { return id == bbnode.id; }
 
@@ -93,7 +93,7 @@ struct BBNode
 	void updateInPrevNode();
 	unsigned getComponenetNum() const { return component_num; }
 	unsigned getPinNum() const { return pin_num; }
-	unsigned getConnectionsNum() const { return connection_num; }	
+	unsigned getConnectionsNum() const { return connection_num; }
 	double getPrice() const { return price; }
 	double getWeight() const { return weight; }
 	double getPowerConsump() const { return power_consumption; }
@@ -112,7 +112,7 @@ struct Infer_Node
 {
 //	double extra_current = 0;
 	bool operator==(const Infer_Node &obj) const { return id == obj.id; }
-	
+
 	std::string getType() const;
 	std::string getName() const;
 	double getPrice() const;
@@ -124,10 +124,12 @@ struct Infer_Node
 	void getUsedNonLinVarNames(const stringvec &);
 
 	Infer_Node() = default;
-	Infer_Node(const std::string &, Infer_Node & = Infer_Node());
-	Infer_Node(std::shared_ptr<Electrical_Component> , Infer_Node & = Infer_Node());
+    Infer_Node(const std::string &);
+	Infer_Node(const std::string &, Infer_Node &);
+	Infer_Node(std::shared_ptr<Electrical_Component>);
+	Infer_Node(std::shared_ptr<Electrical_Component>, Infer_Node &);
 //	~Infer_Node() { std::cout << "INFER NODE DESTRUCTOR" << std::endl; }
-	bool empty();
+	bool empty() const;
 	void addPrevNode(Infer_Node &);
 	void addNextNode(Infer_Node &);
 	void computeElectricProperties(Pin_Connections &);;
@@ -193,12 +195,12 @@ private:
 stringvec2d preprocess(const stringvec &, const doublepairs & = doublepairs(),
 	const doublepairs & = doublepairs());
 stringvec2d sensorPreprocess(const stringvec &);
-stringvec2d actuatorPreprocess(const stringvec &, const doublepairs & = doublepairs(), 
+stringvec2d actuatorPreprocess(const stringvec &, const doublepairs & = doublepairs(),
 	const doublepairs & = doublepairs());
 infernodevec2d initialize(const stringvec2d &, const doublepairs & = doublepairs(),
 	const doublepairs & = doublepairs());
 bbnodevec initialize(const infernodevec2d &);
-std::vector<stringpair> postprocessing(const Pin_Connections &, const stringvec &, 
+std::vector<stringpair> postprocessing(const Pin_Connections &, const stringvec &,
 	const unsignedvec &, const unsignedvec &);
 std::string replaceConnections(const std::string &, const std::string &);
 doublevec getMassVec(const BBNode &, const unsigned &);
@@ -220,8 +222,8 @@ bool backTrack(BBNode &);
 
 stringvec typeInfer(const Infer_Node &);
 stringvec typeInfer(const std::string &);
-stringvec removeEmptyTypes(stringvec &);
-boolvec hasMatchComponents(const stringvec &, const infernodevec &, 
+stringvec removeEmptyTypes(const stringvec &);
+boolvec hasMatchComponents(const stringvec &, const infernodevec &,
 	const Infer_Node &, const Pin_Connections &);
 
 stringvec2d versionInfer(const std::string &, const doublepairs &, const doublepairs &, const doublevec &);
@@ -246,7 +248,7 @@ connection_relation_vec sameLevelComponentsReduction(bbnodevec &);
 
 // nodeptr findAvailPowerComponent(nodeptrvec &, const stringvec &, const double &);
 
-// auxiliary function 
+// auxiliary function
 // visualization function
 // void treeVisualize(nodeptr root, unsigned cnt = 0);
 
@@ -270,7 +272,7 @@ infernodevec generateNodeptrVec(const std::string &, const stringvec &);
 // This function checks the inputs' validity
 bool inputsValidityCheck(const doublepairs &, const doublepairs &);
 
-std::shared_ptr<BBNode> branchNBound(bbnodevec & = bbnodevec());
+std::shared_ptr<BBNode> branchNBound(const bbnodevec & = bbnodevec());
 
 //void expandMap(const bbnodevec &, bbglobalmap &);
 
@@ -287,11 +289,11 @@ std::vector<Component_Pair> extractComponentPairs(infernodevec &);
 std::vector<Component_Pair> extractComponentPairs(infernodevec &,
 	const unsignedpair &, const unsignedpair &);
 std::vector<Component_Pair> extractConsecutiveComponentPairs(infernodevec &, infernodevec &);
-Pin_Connections maxNodeMatch(BBNode &, infernodevec & = infernodevec());
+Pin_Connections maxNodeMatch(BBNode &, const infernodevec & = infernodevec());
 Pin_Connections nodeMatch(infernodevec &);
 Pin_Connections nodeMatch(infernodevec &, const unsignedpair &, const unsignedpair &);
 Pin_Connections consecutiveNodeMatch(infernodevec &, infernodevec &);
- 
+
 void createLinks(infernodevec &, Pin_Connections &);
 void createLinks(infernodevec &, infernodevec &, Pin_Connections &);
 void getDependentPins(infernodevec &, Pin_Connections &);

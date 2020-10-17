@@ -4,9 +4,6 @@
 #include "gurobi_c++.h"
 #include "utility_functions.h"
 #include <Eigen/Dense>
-#ifdef WIN32
-#include <io.h>
-#endif
 #include <fcntl.h>
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -41,7 +38,7 @@ struct Lin_Cons
 	Eigen::MatrixXd coefficients;
 	double constant;
 	Electronics::RELATION type;
-	
+
 	Lin_Cons(const stringvec &_names, const Eigen::MatrixXd &_coefficients,
 		const double &_constant, const Electronics::RELATION _type) : var_names(_names),
 		coefficients(_coefficients), constant(_constant), type(_type)
@@ -71,7 +68,7 @@ class Electrical_Component
 {
 public:
 	friend Circuit;
-	Electrical_Component() = default; 
+	Electrical_Component() = default;
 	Electrical_Component(const std::string &);
 	virtual ~Electrical_Component() = default;
 
@@ -101,16 +98,16 @@ public:
 	double getOutCurrentLimit(const Electronics::CLASS &);
 //	double getInCurrentLimit(const Electronics::CLASS &);
 
-	unsigned getPowerInSize() 
-	{ return static_cast<unsigned>(getPowerInPins().size() + 
+	unsigned getPowerInSize()
+	{ return static_cast<unsigned>(getPowerInPins().size() +
 		getBothInPins().size() + getBothBidirectPins().size()); }
 	virtual unsigned getFuncInSize() = 0;
-	unsigned getPowerOutSize() 
-	{ return static_cast<unsigned>(getPowerOutPins().size() + 
+	unsigned getPowerOutSize()
+	{ return static_cast<unsigned>(getPowerOutPins().size() +
 		getBothOutPins().size() + getBothBidirectPins().size()); }
 	virtual unsigned getFuncOutSize() = 0;
 	void constructVarMaps();
-	
+
 	std::vector<Pin*> getPowerInPins();
 	std::vector<Pin*> getPowerOutPins();
 	std::vector<Pin*> getFuncInPins();
@@ -150,20 +147,20 @@ public:
 	virtual void getUsedVarsName(const stringvec &) = 0;
 
 protected:
-	std::string component_name; 
-	std::string component_type;  
-	std::string component_class;  
+	std::string component_name;
+	std::string component_type;
+	std::string component_class;
 	std::vector<Pin> pins;
 	std::vector<Pin> usable_pins;
 	std::vector<Pin*> dependent_pins;
-	std::vector<GRBVar> vars; 
+	std::vector<GRBVar> vars;
 	stringvec var_names;
 	stringvec used_var_names;
 	std::unordered_map<std::string, GRBVar*> var_maps;
 	stringvec nonlin_var_names;
-	stringvec used_nonlin_var_names; 
+	stringvec used_nonlin_var_names;
 	unsignedvec used_nonlin_var_index;
-	std::vector<char> var_types; 
+	std::vector<char> var_types;
 	Eigen::MatrixXd v_bound_mat;
 	Eigen::MatrixXd i_bound_mat;
 	Eigen::MatrixXd var_bound_mat;
@@ -172,7 +169,7 @@ protected:
 	stringvec model_names;
 	std::unordered_map<std::string, unsigned> model_index_map;
 	std::vector<Lin_Cons> lin_cons;
-	std::vector<Lin_Cons> linear_constraints; 
+	std::vector<Lin_Cons> linear_constraints;
 	bool nonlin;
 	doublevec component_size = doublevec(3);
 	double component_weight = 0;
@@ -181,7 +178,7 @@ protected:
 
 	Electronics::Component* read(const std::string &);
 	void constructUsablePins() { usable_pins = pins; }
-	
+
 private:
 	void extractInfo(const Electronics::Component *);
 	std::vector<Pin*> getPins(Electronics::CLASS, Electronics::IO);
@@ -215,7 +212,7 @@ public:
 	stringvec getPowerOutPinNames() override { return stringvec(); }
 	stringvec getFuncInPinNames() override;
 	stringvec getFuncOutPinNames() override { return stringvec(); }
-	void getUsedVarsName(const stringvec &pin_names) override { 
+	void getUsedVarsName(const stringvec &pin_names) override {
 		if (used_var_names.empty())
 		{
 			used_var_names = var_names;
@@ -267,17 +264,17 @@ public:
 		return doublevec{ i_bound_mat(0, 1) };
 	}
 	double getFuncOutCurrentLimit() override { return 0.0; }
-	double getPowerOutCurrentLimit() override { 
+	double getPowerOutCurrentLimit() override {
 		return i_bound_mat(pow_in_pins.size(), 1); }
 	doublepairs getFuncInVolRange() override { return doublepairs(); }
-	doublepairs getPowerInVolRange() override { 
-		return doublepairs{ std::make_pair(pins[0].v_bound.first, 
-			pins[0].v_bound.second) }; 
+	doublepairs getPowerInVolRange() override {
+		return doublepairs{ std::make_pair(pins[0].v_bound.first,
+			pins[0].v_bound.second) };
 	}
 	doublepair getFuncOutVolRange() override { return doublepair(); }
 	doublepair getPowerOutVolRange() override {
 		size_t pos = pow_in_pins.size();
-		return std::make_pair(pins[pos].v_bound.first, 
+		return std::make_pair(pins[pos].v_bound.first,
 				pins[pos].v_bound.second);
 	}
 	stringvec getPowerInPinNames() override;
@@ -304,7 +301,7 @@ class H_Bridge: public Electrical_Component
 {
 public:
 	H_Bridge() = default;
-	H_Bridge(const std::string &); 
+	H_Bridge(const std::string &);
 
 	void parameters() const override;
 	stringvec getNonlinVarNames() override;
@@ -380,7 +377,7 @@ public:
 	unsigned getFuncOutSize() override { return digital_pins.size() + analog_pins.size(); }
 
 	std::unordered_map<std::string, std::string> getOutDutyCycleMap() { return out_duty_cycle_map; }
-	
+
 private:
 	void extractInfo(Electronics::Component *);
 	void constructDutyCycleMap();
@@ -412,7 +409,7 @@ class Battery: public Electrical_Component
 public:
 	Battery() = default;
 	Battery(const std::string &);
-	
+
 	void parameters() const override;
 	stringvec getNonlinVarNames() override { return stringvec(); }
 	stringvec getUsedNonLinVarNames(const stringvec &) override { return stringvec(); }
@@ -425,7 +422,7 @@ public:
 	doublepairs getFuncInVolRange() override { return doublepairs(); }
 	doublepairs getPowerInVolRange() override { return doublepairs(); }
 	doublepair getFuncOutVolRange() override { return doublepair(); }
-	doublepair getPowerOutVolRange() override { return 
+	doublepair getPowerOutVolRange() override { return
 		std::make_pair(pins[0].v_bound.first, pins[0].v_bound.second); }
 	stringvec getPowerInPinNames() override { return stringvec(); }
 	stringvec getPowerOutPinNames() override;
@@ -512,7 +509,7 @@ public:
 	unsigned getMainPowerIndex() override { return 0; }
 	unsigned getFuncInSize() override { return uart_pins.size(); }
 	unsigned getFuncOutSize() override { return 0; }
-	
+
 private:
 	void extractInfo(Electronics::Component *);
 	void getPinNumberInfo();
@@ -550,7 +547,7 @@ public:
 	doublepair getPowerOutVolRange() override { return doublepair(); }
 	stringvec getPowerInPinNames() override;
 	stringvec getPowerOutPinNames() override { return stringvec(); }
-	stringvec getFuncInPinNames() override; 
+	stringvec getFuncInPinNames() override;
 	stringvec getFuncOutPinNames() override { return stringvec(); }
 	void getUsedVarsName(const stringvec &) override;
 	unsigned getMainPowerIndex() override { return 0; }

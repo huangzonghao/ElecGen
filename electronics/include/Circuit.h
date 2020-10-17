@@ -4,7 +4,7 @@
 
 class Electrical_Component;
 
-std::vector<GRBLinExpr> operator*(Eigen::MatrixXd &, std::vector<GRBVar> &);
+std::vector<GRBLinExpr> operator*(const Eigen::MatrixXd &, const std::vector<GRBVar> &);
 
 namespace OPT_METHOD {
 	const std::string NEWTON_RAPHSON = "NEWTON_RAPHSON",
@@ -14,7 +14,7 @@ namespace OPT_METHOD {
 
 enum verifyMode
 {
-	min, max, normal 
+	min, max, normal
 };
 
 class Circuit
@@ -22,7 +22,7 @@ class Circuit
 public:
 	typedef bool(Circuit::*func)(std::vector<std::shared_ptr<Electrical_Component>>, GRBModel *); // just declaration
 	Circuit() = default;
-	Circuit(std::vector<std::shared_ptr<Electrical_Component>> &, Pin_Connections & = Pin_Connections());
+	Circuit(std::vector<std::shared_ptr<Electrical_Component>> &, const Pin_Connections & = Pin_Connections());
 
 	// methods
 	void minUpdateConnectionsSolve(GRBModel *);
@@ -43,7 +43,7 @@ public:
 
 //	std::vector<Electrical_Component*>& getComponents() { return components; }
 	std::vector<std::shared_ptr<Electrical_Component>> getComponents() const { return components; }
-	
+
 	void syncVars(const GRBModel &);
 	unsigned getMotorNumber();
 

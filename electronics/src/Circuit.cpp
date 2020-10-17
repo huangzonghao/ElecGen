@@ -15,7 +15,7 @@ unordered_map<Electronics::RELATION, char> sign_map{
 };
 
 
-Circuit::Circuit(vector<shared_ptr<Electrical_Component>> &_components, Pin_Connections &_connections):
+Circuit::Circuit(vector<shared_ptr<Electrical_Component>> &_components, const Pin_Connections &_connections):
 	components(_components), pin_connections(_connections)
 {
 	for (size_t i = 0; i < components.size(); i++)
@@ -44,7 +44,7 @@ void Circuit::printComponents()
 
 void Circuit::printRelations()
 {
-	for (auto &beg = pin_connections.begin(); beg != pin_connections.end(); beg++)
+	for (auto beg = pin_connections.begin(); beg != pin_connections.end(); beg++)
 	{
 		cout << beg->first << " " << beg->second << endl;
 	}
@@ -110,7 +110,7 @@ void Circuit::addMaxObjs(GRBModel *model)
 	model->setObjective(objective, GRB_MAXIMIZE);
 }
 
-void Circuit::addModelCons(GRBModel *model) 
+void Circuit::addModelCons(GRBModel *model)
 {
 	for (size_t i = 0; i < components.size(); i++)
 	{
@@ -119,13 +119,13 @@ void Circuit::addModelCons(GRBModel *model)
 		unsignedvec used_index;;
 		for (size_t j = 0; j < used_var_names.size(); j++)
 		{
-			auto &iter = components[i]->model_index_map.find(used_var_names[j]);
+			const auto &iter = components[i]->model_index_map.find(used_var_names[j]);
 			if (iter != components[i]->model_index_map.end())
 			{
 				used_index.push_back(iter->second);
 			}
 		}
-		vector<GRBLinExpr> &lin_exp = components[i]->getModelMat()*components[i]->vars;
+        const vector<GRBLinExpr>& lin_exp = components[i]->getModelMat()*components[i]->vars;
 		vector<char> model_relations = components[i]->getModelRelations();
 		stringvec model_names = components[i]->getModelNames();
 		for (size_t j = 0; j < used_index.size(); j++)
@@ -142,7 +142,7 @@ void Circuit::addLinCons(GRBModel *model)
 {
 	for (size_t i = 0;  i< components.size(); i++)
 	{
-		if (components[i]->has_linear_constraints()) 
+		if (components[i]->has_linear_constraints())
 		{
 			for (size_t j = 0; j < components[i]->linear_constraints.size(); j++)
 			{
@@ -157,8 +157,8 @@ void Circuit::addLinCons(GRBModel *model)
 					vars[k] = *components[i]->var_maps[var_names[k]];
 				}
 
-				vector<GRBLinExpr> &lin_cons = coefficents*vars;
-				model->addConstr(lin_cons[0], sign_map[relation], constant, 
+				const vector<GRBLinExpr> &lin_cons = coefficents*vars;
+				model->addConstr(lin_cons[0], sign_map[relation], constant,
 					components[i]->getComponentName() + "LINEAR CONS");
 			}
 		}
@@ -168,13 +168,13 @@ void Circuit::addLinCons(GRBModel *model)
 
 void Circuit::addCompositions(GRBModel *model) {
 
-	for (auto &beg = pin_connections.begin(); beg != pin_connections.end(); beg++)
+	for (auto beg = pin_connections.begin(); beg != pin_connections.end(); beg++)
 	{
 		stringpair left_pair = separateNames(beg->first);
 		stringpair right_pair = separateNames(beg->second);
 		shared_ptr<Electrical_Component> left_component = component_maps[left_pair.first],
 			right_component = component_maps[right_pair.first];
-		
+
 		model->addConstr(*left_component->var_maps[left_pair.second] == *right_component->var_maps[right_pair.second]);
 	}
 }
@@ -297,7 +297,7 @@ void Circuit::updateVars(GRBModel *model)
 		stringvec var_names = new_components[i]->getVarsName();
 		for (size_t j = 0; j < new_components[i]->getVarsSize(); j++)
 		{
-			new_components[i]->vars[j] = model->addVar(var_bound_mat(j, 0), 
+			new_components[i]->vars[j] = model->addVar(var_bound_mat(j, 0),
 				var_bound_mat(j, 1), 0, var_types[j], var_names[j]);
 		}
 		new_components[i]->constructVarMaps();
@@ -357,13 +357,13 @@ void Circuit::updateModelCons(GRBModel *model)
 		unsignedvec used_index;;
 		for (size_t j = 0; j < used_var_names.size(); j++)
 		{
-			auto &iter = new_components[i]->model_index_map.find(used_var_names[j]);
+			const auto &iter = new_components[i]->model_index_map.find(used_var_names[j]);
 			if (iter != new_components[i]->model_index_map.end())
 			{
 				used_index.push_back(iter->second);
 			}
 		}
-		vector<GRBLinExpr> &lin_exp = new_components[i]->getModelMat()*
+		const vector<GRBLinExpr> &lin_exp = new_components[i]->getModelMat()*
 			new_components[i]->vars;
 		vector<char> model_relations = new_components[i]->getModelRelations();
 		stringvec model_names = new_components[i]->getModelNames();
@@ -399,7 +399,7 @@ void Circuit::updateLinCons(GRBModel *model)
 					vars[k] = *new_components[i]->var_maps[var_names[k]];
 				}
 
-				vector<GRBLinExpr> &lin_cons = coefficents * vars;
+				const vector<GRBLinExpr> &lin_cons = coefficents * vars;
 				model->addConstr(lin_cons[0], sign_map[relation], constant,
 					new_components[i]->getComponentName() + "LINEAR CONS");
 			}
@@ -409,7 +409,7 @@ void Circuit::updateLinCons(GRBModel *model)
 
 void Circuit::updateCompositions(GRBModel *model)
 {
-	for (auto &beg = new_pin_connections.begin(); beg != new_pin_connections.end(); beg++)
+	for (auto beg = new_pin_connections.begin(); beg != new_pin_connections.end(); beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
 			right_pair = separateNames(beg->second);
@@ -427,20 +427,20 @@ void Circuit::restorePrevModelCons(GRBModel *model)
 		unsignedvec used_index;;
 		for (size_t j = 0; j < used_var_names.size(); j++)
 		{
-			auto &iter = new_components[i]->model_index_map.find(used_var_names[j]);
+			const auto &iter = new_components[i]->model_index_map.find(used_var_names[j]);
 			if (iter != new_components[i]->model_index_map.end())
 			{
 				used_index.push_back(iter->second);
 			}
 		}
-		vector<GRBLinExpr> &lin_exp = new_components[i]->getModelMat()*
+		const vector<GRBLinExpr> &lin_exp = new_components[i]->getModelMat()*
 			new_components[i]->vars;
 		vector<char> model_relations = new_components[i]->getModelRelations();
 		stringvec model_names = new_components[i]->getModelNames();
 		for (size_t j = 0; j < used_index.size(); j++)
 		{
 			size_t row = used_index[j];
-			GRBConstr &cons = model->getConstrByName(model_names[row]);
+			const GRBConstr &cons = model->getConstrByName(model_names[row]);
 			for (size_t k = 0; k < lin_exp[row].size(); k++)
 			{
 				model->chgCoeff(cons, lin_exp[row].getVar(k), lin_exp[row].getCoeff(k));
@@ -572,7 +572,7 @@ void Circuit::report() {
 	}
 }
 
-void Circuit::updateComponents(const vector<shared_ptr<Electrical_Component>> 
+void Circuit::updateComponents(const vector<shared_ptr<Electrical_Component>>
 	&_components)
 {
 	components.insert(components.end(), _components.begin(), _components.end());
@@ -590,7 +590,7 @@ void Circuit::updateConnections(const Pin_Connections &_pin_connections)
 	new_pin_connections = _pin_connections;
 }
 
-void Circuit::setMotorWorkPoint(GRBModel *model, 
+void Circuit::setMotorWorkPoint(GRBModel *model,
 	const doublepairs &torqs, const doublepairs &vels)
 {
 	for (size_t i = 0; i < torqs.size(); i++)
@@ -633,7 +633,7 @@ void Circuit::syncVars(const GRBModel &model)
 	GRBVar *vars = model.getVars();
 	for (size_t i = 0; i < components.size(); i++)
 	{
-		for (auto &vbeg = components[i]->vars.begin(); vbeg != components[i]->vars.end(); vbeg++)
+		for (auto vbeg = components[i]->vars.begin(); vbeg != components[i]->vars.end(); vbeg++)
 		{
 			*vbeg = *vars++;
 		}
@@ -733,16 +733,16 @@ void Circuit::getComponentPins(str_strvec_uomap &componentpins, const std::strin
 	}
 }
 */
-std::vector<GRBLinExpr> operator*(Eigen::MatrixXd &mat, std::vector<GRBVar> &vars)
+std::vector<GRBLinExpr> operator*(const Eigen::MatrixXd &mat, const std::vector<GRBVar> &vars)
 {
 	vector<GRBLinExpr> model_cons(mat.rows());
 	doublevec vec(mat.cols());
 
-	auto &con = model_cons.begin();
+	auto con = model_cons.begin();
 	for (unsigned i = 0; i < mat.rows(); i++)
 	{
-		GRBLinExpr &temp_exp = GRBLinExpr(0);
-		auto &vbeg = vec.begin();
+		GRBLinExpr temp_exp(0);
+		auto vbeg = vec.begin();
 		for (unsigned j = 0; j < mat.cols(); j++)
 		{
 			*vbeg++ = mat(i, j);

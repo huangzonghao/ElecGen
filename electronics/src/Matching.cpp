@@ -33,7 +33,7 @@ unordered_multimap<std::string, std::string> connection_map{
 	{Component_Type::Battery, Component_Type::Micro_Controller},
 	{Component_Type::Battery, Component_Type::Voltage_Regulator},
 	{Component_Type::Voltage_Regulator, Component_Type::Servo},
-	{Component_Type::Micro_Controller, Component_Type::Servo}, 
+	{Component_Type::Micro_Controller, Component_Type::Servo},
 	{Component_Type::Voltage_Regulator, Component_Type::Force_Sensor},
 	{Component_Type::Battery, Component_Type::Force_Sensor},
 };
@@ -90,7 +90,7 @@ unordered_map<stringpair, bitset<7>, hash_pair> connection_mask_map {
 };
 
 unordered_multimap<Electronics::FUNCTION_TYPE, Electronics::FUNCTION_TYPE>
-compatible_type_map{ 
+compatible_type_map{
 	{Electronics::DIGITAL, Electronics::ELECTRICAL },
 	{Electronics::PWM, Electronics::ELECTRICAL},
 	{Electronics::PWM, Electronics::DIGITAL},
@@ -106,7 +106,7 @@ compatible_type_map{
 	{Electronics::DIGITAL_UART_TX, Electronics::ELECTRICAL},
 	{Electronics::DIGITAL_UART_RX, Electronics::DIGITAL},
 	{Electronics::DIGITAL_UART_TX, Electronics::DIGITAL},
-	{Electronics::DIGITAL_EXTERNAL_INTERRUPT, Electronics::ELECTRICAL}, 
+	{Electronics::DIGITAL_EXTERNAL_INTERRUPT, Electronics::ELECTRICAL},
 	{Electronics::DIGITAL_EXTERNAL_INTERRUPT, Electronics::DIGITAL},
 	{Electronics::PWM_SPI_MOSI, Electronics::ELECTRICAL},
 	{Electronics::PWM_SPI_MISO, Electronics::ELECTRICAL},
@@ -175,7 +175,7 @@ compatible_type_map{
 	{Electronics::PWM_SPI_SS , Electronics::SPI_SS},
 };
 
-vector<bitset<7>> connect_code_vec{ 0b1001000, 0b1000001, 0b0100100, 
+vector<bitset<7>> connect_code_vec{ 0b1001000, 0b1000001, 0b0100100,
 0b0100010, 0b0100001, 0b0010100, 0b0010010 };
 
 /*
@@ -294,17 +294,17 @@ Component_Connection::componentpinslist Component_Connection::getComponentPins()
 }
 */
 
-Pin_Connections groupMatch(vector<Component_Pair> &component_pairs)
+Pin_Connections groupMatch(const vector<Component_Pair> &component_pairs)
 {
 	Pin_Connections connection_list;
 	boolvec pair_usage_vec(component_pairs.size(), true);
-	// get list of unique components and their occurance number, 
+	// get list of unique components and their occurance number,
 	// start with actuator/sensor
-	vector<shared_ptr<Electrical_Component>> components(component_pairs.size() * 2), 
+	vector<shared_ptr<Electrical_Component>> components(component_pairs.size() * 2),
 		uniq_components;
 	for (size_t i = 0; i < component_pairs.size(); i++)
 	{
-		components[2 * i] = component_pairs[i].first; 
+		components[2 * i] = component_pairs[i].first;
 		components[2 * i + 1] = component_pairs[i].second;
 	}
 	uniq_components = unique_vec(components);
@@ -312,7 +312,7 @@ Pin_Connections groupMatch(vector<Component_Pair> &component_pairs)
 	unsignedvec component_count(uniq_components.size());
 	for (size_t i = 0; i < uniq_components.size(); i++)
 	{
-		component_count[i] = std::count(components.begin(), components.end(), 
+		component_count[i] = std::count(components.begin(), components.end(),
 			uniq_components[i]);
 	}
 
@@ -339,7 +339,7 @@ Pin_Connections groupMatch(vector<Component_Pair> &component_pairs)
 
 		if (least_component == nullptr)
 		{
-			size_t min_index = std::min_element(component_count.begin(), 
+			size_t min_index = std::min_element(component_count.begin(),
 				component_count.end()) - component_count.begin();
 			least_component = uniq_components[min_index];
 		}
@@ -347,18 +347,18 @@ Pin_Connections groupMatch(vector<Component_Pair> &component_pairs)
 		for (size_t i = 0; i < component_pairs.size(); i++)
 		{
 			if (pair_usage_vec[i] &&
-				(component_pairs[i].first == least_component || 
+				(component_pairs[i].first == least_component ||
 				component_pairs[i].second == least_component))
 			{
-				Pin_Connections pair_connection_list = 
+				Pin_Connections pair_connection_list =
 					individualMatch(component_pairs[i]);
-				connection_list.insert(pair_connection_list.begin(), 
+				connection_list.insert(pair_connection_list.begin(),
 					pair_connection_list.end());
 				size_t left_index = std::find(uniq_components.begin(),
-					uniq_components.end(), component_pairs[i].first) 
+					uniq_components.end(), component_pairs[i].first)
 					- uniq_components.begin();
 				size_t right_index = std::find(uniq_components.begin(),
-					uniq_components.end(), component_pairs[i].second) 
+					uniq_components.end(), component_pairs[i].second)
 					- uniq_components.begin();
 				pair_usage_vec[i] = false;
 				component_count[left_index]--;
@@ -375,14 +375,14 @@ Pin_Connections groupMatch(vector<Component_Pair> &component_pairs)
 			}
 		}
 	}
-	
+
 	return connection_list;
 }
 
-Pin_Connections individualMatch(Component_Pair &component_pair)
+Pin_Connections individualMatch(const Component_Pair &component_pair)
 {
 	// left output, right input
-	shared_ptr<Electrical_Component> left_component = component_pair.first, 
+	shared_ptr<Electrical_Component> left_component = component_pair.first,
 		right_component = component_pair.second;
 
 	vector<Pin*> left_power_out_pins = left_component->getPowerOutPins(),
@@ -394,24 +394,24 @@ Pin_Connections individualMatch(Component_Pair &component_pair)
 		right_both_bidirect_pins = right_component->getBothBidirectPins();
 
 	std::bitset<7> pin_connect_code;
-	left_power_out_pins.empty() ? pin_connect_code[6] = 0 : 
+	left_power_out_pins.empty() ? pin_connect_code[6] = 0 :
 		pin_connect_code[6] = 1;
-	left_func_out_pins.empty() ? pin_connect_code[5] = 0 : 
+	left_func_out_pins.empty() ? pin_connect_code[5] = 0 :
 		pin_connect_code[5] = 1;
-	left_func_bidirect_pins.empty() ? pin_connect_code[4] : 
+	left_func_bidirect_pins.empty() ? pin_connect_code[4] :
 		pin_connect_code[4] = 1;
-	right_power_in_pins.empty() ? pin_connect_code[3] = 0 : 
+	right_power_in_pins.empty() ? pin_connect_code[3] = 0 :
 		pin_connect_code[3] = 1;
-	right_func_in_pins.empty() ? pin_connect_code[2] = 0 : 
+	right_func_in_pins.empty() ? pin_connect_code[2] = 0 :
 		pin_connect_code[2] = 1;
-	right_func_bidirect_pins.empty() ? pin_connect_code[1] = 0 : 
+	right_func_bidirect_pins.empty() ? pin_connect_code[1] = 0 :
 		pin_connect_code[1] = 1;
 	right_both_bidirect_pins.empty() ? pin_connect_code[0] = 0 :
 		pin_connect_code[0] = 1;
 
 	// force mask
 	bitset<7> mask = connection_mask_map[make_pair(
-		component_pair.first->getComponentType(), 
+		component_pair.first->getComponentType(),
 		component_pair.second->getComponentType())];
 	pin_connect_code &= mask;
 
@@ -423,21 +423,21 @@ Pin_Connections individualMatch(Component_Pair &component_pair)
 			compatible_codes.push_back(connect_code_vec[i]);
 		}
 	}
-	
+
 	unordered_map<int, pair<vector<Pin*>, vector<Pin*>>> connection_map;
-	connection_map[LPO_RPI] = make_pair(left_power_out_pins, 
+	connection_map[LPO_RPI] = make_pair(left_power_out_pins,
 		right_power_in_pins);
 	connection_map[LPO_RBB] = make_pair(left_power_out_pins,
 		right_both_bidirect_pins);
-	connection_map[LFO_RFI] = make_pair(left_func_out_pins, 
+	connection_map[LFO_RFI] = make_pair(left_func_out_pins,
 		right_func_in_pins);
-	connection_map[LFO_RFB] = make_pair(left_func_out_pins, 
+	connection_map[LFO_RFB] = make_pair(left_func_out_pins,
 		right_func_bidirect_pins);
 	connection_map[LFO_RBB] = make_pair(left_func_out_pins,
 		right_both_bidirect_pins);
-	connection_map[LFB_RFI] = make_pair(left_func_bidirect_pins, 
+	connection_map[LFB_RFI] = make_pair(left_func_bidirect_pins,
 		right_func_in_pins);
-	connection_map[LFB_RFB] = make_pair(left_func_bidirect_pins, 
+	connection_map[LFB_RFB] = make_pair(left_func_bidirect_pins,
 		right_func_bidirect_pins);
 
 	Pin_Connections pin_list;
@@ -445,22 +445,22 @@ Pin_Connections individualMatch(Component_Pair &component_pair)
 	{
 		Pin_Connections pin_connections = powerPinMatch(
 			connection_map[compatible_codes[i].to_ulong()].first,
-			connection_map[compatible_codes[i].to_ulong()].second, 
+			connection_map[compatible_codes[i].to_ulong()].second,
 			component_pair);
 		pin_list.insert(pin_connections.begin(), pin_connections.end());
 	}
 	return removeEmptyConnections(pin_list);
 }
 
-Pin_Connections powerPinMatch(vector<Pin*> &left_pins, vector<Pin*> &right_pins, 
-	Component_Pair &component_pair)
+Pin_Connections powerPinMatch(vector<Pin*> &left_pins, vector<Pin*> &right_pins,
+	const Component_Pair &component_pair)
 {
 	Pin_Connections pow_pin_list;
 	for (size_t i = 0; i < left_pins.size(); i++)
 	{
 		for (size_t j = 0; j < right_pins.size(); j++)
 		{
-			stringpair pow_connection = grammer(left_pins[i], right_pins[j], 
+			stringpair pow_connection = grammer(left_pins[i], right_pins[j],
 				component_pair);
 			pow_pin_list.insert(pow_connection);
 			if (pow_connection.first != "")
@@ -472,19 +472,19 @@ Pin_Connections powerPinMatch(vector<Pin*> &left_pins, vector<Pin*> &right_pins,
 	return pow_pin_list;
 }
 
-stringpair grammer(Pin *left_pin, Pin *right_pin, 
-	Component_Pair &component_pair)
-{			
+stringpair grammer(Pin *left_pin, Pin *right_pin,
+	const Component_Pair &component_pair)
+{
 	// TO DO: terminate early
 //	int ALL_PASS = 0b11111;
 	stringpair power_pin_connection;
 	std::bitset<5> conditions_code;
-	
+
 	// conditions need to satisfy
 	// both pins in active state
-	(!right_pin->status || right_pin->connection == Electronics::CONNECTION::OTM) 
-		&& (!left_pin->status || left_pin->connection == 
-			Electronics::CONNECTION::OTM) ? conditions_code[0] = 1 : 
+	(!right_pin->status || right_pin->connection == Electronics::CONNECTION::OTM)
+		&& (!left_pin->status || left_pin->connection ==
+			Electronics::CONNECTION::OTM) ? conditions_code[0] = 1 :
 		conditions_code[0] = 0;
 
 	// both pins in same physical shape
@@ -526,9 +526,9 @@ stringpair grammer(Pin *left_pin, Pin *right_pin,
 		}
 
 		power_pin_connection = make_pair(
-			createConnectionName(component_pair.first->getComponentName(), 
+			createConnectionName(component_pair.first->getComponentName(),
 				left_pin->name),
-			createConnectionName(component_pair.second->getComponentName(), 
+			createConnectionName(component_pair.second->getComponentName(),
 				right_pin->name));
 		left_pin->status = true;
 		right_pin->status = true;
@@ -544,7 +544,7 @@ Pin_Connections removeEmptyConnections(Pin_Connections &pin_connections)
 }
 
 pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
-	Electronics::FUNCTION_TYPE &right_type, Component_Pair &component_pair)
+	Electronics::FUNCTION_TYPE &right_type, const Component_Pair &component_pair)
 {
 	Pin *matched_pin = nullptr;
 	unsigned result = false;
@@ -552,13 +552,13 @@ pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 	{
 		result = true;
 	}
-	else if (component_pair.first->getComponentType() == 
+	else if (component_pair.first->getComponentType() ==
 		Component_Type::Micro_Controller)
 	{
 		vector<Pin*> pins = component_pair.first->getFuncBidirectPins();
 		bool pwm_empty = true, digital_empty = true;
-		// if pwm/digital run out, use other pins 
-		if (left_type == Electronics::PWM && 
+		// if pwm/digital run out, use other pins
+		if (left_type == Electronics::PWM &&
 			compatible_type_map.find(left_type)->second == right_type)
 		{
 			result = true;
@@ -609,8 +609,8 @@ pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 
 		if (pwm_empty && digital_empty)
 		{
-			auto &range = compatible_type_map.equal_range(left_type);
-			for (auto &beg = range.first; beg != range.second; beg++)
+			const auto &range = compatible_type_map.equal_range(left_type);
+			for (auto beg = range.first; beg != range.second; beg++)
 			{
 				if (beg->second == right_type) {
 					result = true;
@@ -621,8 +621,8 @@ pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 	}
 	else
 	{
-		auto &range = compatible_type_map.equal_range(left_type);
-		for (auto &beg = range.first;  beg != range.second; beg++)
+		const auto &range = compatible_type_map.equal_range(left_type);
+		for (auto beg = range.first;  beg != range.second; beg++)
 		{
 			if (beg->second == right_type) {
 				result = true;
@@ -633,7 +633,7 @@ pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &left_type,
 	return make_pair(result, matched_pin);
 }
 
-stringpair matchDutyCycles(const stringpair &connection, Component_Pair &component_pair)
+stringpair matchDutyCycles(const stringpair &connection, const Component_Pair &component_pair)
 {
 	shared_ptr<Electrical_Component> left_component = component_pair.first,
 		right_component = component_pair.second;
@@ -654,10 +654,10 @@ stringpair matchDutyCycles(const stringpair &connection, Component_Pair &compone
 		stringpair left_pair = separateNames(connection.first),
 			right_pair = separateNames(connection.second);
 
-		auto &hbridge_iter = in_duty_cycle_map.find(right_pair.second);
-		auto &micro_controller_iter = out_duty_cycle_map.find(left_pair.second);
+		const auto &hbridge_iter = in_duty_cycle_map.find(right_pair.second);
+		const auto &micro_controller_iter = out_duty_cycle_map.find(left_pair.second);
 
-		if (hbridge_iter == in_duty_cycle_map.end() || 
+		if (hbridge_iter == in_duty_cycle_map.end() ||
 			micro_controller_iter == out_duty_cycle_map.end())
 		{
 			return stringpair();
@@ -678,7 +678,7 @@ stringpair matchDutyCycles(const stringpair &connection, Component_Pair &compone
 
 void printPinConnections(Pin_Connections &pin_connections)
 {
-	for (auto &beg = pin_connections.begin(); beg != pin_connections.end();
+	for (auto beg = pin_connections.begin(); beg != pin_connections.end();
 		beg++)
 	{
 		cout << beg->first << " " << beg->second << endl;

@@ -27,8 +27,8 @@ inline std::vector<std::vector<T>> vectorCombinations(const std::vector<std::vec
 {
 	unsigned vec_size = 1;
 	intvec index_vec(_vector.size());
-	auto &ibeg = index_vec.begin();
-	for (auto &vvbeg = _vector.begin(); vvbeg != _vector.end(); vvbeg++, ibeg++)
+	auto ibeg = index_vec.begin();
+	for (auto vvbeg = _vector.begin(); vvbeg != _vector.end(); vvbeg++, ibeg++)
 	{
 		*ibeg = static_cast<int>(vvbeg->size() - 1);
 		vec_size *= static_cast<unsigned>(vvbeg->size());
@@ -36,22 +36,22 @@ inline std::vector<std::vector<T>> vectorCombinations(const std::vector<std::vec
 	std::vector<std::vector<T>> vector(vec_size);
 
 	discreture::multisets X(index_vec);
-	auto &vbeg = vector.begin();
+	auto vbeg = vector.begin();
 	for (auto &&x : X)
 	{
-		auto &vvbeg = _vector.begin();
-		for (auto &xbeg = x.begin(); xbeg != x.end(); xbeg++, vvbeg++)
+		auto vvbeg = _vector.begin();
+		for (auto xbeg = x.begin(); xbeg != x.end(); xbeg++, vvbeg++)
 		{
 			vbeg->push_back((*vvbeg)[*xbeg]);
 		}
 		vbeg++;
 	}
-	
+
 	return vector;
 }
 
 template<class T>
-inline std::vector<T> getSubVector(const std::vector<T> &vec, 
+inline std::vector<T> getSubVector(const std::vector<T> &vec,
 	const size_t &start, const size_t &end)
 {
 	return std::vector<T>(vec.begin() + start, vec.begin() + end);
@@ -60,7 +60,7 @@ inline std::vector<T> getSubVector(const std::vector<T> &vec,
 template<class T>
 inline size_t getPosInVec(const T &element, const std::vector<T> &vec)
 {
-	auto &iter = std::find(vec.begin(), vec.end(), element);
+	const auto &iter = std::find(vec.begin(), vec.end(), element);
 	if (iter != vec.end())
 	{
 		return iter - vec.begin();
@@ -80,10 +80,9 @@ doublevec sample(const double &, const double &, const unsigned & = unsigned(100
 std::string removeComponentPrePostfix(std::string);
 std::string removeComponentPostfix(std::string);
 
-
 double roundByPrecision(const double &, const double & = 1e-4);
 
-template <class T> 
+template <class T>
 size_t getPosInVec(const T &, const std::vector<T> &);
 unsigned getFileNumInDirectory(const std::string &);
 doublepairs generateIntersections(const unsignedvec2d &, const doublepairs &);

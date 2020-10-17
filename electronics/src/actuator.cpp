@@ -1,5 +1,10 @@
 ﻿#include "stdafx.h"
 #include "actuator.h"
+#ifdef WIN32
+#include <io.h>
+#define open(a,b) _open(a,b)
+#define close(param) _close(param)
+#endif
 
 using std::vector;
 using std::string;
@@ -41,13 +46,13 @@ BLUETOOTH_PART_MAP, SERVO_PART_MAP, POWER_SUPPLY_PART_MAP;
 Electrical_Component::Electrical_Component(const string &file)
 {
 	std::bitset<10> component_code;
-	isDCMotor(file) ? MOTOR_MAP.empty() ? 
+	isDCMotor(file) ? MOTOR_MAP.empty() ?
 		component_code[0] = 0 : component_code[0] = 1 : component_code[0] = 0;
-	isHbridge(file) ? H_BRIDGE_MAP.empty() ? 
+	isHbridge(file) ? H_BRIDGE_MAP.empty() ?
 		component_code[1] = 0 : component_code[1] = 1 : component_code[1] = 0;
 	isMicroController(file) ? MICRO_CONTROLLER_MAP.empty() ?
 		component_code[2] = 0 : component_code[2] = 1 : component_code[2] = 0;
-	isVoltageRegulator(file) ? VOLTAGE_REGULATOR_MAP.empty()? 
+	isVoltageRegulator(file) ? VOLTAGE_REGULATOR_MAP.empty()?
 		component_code[3] = 0 : component_code[3] = 1 : component_code[3] = 0;
 	isBattery(file) ? BATTERY_MAP.empty() ?
 		component_code[4] = 0 : component_code[4] = 1 : component_code[4] = 0;
@@ -135,7 +140,7 @@ Micro_Controller::Micro_Controller(const std::string &file) : Electrical_Compone
 void Micro_Controller::parameters() const
 {
 	cout << component_name << " PARAMETERS: " << endl;
-	cout << "LOGIC LEVEL [" << logic_level.first << ", "  << 
+	cout << "LOGIC LEVEL [" << logic_level.first << ", "  <<
 		logic_level.second << "]" << endl;
 	cout << endl;
 
@@ -150,7 +155,7 @@ void Micro_Controller::parameters() const
 
 doublevec Micro_Controller::getFuncInCurrentLimit()
 {
-	size_t digital_pos = pow_in_pins.size() + pow_out_pins.size() + 
+	size_t digital_pos = pow_in_pins.size() + pow_out_pins.size() +
 		gnd_pins.size();
 	return doublevec{ i_bound_mat(digital_pos, 1) };
 }
@@ -192,15 +197,15 @@ double Micro_Controller::getPowerOutCurrentLimit()
 
 doublepairs Micro_Controller::getPowerInVolRange()
 {
-	return doublepairs{ make_pair(pins[0].v_bound.first, 
+	return doublepairs{ make_pair(pins[0].v_bound.first,
 		pins[0].v_bound.second) };
 }
 
 doublepair Micro_Controller::getFuncOutVolRange()
 {
-	size_t digtal_pos = pow_in_pins.size() + pow_out_pins.size() + 
+	size_t digtal_pos = pow_in_pins.size() + pow_out_pins.size() +
 		gnd_pins.size();
-	return make_pair(pins[digtal_pos].v_bound.first, 
+	return make_pair(pins[digtal_pos].v_bound.first,
 		pins[digtal_pos].v_bound.second);
 }
 
@@ -246,7 +251,7 @@ doublepair Micro_Controller::getPowerOutVolRange()
 	else
 	{
 		size_t pow_out_size = pow_in_pins.size();
-		return make_pair(pins[pow_out_size].v_bound.first, 
+		return make_pair(pins[pow_out_size].v_bound.first,
 			pins[pow_out_size].v_bound.second);
 	}
 }
@@ -269,7 +274,7 @@ void Micro_Controller::getUsedVarsName(const stringvec &pin_names)
 	size_t used_vars_size = used_var_names.size();
 	for (size_t i = 0; i < used_vars_size; i++)
 	{
-		auto &iter = out_duty_cycle_map.find(used_var_names[i]);
+		const auto &iter = out_duty_cycle_map.find(used_var_names[i]);
 		if (iter != out_duty_cycle_map.end())
 		{
 			if (getPosInVec(iter->second, used_var_names) == -1)
@@ -354,7 +359,7 @@ void Micro_Controller::extractInfo(Electronics::Component *micro_controller)
 		}
 		else
 		{
-			// not used 
+			// not used
 			model_relations[i] = GRB_GREATER_EQUAL;
 			model_names[i] = "OTHER CONS" + to_string(i - range3);
 		}
@@ -376,14 +381,14 @@ void Micro_Controller::constructDutyCycleMap()
 
 void Micro_Controller::getPinNumberInfo()
 {
-	for (auto &beg = pins.begin(); beg != pins.end(); beg++)
+	for (auto beg = pins.begin(); beg != pins.end(); beg++)
 	{
 		if (beg->pin_class == Electronics::POWER)
 		{
 			switch (beg->func_type)
 			{
-			case Electronics::ELECTRICAL: 
-				if (beg->io == Electronics::IN) 
+			case Electronics::ELECTRICAL:
+				if (beg->io == Electronics::IN)
 				{
 					pow_in_pins.push_back(*beg);
 				}
@@ -423,7 +428,7 @@ void Micro_Controller::getPinNumberInfo()
 			case Electronics::DIGITAL_UART_RX: digital_pins.push_back(*beg);
 				uart_pins.push_back(*beg);
 				break;
-			case Electronics::DIGITAL_EXTERNAL_INTERRUPT: 
+			case Electronics::DIGITAL_EXTERNAL_INTERRUPT:
 				digital_pins.push_back(*beg);
 				external_interrupt_pins.push_back(*beg);
 				break;
@@ -493,7 +498,7 @@ void Micro_Controller::getPinNumberInfo()
 				digital_pins.push_back(*beg);
 				pwm_only_pins.push_back(*beg);
 				break;
-			case Electronics::PWM_EXTERNAL_INTERRUPT: 
+			case Electronics::PWM_EXTERNAL_INTERRUPT:
 				pwm_pins.push_back(*beg);
 				digital_pins.push_back(*beg);
 				external_interrupt_pins.push_back(*beg);
@@ -593,7 +598,7 @@ void Battery::extractInfo(Electronics::Component *battery)
 
 	// boundary condition matrix
 	var_bound_mat = MatrixXd::Zero(vars.size(), v_bound_mat.cols());
-	var_bound_mat.block(0, 0, v_bound_mat.rows(), v_bound_mat.cols()) = 
+	var_bound_mat.block(0, 0, v_bound_mat.rows(), v_bound_mat.cols()) =
 		v_bound_mat;
 	var_bound_mat.row(const_col) << 1, 1;
 
@@ -716,12 +721,12 @@ doublevec Camera::getPowerInCurrentLimit()
 doublepairs Camera::getFuncInVolRange()
 {
 	size_t uart_pos = pow_in_pins.size() + gnd_pins.size();
-	return doublepairs{make_pair(pins[uart_pos].v_bound.first, 
+	return doublepairs{make_pair(pins[uart_pos].v_bound.first,
 		pins[uart_pos].v_bound.second)};
 }
 doublepairs Camera::getPowerInVolRange()
 {
-	return doublepairs{make_pair(pins[0].v_bound.first, 
+	return doublepairs{make_pair(pins[0].v_bound.first,
 		pins[0].v_bound.second)};
 }
 
@@ -743,7 +748,7 @@ Electronics::Component* Electrical_Component::read(const std::string &file)
 {
 	Electronics::Component *base_component = new Electronics::Component;
 
-	int fd = _open(file.c_str(), O_RDONLY);
+	int fd = open(file.c_str(), O_RDONLY);
 	if (fd == -1)
 	{
 		throw file + FILE_DOES_NOT_EXSIT;
@@ -756,7 +761,7 @@ Electronics::Component* Electrical_Component::read(const std::string &file)
 			throw CAN_NOT_PARSE_FILE + file;
 		}
 		delete input;
-		_close(fd);
+		close(fd);
 	}
 
 	return base_component;
@@ -894,7 +899,7 @@ void initializeAllServos(const std::string &dir)
 		SERVO_PART_MAP[component] = make_shared<Motor>(component);
 		SERVO_FILES.push_back(component);
 	}
-	SERVO_MAP = servo_map; 
+	SERVO_MAP = servo_map;
 }
 
 void initializeAllVoltageRegulators(const string &dir)
@@ -908,7 +913,7 @@ void initializeAllVoltageRegulators(const string &dir)
 		POWER_SUPPLY_PART_MAP[component] = make_shared<Voltage_Regulator>(component);
 		VOLTAGE_REGULATOR_FILES.push_back(component);
 	}
-	VOLTAGE_REGULATOR_MAP = voltage_regulator_map; 
+	VOLTAGE_REGULATOR_MAP = voltage_regulator_map;
 }
 
 void initializeAllHBridges(const string &dir)
@@ -1114,7 +1119,7 @@ void Motor::extractInfo(const Electronics::Component *motor)
 	r = ext.r();
 	torq_ub = ext.torq();
 	vel_ub = ext.vel();
-	
+
 	// config info
 	size_t extra_var_size = 4;
 	stringvec extra_var_names = { "I", "TORQ", "VEL", "CONST_MOTOR" };
@@ -1148,7 +1153,7 @@ void Motor::extractInfo(const Electronics::Component *motor)
 	var_bound_mat.row(torq_col) << torq_des, torq_des;
 	var_bound_mat.row(vel_col) << vel_des, vel_des;
 	var_bound_mat.row(const_col) << 1, 1;
-	
+
 	// coefficient matrix
 	model_mat = MatrixXd::Zero(model_row_size, vars.size());
 	model_mat(vol_row, lead1_col) = 1;
@@ -1189,7 +1194,7 @@ void Motor::extractInfo(const Electronics::Component *motor)
 Motor::Motor(const string &file, double _torq_des, double _vel_des) : Electrical_Component(file),
 torq_des(_torq_des), vel_des(_vel_des)
 {
-	if (isDCMotor(file) && !MOTOR_MAP.empty()) 
+	if (isDCMotor(file) && !MOTOR_MAP.empty())
 	{
 		*this = MOTOR_MAP[file];
 	}
@@ -1230,7 +1235,7 @@ doublepairs H_Bridge::getPowerInVolRange()
 {
 	doublepair log_vol_range = make_pair(pins[0].v_bound.first,
 		pins[0].v_bound.second),
-		mot_vol_range = make_pair(pins[log_pin_num].v_bound.first, 
+		mot_vol_range = make_pair(pins[log_pin_num].v_bound.first,
 			pins[log_pin_num].v_bound.second);
 
 	if (isIntersect(log_vol_range, mot_vol_range))
@@ -1308,14 +1313,14 @@ void H_Bridge::getUsedVarsName(const stringvec &pin_names)
 	size_t used_vars_size = used_var_names.size();
 	for (size_t i = 0; i < used_vars_size; i++)
 	{
-		auto &iter = in_duty_cycle_map.find(used_var_names[i]);
+		const auto &iter = in_duty_cycle_map.find(used_var_names[i]);
 		if (iter != in_duty_cycle_map.end())
 		{
 			if (getPosInVec(iter->second, used_var_names) == -1)
 			{
 				used_var_names.push_back(iter->second);
 			}
-		} 
+		}
 	}
 }
 
@@ -1358,14 +1363,14 @@ void H_Bridge::extractInfor(const Electronics::Component *h_bridge)
 	logic_level.second = ext.logic_level().ub();
 
 	unsignedvec pin_nums = getPinNumberInfo(pins);
-	log_pin_num = pin_nums[0], mot_pin_num = pin_nums[1], 
+	log_pin_num = pin_nums[0], mot_pin_num = pin_nums[1],
 		ena_pin_num = pin_nums[2], in_pin_num = pin_nums[3],
-		out_pin_num = pin_nums[4], gnd_pin_num = pin_nums[5],	
+		out_pin_num = pin_nums[4], gnd_pin_num = pin_nums[5],
 		other_pin_num = pin_nums[6],
 		total_pin_num = std::accumulate(pin_nums.begin(), pin_nums.end(), 0);
 
 	// config part
-	unsigned extra_var_size = in_pin_num + 1, 
+	unsigned extra_var_size = in_pin_num + 1,
 		duty_cycle_col = static_cast<unsigned> (vars.size());
 	var_bound_mat = MatrixXd::Zero(vars.size() + extra_var_size, 2);
 	for (size_t i = 0; i < extra_var_size; i++)
@@ -1387,7 +1392,7 @@ void H_Bridge::extractInfor(const Electronics::Component *h_bridge)
 	getNonlinVarNames();
 
 	// formulating boundary matrix
-	var_bound_mat.block(0, 0, v_bound_mat.rows(), v_bound_mat.cols()) = 
+	var_bound_mat.block(0, 0, v_bound_mat.rows(), v_bound_mat.cols()) =
 		v_bound_mat;
 
 	// coefficient matrix
@@ -1432,7 +1437,7 @@ void H_Bridge::extractInfor(const Electronics::Component *h_bridge)
 		}
 		else
 		{
-			// not used 
+			// not used
 			model_relations[i] = GRB_EQUAL;
 			model_names[i] = "OTHER CONS" + to_string(i - range3);
 		}
@@ -1442,30 +1447,30 @@ void H_Bridge::extractInfor(const Electronics::Component *h_bridge)
 
 void H_Bridge::constructDutyCycleMap()
 {
-	unsigned pre_pin_num = log_pin_num + mot_pin_num + ena_pin_num + 
+	unsigned pre_pin_num = log_pin_num + mot_pin_num + ena_pin_num +
 		gnd_pin_num;
 	for (size_t i = 0; i < in_pin_num; i++)
 	{
-		in_duty_cycle_map[var_names[pre_pin_num + i]] = 
+		in_duty_cycle_map[var_names[pre_pin_num + i]] =
 			var_names[total_pin_num + i];
 	}
 
 	pre_pin_num += in_pin_num;
 	for (size_t i = 0; i < out_pin_num; i++)
 	{
-		out_duty_cycle_map[var_names[pre_pin_num + i]] = 
+		out_duty_cycle_map[var_names[pre_pin_num + i]] =
 			var_names[total_pin_num + i];
 	}
 }
 
 unsignedvec H_Bridge::getPinNumberInfo(const vector<Pin> &_pins)
-{	
+{
 	// reorder pins
 	vector<Pin> log_pins, mot_pins, ena_pins, gnd_pins,
 		in_pins, out_pins, other_pins;
-	unsigned log_pin_num = 0, mot_pin_num = 0, ena_pin_num = 0, 
+	unsigned log_pin_num = 0, mot_pin_num = 0, ena_pin_num = 0,
 		in_pin_num = 0, out_pin_num = 0, gnd_pin_num = 0, other_pin_num = 0;
-	for (auto &beg = _pins.begin(); beg != _pins.end(); beg++)
+	for (auto beg = _pins.begin(); beg != _pins.end(); beg++)
 	{
 		if (beg->pin_class == Electronics::POWER)
 		{
@@ -1491,7 +1496,7 @@ unsignedvec H_Bridge::getPinNumberInfo(const vector<Pin> &_pins)
 			case Electronics::ENABLE: ena_pin_num++;
 				ena_pins.push_back(*beg);
 				break;
-			case Electronics::ELECTRICAL: 
+			case Electronics::ELECTRICAL:
 				if (beg->io == Electronics::IN)
 				{
 					in_pin_num++;
@@ -1499,7 +1504,7 @@ unsignedvec H_Bridge::getPinNumberInfo(const vector<Pin> &_pins)
 				}
 				else
 				{
-					out_pin_num++; 
+					out_pin_num++;
 					out_pins.push_back(*beg);
 				}
 				break;
@@ -1526,7 +1531,7 @@ unsignedvec H_Bridge::getPinNumberInfo(const vector<Pin> &_pins)
 		v_bound_mat.row(i) << pins[i].v_bound.first, pins[i].v_bound.second;
 		i_bound_mat.row(i) << pins[i].i_bound.first, pins[i].i_bound.second;
 	}
-	return {log_pin_num, mot_pin_num, ena_pin_num, in_pin_num, out_pin_num, 
+	return {log_pin_num, mot_pin_num, ena_pin_num, in_pin_num, out_pin_num,
 		gnd_pin_num, other_pin_num};
 }
 
@@ -1545,7 +1550,7 @@ stringvec H_Bridge::getNonlinVarNames()
 {
 	for (size_t i = 0; i < out_pin_num; i++)
 	{
-		nonlin_var_names.push_back(var_names[i + log_pin_num + mot_pin_num + 
+		nonlin_var_names.push_back(var_names[i + log_pin_num + mot_pin_num +
 			ena_pin_num + gnd_pin_num + in_pin_num]);
 	}
 	return nonlin_var_names;
@@ -1600,7 +1605,7 @@ bool H_Bridge::thresholdCheck()
 	{
 		indicator_vec.push_back(abs(out_pin_vals[i] - mot_pin_val*duty_cycle_vals[i]) < tol ? true : false);
 	}
-	std::find(indicator_vec.begin(), indicator_vec.end(), false) == indicator_vec.end() ? indicator = true : indicator = false;	
+	std::find(indicator_vec.begin(), indicator_vec.end(), false) == indicator_vec.end() ? indicator = true : indicator = false;
 	return indicator;
 }
 
@@ -1632,7 +1637,7 @@ void H_Bridge::updateCoefficients(GRBModel *model, vector<GRBConstr> &model_cons
 		if (!indicator_vec[i])
 		{
 			string cons_name = model_names[model_index_map[used_nonlin_var_names[2+j]]];
-			GRBConstr &cons = model->getConstrByName(cons_name);
+			const GRBConstr &cons = model->getConstrByName(cons_name);
 			model->chgCoeff(cons, *var_maps[used_nonlin_var_names[0]],
 				-duty_cycle_vals[i]);
 			model->chgCoeff(cons, *var_maps[used_nonlin_var_names[j + 3]],
@@ -1664,7 +1669,7 @@ doublevec H_Bridge::getPowerInCurrentLimit()
 	{
 		return doublevec{ i_bound_mat(0, 1), i_bound_mat(log_pin_num, 1) };
 	}
-	
+
 }
 
 double H_Bridge::getFuncOutCurrentLimit()
@@ -1718,7 +1723,7 @@ doublepair Electrical_Component::getOutVolRange(const Electronics::CLASS
 	}
 }
 
-// doublepair Electrical_Component::getInVolRange(const Electronics::CLASS 
+// doublepair Electrical_Component::getInVolRange(const Electronics::CLASS
 //	&pin_class)
 // {
 //	if (pin_class == Electronics::CLASS::POWER)
@@ -1731,7 +1736,7 @@ doublepair Electrical_Component::getOutVolRange(const Electronics::CLASS
 //	}
 // }
 
-double Electrical_Component::getOutCurrentLimit(const Electronics::CLASS 
+double Electrical_Component::getOutCurrentLimit(const Electronics::CLASS
 	&pin_class)
 {
 	if (pin_class == Electronics::CLASS::POWER)
@@ -1744,7 +1749,7 @@ double Electrical_Component::getOutCurrentLimit(const Electronics::CLASS
 	}
 }
 
-// double Electrical_Component::getInCurrentLimit(const Electronics::CLASS 
+// double Electrical_Component::getInCurrentLimit(const Electronics::CLASS
 //	&pin_class)
 // {
 //	if (pin_class == Electronics::CLASS::POWER)
@@ -1801,7 +1806,7 @@ vector<Pin*> Electrical_Component::getDependentPins(const string &pin_name)
 {
 	for (size_t i = 0; i < pins.size(); i++)
 	{
-		if (pins[i].name == pin_name && 
+		if (pins[i].name == pin_name &&
 			getPosInVec(&pins[i], dependent_pins) == -1)
 		{
 			dependent_pins.push_back(&pins[i]);
@@ -1871,7 +1876,7 @@ doublepairs Force_Sensor::getFuncInVolRange()
 
 doublepairs Force_Sensor::getPowerInVolRange()
 {
-	return doublepairs{ make_pair(pins[0].v_bound.first, 
+	return doublepairs{ make_pair(pins[0].v_bound.first,
 		pins[0].v_bound.second) };
 }
 
@@ -2027,13 +2032,13 @@ void Voltage_Regulator::extractInfo(Electronics::Component *voltage_regulator)
 void Voltage_Regulator::getPinNumberInfo()
 {
 	// reorder pins
-	for (auto &beg = pins.begin(); beg != pins.end(); beg++)
+	for (auto beg = pins.begin(); beg != pins.end(); beg++)
 	{
 		if (beg->pin_class == Electronics::POWER)
 		{
 			switch (beg->func_type)
 			{
-			case Electronics::ELECTRICAL: 
+			case Electronics::ELECTRICAL:
 				if (beg->io == Electronics::IN)
 				{
 					pow_in_pins.push_back(*beg);
@@ -2120,7 +2125,7 @@ void Camera::extractInfo(Electronics::Component *camera)
 	unsigned pow_in_pin_num = pow_in_pins.size(),
 		gnd_pin_num = gnd_pins.size(), uart_pin_num = uart_pins.size(),
 		other_pin_num = other_pins.size(), range1 = pow_in_pin_num,
-		range2 = range1 + gnd_pin_num, range3 = range2 + uart_pin_num, 
+		range2 = range1 + gnd_pin_num, range3 = range2 + uart_pin_num,
 		model_row_size = pins.size();
 
 	for (size_t i = 0; i < extra_var_size; i++)
@@ -2169,7 +2174,7 @@ void Camera::extractInfo(Electronics::Component *camera)
 void Camera::getPinNumberInfo()
 {
 	// reorder pins
-	for (auto &beg = pins.begin(); beg != pins.end(); beg++)
+	for (auto beg = pins.begin(); beg != pins.end(); beg++)
 	{
 		if (beg->pin_class == Electronics::POWER)
 		{
@@ -2265,7 +2270,7 @@ doublepairs Bluetooth::getFuncInVolRange()
 
 doublepairs Bluetooth::getPowerInVolRange()
 {
-	return doublepairs{make_pair(pins[0].v_bound.first, 
+	return doublepairs{make_pair(pins[0].v_bound.first,
 		pins[0].v_bound.second)};
 }
 
@@ -2398,7 +2403,7 @@ void Bluetooth::extractInfo(Electronics::Component *bluetooth)
 void Bluetooth::getPinNumberInfo()
 {
 	// reorder pins
-	for (auto &beg = pins.begin(); beg != pins.end(); beg++)
+	for (auto beg = pins.begin(); beg != pins.end(); beg++)
 	{
 		if (beg->pin_class == Electronics::POWER)
 		{
@@ -2430,7 +2435,7 @@ void Bluetooth::getPinNumberInfo()
 				break;
 			case Electronics::DIGITAL: digital_pins.push_back(*beg);
 				break;
-			case Electronics::EXTERNAL_INTERRUPT: 
+			case Electronics::EXTERNAL_INTERRUPT:
 				interrupt_pins.push_back(*beg);
 				break;
 			case Electronics::OTHER: other_pins.push_back(*beg);
@@ -2520,7 +2525,7 @@ void Encoder::extractInfo(Electronics::Component *encoder)
 void Encoder::getPinNumberInfo()
 {
 	// reorder pins
-	for (auto &beg = pins.begin(); beg != pins.end(); beg++)
+	for (auto beg = pins.begin(); beg != pins.end(); beg++)
 	{
 		if (beg->pin_class == Electronics::POWER)
 		{
@@ -2605,13 +2610,13 @@ doublevec Encoder::getPowerInCurrentLimit()
 doublepairs Encoder::getFuncInVolRange()
 {
 	size_t sig_pos = pow_in_pins.size() + gnd_pins.size();
-	return doublepairs{make_pair(pins[sig_pos].v_bound.first, 
+	return doublepairs{make_pair(pins[sig_pos].v_bound.first,
 		pins[sig_pos].v_bound.second)};
 }
 
 doublepairs Encoder::getPowerInVolRange()
 {
-	return doublepairs{make_pair(pins[0].v_bound.first, 
+	return doublepairs{make_pair(pins[0].v_bound.first,
 		pins[0].v_bound.second)};
 }
 

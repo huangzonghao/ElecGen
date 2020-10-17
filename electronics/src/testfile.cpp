@@ -119,9 +119,9 @@ void motor_hbridge_solve()
 	Pin_Connections pin_connection_list = groupMatch(
 		vector<Component_Pair>{component_pair});
 	printPinConnections(pin_connection_list);
-	
+
 	stringvec2d pins_vec(2);
-	for (auto &beg = pin_connection_list.begin(); beg != 
+	for (auto beg = pin_connection_list.begin(); beg !=
 		pin_connection_list.end(); beg++)
 	{
 		pins_vec[0].push_back(separateNames(beg->second).second);
@@ -163,7 +163,7 @@ void motor_hbridge_battery_solve()
 	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
-	for (auto &beg = pin_connection_list.begin(); beg !=
+	for (auto beg = pin_connection_list.begin(); beg !=
 		pin_connection_list.end(); beg++)
 	{
 		pins_vec[0].push_back(separateNames(beg->second).second);
@@ -201,7 +201,7 @@ void motor_hbridge_battery_solve()
 
 	pins_vec[0].clear();
 	pins_vec[1].clear();
-	for (auto &beg = pin_connection_list.begin(); beg !=
+	for (auto beg = pin_connection_list.begin(); beg !=
 		pin_connection_list.end(); beg++)
 	{
 		pins_vec[0].push_back(separateNames(beg->second).second);
@@ -244,7 +244,7 @@ void motor_hbridge_battery_micro_controller_solve()
 	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
-	for (auto &beg = pin_connection_list.begin(); beg !=
+	for (auto beg = pin_connection_list.begin(); beg !=
 		pin_connection_list.end(); beg++)
 	{
 		pins_vec[0].push_back(separateNames(beg->second).second);
@@ -269,7 +269,7 @@ void motor_hbridge_battery_micro_controller_solve()
 	// "85AAAHCB.txt"
 	// "D1604-1F.txt"
 
-	shared_ptr<Micro_Controller> micro_controller = 
+	shared_ptr<Micro_Controller> micro_controller =
 		make_shared<Micro_Controller>(micro_controller_path + "Arduino_Mega.txt");
 	components.push_back(micro_controller);
 	// "Arduino_Mini.txt"
@@ -296,7 +296,7 @@ void motor_hbridge_battery_micro_controller_solve()
 	pins_vec.clear();
 	pins_vec.resize(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -398,7 +398,7 @@ void motor_hbridge_battery_connect()
 	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
-	for (auto &beg = pin_connection_list.begin(); beg !=
+	for (auto beg = pin_connection_list.begin(); beg !=
 		pin_connection_list.end(); beg++)
 	{
 		pins_vec[0].push_back(separateNames(beg->second).second);
@@ -475,7 +475,7 @@ void motor_hbridge_battery_micro_controller_connect()
 
 	stringvec2d pins_vec(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -514,7 +514,7 @@ void motor_hbridge_battery_micro_controller_connect()
 	// "85AAAHCB.txt"
 	// "D1604-1F.txt"
 
-	shared_ptr<Micro_Controller> micro_controller = 
+	shared_ptr<Micro_Controller> micro_controller =
 		make_shared<Micro_Controller>(micro_controller_path + "Arduino_Mini.txt");
 	components.push_back(micro_controller);
 	// "Arduino_Mini.txt"
@@ -553,7 +553,7 @@ void motor_hbridge_battery_micro_controller_connect()
 	pins_vec.clear();
 	pins_vec.resize(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -620,7 +620,7 @@ void motor_hbridge_voltage_regulator_micro_controller_connect()
 	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
-	for (auto &beg = pin_connection_list.begin(); beg !=
+	for (auto beg = pin_connection_list.begin(); beg !=
 		pin_connection_list.end(); beg++)
 	{
 		pins_vec[0].push_back(separateNames(beg->second).second);
@@ -636,14 +636,14 @@ void motor_hbridge_voltage_regulator_micro_controller_connect()
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
-	shared_ptr<Voltage_Regulator> voltage_regulator = 
+	shared_ptr<Voltage_Regulator> voltage_regulator =
 		make_shared<Voltage_Regulator>(voltage_regulator_path + "DC-DC_Convertor.txt");
 	components.push_back(voltage_regulator);
 	// "DC-DC_Convertor.txt"
 	// "L4931-33.txt"
 
 
-	shared_ptr<Micro_Controller> micro_controller = 
+	shared_ptr<Micro_Controller> micro_controller =
 		make_shared<Micro_Controller>(micro_controller_path + "Arduino_Mega.txt");
 	components.push_back(micro_controller);
 	// "Arduino_Mini.txt"
@@ -670,7 +670,7 @@ void motor_hbridge_voltage_regulator_micro_controller_connect()
 	pins_vec.clear();
 	pins_vec.resize(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -741,7 +741,7 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 	printPinConnections(pin_connection_list);
 
 	stringvec2d pins_vec(2);
-	for (auto &beg = pin_connection_list.begin(); beg !=
+	for (auto beg = pin_connection_list.begin(); beg !=
 		pin_connection_list.end(); beg++)
 	{
 		pins_vec[0].push_back(separateNames(beg->second).second);
@@ -757,14 +757,14 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 	test_circuit.updateVerify(&model);
 	test_circuit.maxSolve(&model);
 
-	shared_ptr<Voltage_Regulator> voltage_regulator = 
+	shared_ptr<Voltage_Regulator> voltage_regulator =
 		make_shared<Voltage_Regulator>(voltage_regulator_path + "DC-DC_Convertor.txt");
 	components.push_back(voltage_regulator);
 	// "DC-DC_Convertor.txt"
 	// "L4931-33.txt"
 
 
-	shared_ptr<Micro_Controller> micro_controller = 
+	shared_ptr<Micro_Controller> micro_controller =
 		make_shared<Micro_Controller>(micro_controller_path + "Arduino_Mega.txt");
 	components.push_back(micro_controller);
 	// "Arduino_Mini.txt"
@@ -791,7 +791,7 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 	pins_vec.clear();
 	pins_vec.resize(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -857,7 +857,7 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 	pins_vec.clear();
 	pins_vec.resize(1);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -891,7 +891,7 @@ void motor_hbridge_voltage_regulator_micro_controller_battery_connect()
 
 void force_sensor_battery_micro_controller_connect()
 {
-	shared_ptr<Force_Sensor> force_sensor = 
+	shared_ptr<Force_Sensor> force_sensor =
 		make_shared<Force_Sensor>(forcesensor_path + "Pololu_1645.txt");
 
 	GRBEnv env = GRBEnv();
@@ -912,7 +912,7 @@ void force_sensor_battery_micro_controller_connect()
 	// "85AAAHCB.txt"
 	// "D1604-1F.txt"
 
-	shared_ptr<Micro_Controller> micro_controller = 
+	shared_ptr<Micro_Controller> micro_controller =
 		make_shared<Micro_Controller>(micro_controller_path + "Arduino_Mini.txt");
 	components.push_back(micro_controller);
 	// "Arduino_Mini.txt"
@@ -938,7 +938,7 @@ void force_sensor_battery_micro_controller_connect()
 
 	stringvec2d pins_vec(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -994,9 +994,9 @@ void servo_micro_controller_voltage_regulator_battery_connect()
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
-	shared_ptr<Voltage_Regulator> voltage_regulator = 
+	shared_ptr<Voltage_Regulator> voltage_regulator =
 		make_shared<Voltage_Regulator>(voltage_regulator_path + "DC-DC_Convertor.txt");
-	shared_ptr<Micro_Controller> micro_controller = 
+	shared_ptr<Micro_Controller> micro_controller =
 		make_shared<Micro_Controller>(micro_controller_path + "Arduino_Mini.txt");
 	components.push_back(voltage_regulator);
 	components.push_back(micro_controller);
@@ -1019,7 +1019,7 @@ void servo_micro_controller_voltage_regulator_battery_connect()
 
 	stringvec2d pins_vec(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1082,7 +1082,7 @@ void servo_micro_controller_voltage_regulator_battery_connect()
 	pins_vec.clear();
 	pins_vec.resize(1);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1127,9 +1127,9 @@ void camera_voltage_regulator_micro_controller_battery_connect()
 	test_circuit.verify(&model);
 	test_circuit.maxSolve(&model);
 
-	shared_ptr<Voltage_Regulator> voltage_regulator = 
+	shared_ptr<Voltage_Regulator> voltage_regulator =
 		make_shared<Voltage_Regulator>(voltage_regulator_path + "DC-DC_Convertor.txt");
-	shared_ptr<Micro_Controller> micro_controller = 
+	shared_ptr<Micro_Controller> micro_controller =
 		make_shared<Micro_Controller>(micro_controller_path + "Arduino_Uno.txt");
 	components.push_back(voltage_regulator);
 	components.push_back(micro_controller);
@@ -1152,7 +1152,7 @@ void camera_voltage_regulator_micro_controller_battery_connect()
 
 	stringvec2d pins_vec(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1215,7 +1215,7 @@ void camera_voltage_regulator_micro_controller_battery_connect()
 	pins_vec.clear();
 	pins_vec.resize(1);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1261,7 +1261,7 @@ void bluetooth_battery_micro_controller_connect()
 	test_circuit.maxSolve(&model);
 
 	shared_ptr<Battery> battery = make_shared<Battery>(battery_path + "D1604-1F.txt");
-	shared_ptr<Micro_Controller> micro_controller = 
+	shared_ptr<Micro_Controller> micro_controller =
 		make_shared<Micro_Controller>(micro_controller_path + "Arduino_Mega.txt");
 	components.push_back(battery);
 	components.push_back(micro_controller);
@@ -1269,7 +1269,7 @@ void bluetooth_battery_micro_controller_connect()
 	// CONNECT TEST
 	vector<Component_Pair> component_pairs;
 	shared_ptr<Electrical_Component> left_component = components[1],
-		right_component = components[0];	
+		right_component = components[0];
 	Component_Pair component_pair = make_pair(left_component,
 		right_component);
 	component_pairs.push_back(component_pair);
@@ -1284,7 +1284,7 @@ void bluetooth_battery_micro_controller_connect()
 
 	stringvec2d pins_vec(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1363,7 +1363,7 @@ void encoder_battery_micro_controller_connect()
 
 	stringvec2d pins_vec(2);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1427,7 +1427,7 @@ void motor_encoder_hbridge_battery_connect()
 	components.push_back(h_bridge);
 	components.push_back(battery);
 	components.push_back(micro_controller);
-	
+
 
 	// CONNECT TEST
 	vector<Component_Pair> component_pairs;
@@ -1452,7 +1452,7 @@ void motor_encoder_hbridge_battery_connect()
 
 	stringvec2d pins_vec(3);
 	// process connections
-	for (auto &beg = pin_connection_list.begin(); beg != pin_connection_list.end();
+	for (auto beg = pin_connection_list.begin(); beg != pin_connection_list.end();
 		beg++)
 	{
 		stringpair left_pair = separateNames(beg->first),
@@ -1500,22 +1500,22 @@ void motor_encoder_hbridge_battery_connect()
 
 void system_test()
 {
-	// pre-processing 
-	stringvec input_types{ 
-		Component_Type::Motor, Component_Type::Motor, 
+	// pre-processing
+	stringvec input_types{
+		Component_Type::Motor, Component_Type::Motor,
 		Component_Type::Motor, Component_Type::Motor,
 		Component_Type::Motor, Component_Type::Motor,
 		Component_Type::Motor, Component_Type::Motor,
 		Component_Type::Servo, Component_Type::Servo,
 		Component_Type::Servo, Component_Type::Servo,
-		Component_Type::Encoder, Component_Type::Encoder, 
+		Component_Type::Encoder, Component_Type::Encoder,
 		Component_Type::Encoder, Component_Type::Encoder,
 		Component_Type::Encoder, Component_Type::Encoder,
 		Component_Type::Encoder, Component_Type::Encoder,
 		Component_Type::Camera
 	};
 	doublepairs input_torques{
-		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4), 
+		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
 		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
 		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
 		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
@@ -1523,7 +1523,7 @@ void system_test()
 		make_pair<double>(1e-3, 0.14), make_pair<double>(1e-3, 0.14),
 	};
 	doublepairs input_velocities{
-		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0), 
+		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
 		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
 		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
 		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
@@ -1534,14 +1534,14 @@ void system_test()
 	stringvec2d component_versions = preprocess(input_types, input_torques, input_velocities);
 	infernodevec2d infer_nodes_vec = initialize(component_versions, input_torques, input_velocities);
 	bbnodevec bbnodes = initialize(infer_nodes_vec);
-	
+
 	// SINGLE/MULTIPLE MOTOR TEST
 //	shared_ptr<Motor> dc_motor1 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //	shared_ptr<Motor> dc_motor2 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //	shared_ptr<Motor> dc_motor3 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //	shared_ptr<Motor> dc_motor4 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //  HIGH SPEED - LOW TORQUE
-//	dc_motor1->setWorkPoint(1e-3, 6.0);  
+//	dc_motor1->setWorkPoint(1e-3, 6.0);
 //	dc_motor2->setWorkPoint(1e-3, 6.0);
 //	dc_motor3->setWorkPoint(1e-3, 6.0);
 //	dc_motor4->setWorkPoint(1e-3, 6.0);
@@ -1556,7 +1556,7 @@ void system_test()
 //	shared_ptr<Motor> servo_motor2 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
 //	shared_ptr<Motor> servo_motor3 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
 //	shared_ptr<Motor> servo_motor4 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
-	// HIGH SPEED - LOW TORQUE	
+	// HIGH SPEED - LOW TORQUE
 //	servo_motor1->setWorkPoint(1e-3, 10);
 //	servo_motor2->setWorkPoint(1e-3, 10);
 //	servo_motor3->setWorkPoint(1e-3, 10);
@@ -1590,7 +1590,7 @@ void system_test()
 //	shared_ptr<Motor> dc_motor2 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //	shared_ptr<Motor> dc_motor3 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //	shared_ptr<Motor> dc_motor4 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-//	dc_motor1->setWorkPoint(1e-3, 6.0);  
+//	dc_motor1->setWorkPoint(1e-3, 6.0);
 //	dc_motor2->setWorkPoint(1e-3, 6.0);
 //	dc_motor3->setWorkPoint(1e-3, 6.0);
 //	dc_motor4->setWorkPoint(1e-3, 6.0);
@@ -1604,11 +1604,11 @@ void system_test()
 //	shared_ptr<Motor> servo_motor2 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
 //	shared_ptr<Motor> servo_motor3 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
 //	shared_ptr<Motor> servo_motor4 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
-	// HIGH SPEED - LOW TORQUE	
+	// HIGH SPEED - LOW TORQUE
 //	servo_motor1->setWorkPoint(1e-3, 10);
 //	servo_motor2->setWorkPoint(1e-3, 10);
 //	servo_motor3->setWorkPoint(1e-3, 10);
-//	servo_motor4->setWorkPoint(1e-3, 10); 
+//	servo_motor4->setWorkPoint(1e-3, 10);
 
 //	shared_ptr<Force_Sensor> force_sensor1 = make_shared<Force_Sensor>(forcesensor_path + "Pololu_1645.txt");
 //	shared_ptr<Force_Sensor> force_sensor2 = make_shared<Force_Sensor>(forcesensor_path + "Pololu_1645.txt");
@@ -1616,7 +1616,7 @@ void system_test()
 	// dc motor*2 + camera + bluetooth
 //	shared_ptr<Motor> dc_motor1 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //	shared_ptr<Motor> dc_motor2 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-//	dc_motor1->setWorkPoint(1e-3, 6.0);  
+//	dc_motor1->setWorkPoint(1e-3, 6.0);
 //	dc_motor2->setWorkPoint(1e-3, 6.0);
 
 //	shared_ptr<Camera> camera = make_shared<Camera>(camera_path + "MU_Vision_Sensor.txt");
@@ -1631,7 +1631,7 @@ void system_test()
 //	shared_ptr<Motor> dc_motor6 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //	shared_ptr<Motor> dc_motor7 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
 //	shared_ptr<Motor> dc_motor8 = make_shared<Motor>(dc_motor_path + "Pololu_4797.txt");
-//	dc_motor1->setWorkPoint(1e-3, 6.0);  
+//	dc_motor1->setWorkPoint(1e-3, 6.0);
 //	dc_motor2->setWorkPoint(1e-3, 6.0);
 //	dc_motor3->setWorkPoint(1e-3, 6.0);
 //	dc_motor4->setWorkPoint(1e-3, 6.0);
@@ -1652,11 +1652,11 @@ void system_test()
 //	shared_ptr<Motor> servo_motor2 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
 //	shared_ptr<Motor> servo_motor3 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
 //	shared_ptr<Motor> servo_motor4 = make_shared<Motor>(servo_path + "LS-0009AF.txt");
-	// HIGH SPEED - LOW TORQUE	
+	// HIGH SPEED - LOW TORQUE
 //	servo_motor1->setWorkPoint(1e-3, 10);
 //	servo_motor2->setWorkPoint(1e-3, 10);
 //	servo_motor3->setWorkPoint(1e-3, 10);
-//	servo_motor4->setWorkPoint(1e-3, 10); 
+//	servo_motor4->setWorkPoint(1e-3, 10);
 
 //	shared_ptr<Camera> camera = make_shared<Camera>(camera_path + "MU_Vision_Sensor.txt");
 
@@ -1672,11 +1672,11 @@ void system_test()
 //	BBNode root(infer_nodes);
 // 	bbnodevec bbnodes{ root };
 	shared_ptr<BBNode> best_node = branchNBound(bbnodes);
-	writeDesign(*best_node); 
+	writeDesign(*best_node);
 	doublevec mass_vec = getMassVec(*best_node, input_torques.size());
 	bool success = doubleCheck(*best_node, input_torques, input_velocities);
  	int a = 1;
-	
+
 }
 
- 
+

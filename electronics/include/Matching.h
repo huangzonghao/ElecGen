@@ -21,16 +21,16 @@ const std::bitset<7> power_mask = 0b1001001, func_mask = 0b0110111;
 
 using Component_Pair = std::pair<std::shared_ptr<Electrical_Component>, std::shared_ptr<Electrical_Component>>;
 using Pin_Connections = std::unordered_multimap<std::string, std::string>;
-Pin_Connections groupMatch(std::vector<Component_Pair> &);
-Pin_Connections individualMatch(Component_Pair &);
-Pin_Connections powerPinMatch(std::vector<Pin*> &, std::vector<Pin*> &, Component_Pair &);
+Pin_Connections groupMatch(const std::vector<Component_Pair> &);
+Pin_Connections individualMatch(const Component_Pair &);
+Pin_Connections powerPinMatch(std::vector<Pin*> &, std::vector<Pin*> &, const Component_Pair &);
 Pin_Connections funcPinMatch(std::vector<Pin*> &, std::vector<Pin*> &, Component_Pair &);
-stringpair grammer(Pin *, Pin *, Component_Pair &);
-stringpair matchDutyCycles(const stringpair &, Component_Pair &);
+stringpair grammer(Pin *, Pin *, const Component_Pair &);
+stringpair matchDutyCycles(const stringpair &, const Component_Pair &);
 void printPinConnections(Pin_Connections &);
 Pin_Connections removeEmptyConnections(Pin_Connections &);
-std::pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &, Electronics::FUNCTION_TYPE &, 
-	Component_Pair &);
+std::pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &, Electronics::FUNCTION_TYPE &,
+	const Component_Pair &);
 
 
 template <typename T> std::vector<T> unique_vec(std::vector<T>);
