@@ -9,18 +9,31 @@ list(APPEND CMAKE_PREFIX_PATH ${PROJECT_DEP_INSTALL_DIR})
 # first take care of external dependencies
 message(STATUS "Looking for external dependencies")
 
-set( EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}" CACHE PATH "Eigen3 root directory")
+# eigen3 find script doesn't work well on WIN32
+if (UNIX)
+    find_package(Eigen3 QUIET)
+    if (NOT Eigen3_FOUND)
+        message(SEND_ERROR "Error: Could not find Eigen3")
+        message("  Set Eigen3_DIR to the directory that contains Eigen3Config.cmake")
+        set(NEED_TO_RETURN True)
+    endif()
+elseif (WIN32)
+    set(EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}" CACHE PATH "Eigen3 root directory")
+    if (NOT EIGEN3_INCLUDE_DIR)
+        message(SEND_ERROR "Error: Could not find Eigen3")
+        message("  Set EIGEN3_INCLUDE_DIR to the root directory of your unzipped eigen library")
+        set(NEED_TO_RETURN True)
+    endif()
+else()
+    message(SEND_ERROR Unknown system)
+    return()
+endif()
+
 find_package(Chrono
              COMPONENTS Irrlicht Vehicle
              CONFIG QUIET)
 find_package(Gurobi QUIET)
 find_package(Boost QUIET)
-
-if (NOT EIGEN3_INCLUDE_DIR )
-    message(SEND_ERROR "Error: Could not find Eigen3")
-	message("  Set EIGEN3_INCLUDE_DIR to the root directory of your unzipped eigen library")
-    set(NEED_TO_RETURN True)
-endif()
 
 if (NOT Chrono_FOUND)
     message(SEND_ERROR "Error: Could not find Chrono or one of its required modules.")
@@ -163,6 +176,7 @@ if (NOT towr_FOUND)
 
     execute_process(COMMAND ${CMAKE_COMMAND}
                             -DIPOPT_DIR:PATH=${PROJECT_DEP_INSTALL_DIR}
+                            -DEIGEN3_INCLUDE_DIR:PATH=${EIGEN3_INCLUDE_DIR}
                             -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
                             ${CMAKE_SOURCE_DIR}/thirdparty/ifopt
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/ifopt)
