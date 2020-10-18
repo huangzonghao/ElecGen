@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Electronics_Generation)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 set(PROJECT_DEP_INSTALL_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install)
 list(APPEND CMAKE_PREFIX_PATH ${PROJECT_DEP_INSTALL_DIR})
@@ -16,6 +21,8 @@ if (UNIX)
         message(SEND_ERROR "Error: Could not find Eigen3")
         message("  Set Eigen3_DIR to the directory that contains Eigen3Config.cmake")
         set(NEED_TO_RETURN True)
+    else()
+        message(STATUS "Eigen3 Found")
     endif()
 elseif (WIN32)
     set(EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}" CACHE PATH "Eigen3 root directory")
@@ -23,9 +30,11 @@ elseif (WIN32)
         message(SEND_ERROR "Error: Could not find Eigen3")
         message("  Set EIGEN3_INCLUDE_DIR to the root directory of your unzipped eigen library")
         set(NEED_TO_RETURN True)
+    else()
+        message(STATUS "Eigen3 Found")
     endif()
 else()
-    message(SEND_ERROR Unknown system)
+    message(SEND_ERROR "Unknown system")
     return()
 endif()
 
@@ -39,18 +48,22 @@ if (NOT Chrono_FOUND)
     message(SEND_ERROR "Error: Could not find Chrono or one of its required modules.")
     message("  Set Chrono_DIR to the directory that contains ChronoConfig.cmake")
     set(NEED_TO_RETURN True)
+    else()
+        message(STATUS "Chrono Found")
 endif()
 if (NOT Gurobi_FOUND)
-    message(SEND_ERROR "Could not find Gurobi, set Gurobi_ROOT_DIR to the directory containing Gurobi's bin, include, lib, etc")
-    set(Gurobi_ROOT_DIR "Set Path to Gurobi Root" CACHE PATH
-    "Gurobi base directory")
+    message(SEND_ERROR "Could not find Gurobi, set Gurobi_DIR to the directory containing Gurobi's bin, include, lib, etc")
+    set(Gurobi_DIR "Set Path to Gurobi Root" CACHE PATH "Gurobi base directory")
     set(NEED_TO_RETURN True)
+    else()
+        message(STATUS "Gurobi Found")
 endif()
 if (NOT Boost_FOUND)
     message(SEND_ERROR "Could not find Boost, set BOOST_ROOT to the Boost base directory containing boost, libs, etc")
-    set(BOOST_ROOT "Set Path To Boost Root" CACHE PATH
-    "Boost base directory")
+    set(BOOST_ROOT "Set Path To Boost Root" CACHE PATH "Boost base directory")
     set(NEED_TO_RETURN True)
+    else()
+        message(STATUS "Boost Found")
 endif()
 
 if (NEED_TO_RETURN)
@@ -116,6 +129,8 @@ if (NOT urdfdom_FOUND)
                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
 
     find_package(urdfdom QUIET)
+else()
+    message(STATUS "urdfdom Found")
 endif()
 include_directories(${urdfdom_INCLUDE_DIRS})
 
@@ -123,6 +138,8 @@ find_package(Matlab QUIET)
 if (NOT Matlab_FOUND)
     message(SEND_ERROR "Could not find Matlab.")
     return()
+else()
+    message(STATUS "Matlab Found")
 endif()
 mark_as_advanced(Matlab_ROOT_DIR)
 
@@ -144,6 +161,8 @@ if (NOT Protobuf_FOUND)
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
     find_package(Protobuf QUIET)
+else()
+    message(STATUS "Protobuf Found")
 endif()
 mark_as_advanced(Protobuf_SRC_ROOT_FOLDER)
 include_directories(${Protobuf_INCLUDE_DIRS})
@@ -191,6 +210,8 @@ if (NOT towr_FOUND)
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr)
 
     find_package(towr QUIET)
+else()
+    message(STATUS "Towr Found")
 endif()
 include_directories(${towr_INCLUDE_DIRS})
 
@@ -286,70 +307,69 @@ set(CHRONOSIM_SOURCES
         ${CHRONOSIM_SRC_PATH}/ChUrdfDoc.cpp
         ${CHRONOSIM_SRC_PATH}/RobotController.cpp
         ${CHRONOSIM_SRC_PATH}/SimMotor.cpp
-        ${CHRONOSIM_SRC_PATH}/SimulationManager.cpp
-        ${CHRONOSIM_SRC_PATH}/launch_simulation.cpp)
+        ${CHRONOSIM_SRC_PATH}/SimulationManager.cpp)
 
 set(TRAJECTORY_SOURCES
         ${TRAJECTORY_SRC_PATH}/eigen_heightmap.cpp
         ${TRAJECTORY_SRC_PATH}/quadrupedal_kinematics.cpp
         ${TRAJECTORY_SRC_PATH}/traj_optimizer.cpp)
 
-set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp)
+set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp,
+                       ${CHRONOSIM_SRC_PATH}/launch_simulation.cpp)
 
-## Main Target of the project
-# ===========================================================
+## Matlab Interface
+# =================
 matlab_add_mex(NAME mexRun SRC ${MATLAB_CPP_GATEWAY} ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
 
 set_target_properties(mexRun PROPERTIES
         COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
         COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
         LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+if(MSVC)
+    # to make protobuf run with dll
+    target_compile_definitions(mexRun PUBLIC PROTOBUF_USE_DLLS)
+endif()
+
+target_link_libraries(mexRun
+                      optimized ${Gurobi_CXX_LIBRARY}
+                      debug ${Gurobi_CXX_DEBUG_LIBRARY})
 
 target_link_libraries(mexRun ${CHRONO_LIBRARIES}
                              ${urdfdom_LIBRARIES}
                              ${towr_LIBRARIES}
-                             ${Gurobi_LIBRARIES}
+                             ${Gurobi_LIBRARY}
                              ${Protobuf_LIBRARIES}
                              component_structure)
 # ===========================================================
 
-## Full compilation target on windows
-# ===========================================================
-# add_executable(main_test electronics/src/main.cpp ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
 
-# set_target_properties(main_test PROPERTIES
-        # COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-        # COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-        # LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
-# if(MSVC)
-    # # to make protobuf run with dll
-    # target_compile_definitions(main_test PUBLIC PROTOBUF_USE_DLLS)
-# endif()
-# target_link_libraries(main_test ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${Gurobi_LIBRARIES} ${towr_LIBRARIES} ${Protobuf_LIBRARIES} component_structure)
-# ==========================================================
-
-## Main test target on Linux
-# ===========================================================
+## Direct C++ Tests
+# =================
+# tests combined
 # add_executable(executable ${CHRONOSIM_SRC_PATH}/test_iteration.cpp ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
 
-# set_target_properties(executable PROPERTIES
-        # COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-        # COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-        # LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+# single test
+add_executable(executable ${CHRONOSIM_SRC_PATH}/testcpp.cpp ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
 
-# target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES} ${towr_LIBRARIES})
-# ===========================================================
+set_target_properties(executable PROPERTIES
+        COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+        COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+        LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+if(MSVC)
+    # to make protobuf run with dll
+    target_compile_definitions(executable PUBLIC PROTOBUF_USE_DLLS)
+endif()
 
-# Single test target on Linux
-# ===========================================================
-# add_executable(executable src/testcpp.cpp src/ChUrdfDoc.cpp src/launch_simulation.cpp)
+target_link_libraries(executable
+                      optimized ${Gurobi_CXX_LIBRARY}
+                      debug ${Gurobi_CXX_DEBUG_LIBRARY})
 
-# set_target_properties(executable PROPERTIES
-        # COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-        # COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-        # LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+target_link_libraries(executable ${CHRONO_LIBRARIES}
+                                 ${urdfdom_LIBRARIES}
+                                 ${Gurobi_LIBRARY}
+                                 ${Protobuf_LIBRARIES}
+                                 component_structure)
 
-# target_link_libraries(executable ${CHRONO_LIBRARIES} ${urdfdom_LIBRARIES})
 # ===========================================================
 
 
