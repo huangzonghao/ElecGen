@@ -1569,56 +1569,56 @@ bool inputsValidityCheck(const doublepairs &torqs, const doublepairs &vels)
 }
 */
 
-shared_ptr<BBNode> branchNBound(bbnodevec &roots)
+shared_ptr<BBNode> branchNBound(bbnodevec *roots)
 {
 	static bool first_branch = true;
 	static shared_ptr<BBNode> best_node;
 
 	bbnodevec descendents;
-	for (size_t i = 0; i < roots.size(); i++)
+	for (size_t i = 0; i < roots->size(); i++)
 	{
-		if (!roots[i].empty())
+		if (!roots->at(i).empty())
 		{
-			roots[i].evaluate();
+			roots->at(i).evaluate();
 			if (!first_branch && BBNode::pruning_enable)
 			{
-				roots[i].bound();
+				roots->at(i).bound();
 			}
 
-			if (roots[i].feasibility)
+			if (roots->at(i).feasibility)
 			{
- 				descendents = roots[i].branch();
+ 				descendents = roots->at(i).branch();
 			}
 
 			if (!descendents.size())
 			{
 				if (first_branch)
 				{
-					roots[i].reevaluate();
-					BBNode::best_metric_val = roots[i].getMetricVal();
+					roots->at(i).reevaluate();
+					BBNode::best_metric_val = roots->at(i).getMetricVal();
 					// get best node
-					best_node =  make_shared<BBNode>(roots[i].infer_nodes, roots[i].circuit,
-						roots[i].model, roots[i].prev_bbnode);
-					best_node->copyMetrics(roots[i]);
-					roots[i].prev_bbnode->next_bbnodes.pop_back();
+					best_node =  make_shared<BBNode>(roots->at(i).infer_nodes, roots->at(i).circuit,
+						roots->at(i).model, roots->at(i).prev_bbnode);
+					best_node->copyMetrics(roots->at(i));
+					roots->at(i).prev_bbnode->next_bbnodes.pop_back();
 					first_branch = false;
 				}
-				else if (roots[i].feasibility)
+				else if (roots->at(i).feasibility)
 				{
-					roots[i].reevaluate();
-					if (BBNode::best_metric_val > roots[i].getMetricVal())
+					roots->at(i).reevaluate();
+					if (BBNode::best_metric_val > roots->at(i).getMetricVal())
 					{
-						BBNode::best_metric_val = roots[i].getMetricVal();
-						best_node = make_shared<BBNode>(roots[i].infer_nodes, roots[i].circuit,
-							roots[i].model, roots[i].prev_bbnode);
-						best_node->copyMetrics(roots[i]);
-						roots[i].prev_bbnode->next_bbnodes.pop_back();
+						BBNode::best_metric_val = roots->at(i).getMetricVal();
+						best_node = make_shared<BBNode>(roots->at(i).infer_nodes, roots->at(i).circuit,
+							roots->at(i).model, roots->at(i).prev_bbnode);
+						best_node->copyMetrics(roots->at(i));
+						roots->at(i).prev_bbnode->next_bbnodes.pop_back();
 					}
 				}
 			}
 			else
 			{
-				best_node = branchNBound(descendents);
+				best_node = branchNBound(&descendents);
 			}
 		}
 	}

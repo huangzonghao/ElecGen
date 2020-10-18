@@ -272,7 +272,7 @@ infernodevec generateNodeptrVec(const std::string &, const stringvec &);
 // This function checks the inputs' validity
 bool inputsValidityCheck(const doublepairs &, const doublepairs &);
 
-std::shared_ptr<BBNode> branchNBound(const bbnodevec & = bbnodevec());
+std::shared_ptr<BBNode> branchNBound(bbnodevec * = new bbnodevec);
 
 //void expandMap(const bbnodevec &, bbglobalmap &);
 

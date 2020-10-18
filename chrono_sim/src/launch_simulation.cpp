@@ -168,7 +168,7 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
             stringvec2d component_versions = preprocess(input_types, input_torqs, input_vels);
             infernodevec2d infer_nodes_vec = initialize(component_versions, input_torqs, input_vels);
             bbnodevec bbnodes = initialize(infer_nodes_vec);
-            best_node = branchNBound(bbnodes);
+            best_node = branchNBound(&bbnodes);
             writeDesign(*best_node);
         }
         else if (task_done) {
@@ -183,7 +183,7 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
                 stringvec2d component_versions = preprocess(input_types, input_torqs, input_vels);
                 infernodevec2d infer_nodes_vec = initialize(component_versions, input_torqs, input_vels);
                 bbnodevec bbnodes = initialize(infer_nodes_vec);
-                best_node = branchNBound(bbnodes);
+                best_node = branchNBound(&bbnodes);
                 writeDesign(*best_node);
             }
         }

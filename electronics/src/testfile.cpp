@@ -1671,7 +1671,7 @@ void system_test()
 //		infer_node15, infer_node16, infer_node17, infer_node18,  infer_node19, infer_node20, infer_node21 };
 //	BBNode root(infer_nodes);
 // 	bbnodevec bbnodes{ root };
-	shared_ptr<BBNode> best_node = branchNBound(bbnodes);
+	shared_ptr<BBNode> best_node = branchNBound(&bbnodes);
 	writeDesign(*best_node);
 	doublevec mass_vec = getMassVec(*best_node, input_torques.size());
 	bool success = doubleCheck(*best_node, input_torques, input_velocities);
