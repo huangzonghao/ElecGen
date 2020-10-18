@@ -33,6 +33,7 @@ class  SimulationManager {
     void SetEigenHeightmap(const std::shared_ptr<const Eigen::MatrixXd>& heightmap);
     void SetFrictionS(double fs) {s_friction_ = fs;};
     void SetFrictionK(double fk) {k_friction_ = fk;};
+    void SetTimeout(double timeout) {timeout_ = timeout;};
 
     void AddPayload(const std::string& body_name, double mass,
                     double size_x, double size_y, double size_z,
