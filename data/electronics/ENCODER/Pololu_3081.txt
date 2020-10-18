@@ -1,0 +1,142 @@
+component_name: "Pololu_3081"
+component_type: "ENCODER"
+component_class: "SENSOR" 
+pin {
+  name: "VCC"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 2.7   
+    ub: 18
+  }
+  i_bound {
+    lb: 0
+	ub: 0.05
+  }
+  dependents {
+    others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+	ub: 0
+  }
+  dependents {
+    others: "VCC"
+  }
+} 
+pin {
+  name: "M1"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 12
+  }
+  i_bound {
+    lb: 0
+	ub: 1.5
+  }
+  dependents {
+    others: ""
+  }
+}
+pin {
+  name: "M2"
+  pin_class: FUNCTION
+  func_type: OTHER
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 12
+  }
+  i_bound {
+    lb: 0
+	ub: 1.5
+  }
+  dependents {
+    others: ""
+  }
+}
+pin {
+  name: "OUTA"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0   
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.01
+  }
+  dependents {
+    others: "VCC"
+	others: "OUTB"
+	others: "GND"
+  }
+}
+pin {
+  name: "OUTB"
+  pin_class: FUNCTION
+  func_type: DIGITAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+	ub: 0.01
+  }
+  dependents {
+    others: "VCC"
+	others: "OUTA"
+	others: "GND"
+  }
+}
+nonlin: 0
+size {
+  length: 11.6
+  width: 10.6
+  height: 1.2
+}
+weight: 1
+price: 8.95
+[Electronics.Encoder.encoder]
+{
+  frequency: 320000
+}
+
+
+

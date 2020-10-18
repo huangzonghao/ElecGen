@@ -394,7 +394,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG
   phys_type: NORMAL
-  io: IN
+  io: OUT
   connection: OTO
   status: false
   v_bound {
@@ -415,7 +415,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG
   phys_type: NORMAL
-  io: IN
+  io: OUT
   connection: OTO
   status: false
   v_bound {
@@ -436,7 +436,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG
   phys_type: NORMAL
-  io: IN
+  io: OUT
   connection: OTO
   status: false
   v_bound {
@@ -457,7 +457,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG
   phys_type: NORMAL
-  io: IN
+  io: OUT
   connection: OTO
   status: false
   v_bound {
@@ -478,7 +478,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG_I2C_SDA
   phys_type: NORMAL
-  io: BIDIRECT
+  io: OUT
   connection: OTO
   status: false
   v_bound {
@@ -500,7 +500,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG_I2C_SCL
   phys_type: NORMAL
-  io: BIDIRECT
+  io: OUT
   connection: OTO
   status: false
   v_bound {
@@ -522,7 +522,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG
   phys_type: NORMAL
-  io: IN
+  io: OUT
   connection: OTO
   status: false
   v_bound {
@@ -543,7 +543,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG
   phys_type: NORMAL
-  io: IN
+  io: OUT
   connection: OTO
   status: false
   v_bound {

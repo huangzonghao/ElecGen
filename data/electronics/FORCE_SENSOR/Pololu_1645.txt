@@ -15,7 +15,7 @@ pin {
   }
   i_bound {
     lb: 0 
-    ub: 2
+    ub: 0.02
   }
   dependents {
 	others: "RIGHT"
@@ -26,7 +26,7 @@ pin {
   pin_class: FUNCTION
   func_type: ANALOG
   phys_type: NORMAL
-  io: OUT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
