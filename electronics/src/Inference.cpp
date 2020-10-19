@@ -1919,40 +1919,102 @@ void addInferNodeMap(const infernodevec &infer_nodes)
 			infer_nodes[i]));
 	}
 }
+// string makeReplicate(const string &name, const stringvec &references)
+// {
+	// int max_id = -1;
+	// int max_tmp = 0;
+	// size_t pos_tmp;
+	// std::string basename;
+	// // TODO: will throw error if string after @ doesn't contain a number
+	// // first check if name contains an id
+	// pos_tmp = name.find_last_of('@');
+	// if (pos_tmp != std::string::npos){
+		// max_id = std::stoi(name.substr(pos_tmp+1, std::string::npos));
+		// basename = name.substr(0, pos_tmp);
+	// }
+	// else{
+		// basename = name;
+	// }
 
+	// for (int i = 0; i < references.size(); ++i){
+		// pos_tmp = references[i].find(basename);
+		// if (pos_tmp != std::string::npos){
+			// // decode the string in ref and get the number after @
+			// pos_tmp = references[i].find_last_of('@');
+			// if (pos_tmp == std::string::npos){
+				// max_tmp = 0;
+			// }
+			// else{
+				// max_tmp = std::stoi(references[i].substr(pos_tmp+1, std::string::npos));
+			// }
+			// max_id = std::max(max_id, max_tmp);
+		// }
+	// }
+	// return basename + '@' + std::to_string(max_id);
+// }
 string makeReplicate(const string &name, const stringvec &references)
 {
-	int max_id = -1;
-	int max_tmp = 0;
-	size_t pos_tmp;
-	std::string basename;
-	// TODO: will throw error if string after @ doesn't contain a number
-	// first check if name contains an id
-	pos_tmp = name.find_last_of('@');
-	if (pos_tmp != std::string::npos){
-		max_id = std::stoi(name.substr(pos_tmp+1, std::string::npos));
-		basename = name.substr(0, pos_tmp);
+	string result;
+	size_t pos = getPosInVec(name, references);
+	if (pos != -1)
+	{
+		result = makeReplicate(makeReplicate(name), references);
 	}
-	else{
-		basename = name;
+	else
+	{
+		result = name;
 	}
-
-	for (int i = 0; i < references.size(); ++i){
-		pos_tmp = references[i].find(basename);
-		if (pos_tmp != std::string::npos){
-			// decode the string in ref and get the number after @
-			pos_tmp = references[i].find_last_of('@');
-			if (pos_tmp == std::string::npos){
-				max_tmp = 0;
-			}
-			else{
-				max_tmp = std::stoi(references[i].substr(pos_tmp+1, std::string::npos));
-			}
-			max_id = std::max(max_id, max_tmp);
-		}
-	}
-	return basename + '@' + std::to_string(max_id);
+	return result;
 }
+
+string makeReplicate(const string &name)
+{
+	string result;
+	size_t pos = name.find_last_of("@");
+	if (pos >= name.size())
+	{
+		result = name + "@1";
+	}
+	else
+	{
+		result = name.substr(0, pos) + "@" + std::to_string(name[pos + 1] - 47);
+	}
+	return result;
+}
+
+// string makeReplicate(const string &name, const stringvec &references)
+// {
+	// int max_id = -1;
+	// int max_tmp = 0;
+	// size_t pos_tmp;
+	// std::string basename;
+	// // TODO: will throw error if string after @ doesn't contain a number
+	// // first check if name contains an id
+	// pos_tmp = name.find_last_of('@');
+	// if (pos_tmp != std::string::npos){
+		// max_id = std::stoi(name.substr(pos_tmp+1, std::string::npos));
+		// basename = name.substr(0, pos_tmp);
+	// }
+	// else{
+		// basename = name;
+	// }
+
+	// for (int i = 0; i < references.size(); ++i){
+		// pos_tmp = references[i].find(basename);
+		// if (pos_tmp != std::string::npos){
+			// // decode the string in ref and get the number after @
+			// pos_tmp = references[i].find_last_of('@');
+			// if (pos_tmp == std::string::npos){
+				// max_tmp = 0;
+			// }
+			// else{
+				// max_tmp = std::stoi(references[i].substr(pos_tmp+1, std::string::npos));
+			// }
+			// max_id = std::max(max_id, max_tmp);
+		// }
+	// }
+	// return basename + '@' + std::to_string(max_id);
+// }
 
 /*
 void printConnections(const BBNode &opt_node, const bbnodevec &descendents, const connection_relation_vec2d &next_relations_vec)
@@ -2680,10 +2742,10 @@ Infer_Node::Infer_Node(const string &file)
 {
 	id = num_of_nodes++;
 	component = creatComponent(file);
-    const Infer_Node& prev_node = Infer_Node();
-	if (!prev_node.empty())
+	Infer_Node* prev_node = new Infer_Node;
+	if (!prev_node->empty())
 	{
-		prev_node_ids.push_back(prev_node.id);
+		prev_node_ids.push_back(prev_node->id);
 	}
 }
 
@@ -2701,10 +2763,10 @@ Infer_Node::Infer_Node(shared_ptr<Electrical_Component> _component):
 	component(_component)
 {
 	id = num_of_nodes++;
-    const Infer_Node& prev_node = Infer_Node();
-	if (!prev_node.empty())
+    Infer_Node* prev_node = new Infer_Node;
+	if (!prev_node->empty())
 	{
-		prev_node_ids.push_back(prev_node.id);
+		prev_node_ids.push_back(prev_node->id);
 	}
 }
 
@@ -3020,10 +3082,7 @@ BBNode::BBNode(const infernodevec &_infer_nodes, const Circuit &_circuit,
 	GRBModel &_model, BBNode *_prev_bbnode) : circuit(_circuit), model(_model)
 {
     if (!_prev_bbnode){
-        this->prev_bbnode = new BBNode;
-    }
-    else {
-        this->prev_bbnode = _prev_bbnode;
+        _prev_bbnode = new BBNode;
     }
 //	this->model.set(GRB_IntParam_LogToConsole, 0);
 	this->id = num_of_bbnodes++;
@@ -3032,6 +3091,7 @@ BBNode::BBNode(const infernodevec &_infer_nodes, const Circuit &_circuit,
 	this->component_names = _prev_bbnode->component_names;
 	this->copyMetrics(*_prev_bbnode);
 	this->makeReplicates();
+	this->prev_bbnode = _prev_bbnode;
 	this->prev_bbnode->next_bbnodes.push_back(*this);
 	::addInferNodeMap(infer_nodes);
 }
