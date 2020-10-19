@@ -300,7 +300,6 @@ void getDependentPins(infernodevec &, Pin_Connections &);
 infernodevec getAllAnscenstor(BBNode &);
 void addInferNodeMap(const infernodevec &);
 std::string makeReplicate(const std::string &, const stringvec &);
-std::string makeReplicate(const std::string &);
 
 std::shared_ptr<Electrical_Component> creatComponent(const std::string &);
 stringvec getAllSensorVersions(const std::string &);

@@ -1,4 +1,5 @@
 ﻿#include "Inference.h"
+#include <algorithm>
 
 // connection_relation BBNode::final_connections = connection_relation();
 GRBEnv env = GRBEnv();
@@ -663,7 +664,7 @@ infernodevec2d initialize(const stringvec2d &component_versions,
 			{
 				node = Infer_Node(component_versions[i][j]);
 			}
-   			infer_nodes_vec[i].push_back(node);
+			infer_nodes_vec[i].push_back(node);
 		}
 	}
 	return infer_nodes_vec;
@@ -1587,7 +1588,7 @@ shared_ptr<BBNode> branchNBound(bbnodevec *roots)
 
 			if (roots->at(i).feasibility)
 			{
- 				descendents = roots->at(i).branch();
+				descendents = roots->at(i).branch();
 			}
 
 			if (!descendents.size())
@@ -1913,32 +1914,36 @@ void addInferNodeMap(const infernodevec &infer_nodes)
 
 string makeReplicate(const string &name, const stringvec &references)
 {
-	string result;
-	size_t pos = getPosInVec(name, references);
-	if (pos != -1)
-	{
-		result = makeReplicate(makeReplicate(name), references);
+	int max_id = -1;
+	int max_tmp = 0;
+	size_t pos_tmp;
+	std::string basename;
+	// TODO: will throw error if string after @ doesn't contain a number
+	// first check if name contains an id
+	pos_tmp = name.find_last_of('@');
+	if (pos_tmp != std::string::npos){
+		max_id = std::stoi(name.substr(pos_tmp+1, std::string::npos));
+		basename = name.substr(0, pos_tmp);
 	}
-	else
-	{
-		result = name;
+	else{
+		basename = name;
 	}
-	return result;
-}
 
-string makeReplicate(const string &name)
-{
-	string result;
-	size_t pos = name.find_last_of("@");
-	if (pos >= name.size())
-	{
-		result = name + "@1";
+	for (int i = 0; i < references.size(); ++i){
+		pos_tmp = references[i].find(basename);
+		if (pos_tmp != std::string::npos){
+			// decode the string in ref and get the number after @
+			pos_tmp = references[i].find_last_of('@');
+			if (pos_tmp == std::string::npos){
+				max_tmp = 0;
+			}
+			else{
+				max_tmp = std::stoi(references[i].substr(pos_tmp+1, std::string::npos));
+			}
+			max_id = std::max(max_id, max_tmp);
+		}
 	}
-	else
-	{
-		result = name.substr(0, pos) + "@" + std::to_string(name[pos + 1] - 47);
-	}
-	return result;
+	return basename + '@' + std::to_string(max_id);
 }
 
 /*
@@ -2250,7 +2255,7 @@ bbnodevec BBNode::branch()
 		this->infer_nodes);
 	this->optimize();
 //	printPinConnections(this->pin_connections);
- 	Pin_Connections connections;
+	Pin_Connections connections;
 	if (this->level < 2)
 	{
 		connections = nodeMatch(this->infer_nodes);
@@ -2262,7 +2267,7 @@ bbnodevec BBNode::branch()
 	}
 //	printPinConnections(connections);
 	this->pin_connections.insert(connections.begin(), connections.end());
- 	this->updateConnections(connections);
+	this->updateConnections(connections);
 
 	// get vals
 	std::sort(infer_nodes.begin(), infer_nodes.end(),
@@ -2295,7 +2300,7 @@ bbnodevec BBNode::branch()
 	}
 	this->minCliqueCover();
 	stringvec2d versions = this->versionInfer();
- 	infernodevec2d next_infer_nodes_vec = this->numberInfer(versions);
+	infernodevec2d next_infer_nodes_vec = this->numberInfer(versions);
 
 	for (size_t i = 0; i < next_infer_nodes_vec.size(); i++)
 	{
@@ -2989,11 +2994,9 @@ doublevec Infer_Node::getPowerInVal()
 BBNode::BBNode(const infernodevec &_infer_nodes, BBNode *_prev_bbnode)
 {
     if (!_prev_bbnode){
-        this->prev_bbnode = new BBNode;
+        _prev_bbnode = new BBNode;
     }
-    else {
-        this->prev_bbnode = _prev_bbnode;
-    }
+    this->prev_bbnode = _prev_bbnode;
 //	this->model.set(GRB_IntParam_LogToConsole, 0);
 	this->id = num_of_bbnodes++;
 	this->level = _prev_bbnode->level + 1;

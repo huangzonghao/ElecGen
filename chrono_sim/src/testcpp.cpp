@@ -11,7 +11,7 @@ const std::string urdf_file = "../data/robots/fourleg3.urdf";
 int main(int argc, char *argv[]) {
     // first init simulation manager
     SimulationManager sm;
-    sm.SetTimeout(0.5);
+    sm.SetTimeout(0.1);
     sm.SetUrdfFile(urdf_file);
     sm.SetEnv(env_file, 1, 1, 0.08);
     sm.SetFrictionK(k_friction);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     // ...
     // n + 1 vector: n for input components masses,
     // 1 for sum of all other components mass
-    stringvec input_types(sm.GetComponentNumber());
+    stringvec input_types;
     doublepairs input_vels(sm.GetMotorNumber(), std::pair<double, double>(0.0, 0.0));
     doublepairs input_torqs(sm.GetMotorNumber(), std::pair<double, double>(0.0, 0.0));
     std::shared_ptr<BBNode> best_node;

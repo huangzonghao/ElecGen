@@ -60,7 +60,7 @@ const std::string data_root(std::string(DATA_DIRECTORY_PATH) + "/");
 const std::string elec_root(data_root + "electronics/");
 
 const std::string
-    dc_motor_path          (elec_root + "DC_MOTOR/"),
+    dc_motor_path          (elec_root + "DC_Motor/"),
     battery_path           (elec_root + "BATTERY/"),
     h_bridge_path          (elec_root + "H_BRIDGE/"),
     micro_controller_path  (elec_root + "MICRO_CONTROLLER/"),
