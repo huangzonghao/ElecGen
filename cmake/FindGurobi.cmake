@@ -42,3 +42,7 @@ endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Gurobi DEFAULT_MSG Gurobi_LIBRARY)
+mark_as_advanced(Gurobi_CXX_LIBRARY
+                 Gurobi_CXX_DEBUG_LIBRARY
+                 Gurobi_LIBRARY
+                 Gurobi_INCLUDE_DIRS)
