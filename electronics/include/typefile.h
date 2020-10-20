@@ -56,22 +56,22 @@ using connection_relation_vec = std::vector<connection_relation>;
 using connection_relation_vec2d = std::vector<connection_relation_vec>;
 
 // file path
-const std::string data_root(std::string(DATA_DIRECTORY_PATH));
-const std::string output_root(std::string(ELECGEN_OUTPUT_PATH));
-const std::string elec_root(data_root + "electronics/");
+const std::string data_root(DATA_DIRECTORY_PATH);
+const std::string output_root(ELECGEN_OUTPUT_PATH);
+const std::string elec_root(data_root + "/electronics/");
 
 const std::string
-    dc_motor_path          (elec_root + "DC_Motor/"),
-    battery_path           (elec_root + "BATTERY/"),
-    h_bridge_path          (elec_root + "H_BRIDGE/"),
-    micro_controller_path  (elec_root + "MICRO_CONTROLLER/"),
-    voltage_regulator_path (elec_root + "VOLTAGE_REGULATOR/"),
-    encoder_path           (elec_root + "ENCODER/"),
-    bluetooth_path         (elec_root + "BLUETOOTH/"),
-    camera_path            (elec_root + "CAMERA/"),
-    forcesensor_path       (elec_root + "FORCE_SENSOR/"),
-    servo_path             (elec_root + "SERVO/"),
-    design_path            (output_root + "Designs/");
+    dc_motor_path          (std::filesystem::path(elec_root + "/DC_Motor/").string()),
+    battery_path           (std::filesystem::path(elec_root + "/BATTERY/").string()),
+    h_bridge_path          (std::filesystem::path(elec_root + "/H_BRIDGE/").string()),
+    micro_controller_path  (std::filesystem::path(elec_root + "/MICRO_CONTROLLER/").string()),
+    voltage_regulator_path (std::filesystem::path(elec_root + "/VOLTAGE_REGULATOR/").string()),
+    encoder_path           (std::filesystem::path(elec_root + "/ENCODER/").string()),
+    bluetooth_path         (std::filesystem::path(elec_root + "/BLUETOOTH/").string()),
+    camera_path            (std::filesystem::path(elec_root + "/CAMERA/").string()),
+    forcesensor_path       (std::filesystem::path(elec_root + "/FORCE_SENSOR/").string()),
+    servo_path             (std::filesystem::path(elec_root + "/SERVO/").string()),
+    design_path            (std::filesystem::path(output_root + "/Designs/").string());
 
 
 // prefix, postfix

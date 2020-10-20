@@ -1,5 +1,6 @@
 ﻿#include "Inference.h"
 #include <algorithm>
+#include <filesystem>
 
 // connection_relation BBNode::final_connections = connection_relation();
 GRBEnv env = GRBEnv();
@@ -1328,6 +1329,11 @@ void writeDesign(const nodeptrvec &roots, const Circuit &circuit, str_unsigned_u
 */
 void writeDesign(const BBNode &bbnode)
 {
+    // check existence of diectory
+    if (!std::filesystem::exists(design_path)){
+        std::filesystem::create_directory(design_path);
+    }
+
 	std::ofstream design;
 	design.open(design_path + design_pf + "_" + std::to_string(getFileNumInDirectory(design_path)) + text_pf);
 
@@ -1372,6 +1378,8 @@ void writeDesign(const BBNode &bbnode)
 	design << endl;
 
 	design.close();
+
+    std::cout << "Design file has been written to : " << design_path << std::endl;
 }
 /*
 void writeRawDesign(const BBNode &bbnode)

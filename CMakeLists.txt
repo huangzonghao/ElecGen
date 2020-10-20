@@ -291,7 +291,7 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/discreture/include)
 
 set(DATA_DIRECTORY_PATH ${CMAKE_SOURCE_DIR}/data/)
-set(ELECGEN_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(ELECGEN_OUTPUT_PATH ${CMAKE_BINARY_DIR}/)
 configure_file(${CMAKE_MODULE_PATH}/data_dir_path.h.in data_dir_path.h @ONLY)
 include_directories(${CMAKE_BINARY_DIR})
 
