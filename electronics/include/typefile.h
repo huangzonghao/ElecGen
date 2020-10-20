@@ -56,7 +56,8 @@ using connection_relation_vec = std::vector<connection_relation>;
 using connection_relation_vec2d = std::vector<connection_relation_vec>;
 
 // file path
-const std::string data_root(std::string(DATA_DIRECTORY_PATH) + "/");
+const std::string data_root(std::string(DATA_DIRECTORY_PATH));
+const std::string output_root(std::string(ELECGEN_OUTPUT_PATH));
 const std::string elec_root(data_root + "electronics/");
 
 const std::string
@@ -70,7 +71,7 @@ const std::string
     camera_path            (elec_root + "CAMERA/"),
     forcesensor_path       (elec_root + "FORCE_SENSOR/"),
     servo_path             (elec_root + "SERVO/"),
-    design_path            (data_root + "Designs/");
+    design_path            (output_root + "Designs/");
 
 
 // prefix, postfix
