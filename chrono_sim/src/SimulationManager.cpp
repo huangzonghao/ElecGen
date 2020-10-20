@@ -140,7 +140,6 @@ bool SimulationManager::RunSimulation(bool do_viz){
         vehicle::RigidTerrain terrain(ch_system_.get());
         auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(env_x_ / 2, env_y_ / 2, -0.5), Q_ROTATE_X_TO_Y),
                                       env_file_, "ground_mesh", env_x_, env_y_, 0, env_z_);
-        std::cerr << "after" << std::endl;
         patch->SetColor(ChColor(0.2, 0.2, 0.2));
         terrain.Initialize();
     }
@@ -334,18 +333,24 @@ bool SimulationManager::RunSimulation(bool do_viz){
     return true;
 }
 
-void SimulationManager::GetComponentTypes(std::vector<std::string> *types_container) const {
-    auto& types_vec = *types_container;
-    for (int i = 0; i < motors_.size(); ++i){
-        types_vec.push_back("MOTOR");
+void SimulationManager::GetComponentTypes(std::vector<std::string> &types_vec) const {
+    if (types_vec.empty()){
+        for (int i = 0; i < motors_.size(); ++i){
+            types_vec.push_back("MOTOR");
+        }
+    }
+    else{
+        std::cerr << "Error: passing in a non-empty ComponentTypes vector. ComponentTypes vector can only be initialized once" << std::endl;
     }
 }
 
 void SimulationManager::
-GetActuatorVels(std::vector<std::pair<double, double> > *vels_container) const {
-    auto& vels_vec = *vels_container;
-    if (vels_vec.size() != motors_.size()){
-        std::cerr<< "Error, simulation motor number is not equal to generation motor number" << std::endl;
+GetActuatorVels(std::vector<std::pair<double, double> > &vels_vec) const {
+    if (vels_vec.empty()){
+        vels_vec.resize(motors_.size());
+    }
+    else if (vels_vec.size() != motors_.size()){
+        std::cerr << "Error, simulation motor number is not equal to generation motor number" << std::endl;
         exit(EXIT_FAILURE);
     }
     for (int i = 0; i < motors_.size(); ++i){
@@ -354,10 +359,12 @@ GetActuatorVels(std::vector<std::pair<double, double> > *vels_container) const {
 }
 
 void SimulationManager::
-GetActuatorTorques(std::vector<std::pair<double, double> > *torqs_container) const {
-    auto& torqs_vec = *torqs_container;
-    if (torqs_vec.size() != motors_.size()){
-        std::cerr<< "Error, simulation motor number is not equal to generation motor number" << std::endl;
+GetActuatorTorques(std::vector<std::pair<double, double> > &torqs_vec) const {
+    if (torqs_vec.empty()){
+        torqs_vec.resize(motors_.size());
+    }
+    else if (torqs_vec.size() != motors_.size()){
+        std::cerr << "Error, simulation motor number is not equal to generation motor number" << std::endl;
         exit(EXIT_FAILURE);
     }
     for (int i = 0; i < motors_.size(); ++i){
@@ -366,8 +373,12 @@ GetActuatorTorques(std::vector<std::pair<double, double> > *torqs_container) con
 }
 
 void SimulationManager::UpdateMassInfo(const std::vector<double>& mass_vec){
-    for (int i = 0; i < mass_vec.size() - 1; ++i){
-
+    if (mass_vec.size() != motors_.size()){
+        std::cerr << "Error, simulation motor number is not equal to returned mass number" << std::endl;
+        exit(EXIT_FAILURE);
     }
-    // the final mass update apply to body
+    for (int i = 0; i < mass_vec.size() - 1; ++i){
+        motors_[i]->SetMass(mass_vec[i]);
+    }
+    // TODO: the final mass update apply to body
 }

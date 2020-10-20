@@ -146,9 +146,9 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
     // ...
     // n + 1 vector: n for input components masses,
     // 1 for sum of all other components mass
-    stringvec input_types(sm.GetComponentNumber());
-    doublepairs input_vels(sm.GetMotorNumber(), std::pair<double, double>(0.0, 0.0));
-    doublepairs input_torqs(sm.GetMotorNumber(), std::pair<double, double>(0.0, 0.0));
+    stringvec input_types;
+    doublepairs input_vels;
+    doublepairs input_torqs;
     std::shared_ptr<BBNode> best_node;
 
     sm.AddWaypoints(waypoints);
@@ -161,9 +161,9 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
         bool task_done = sm.RunSimulation(true);
 
         if (task_done && !cnt) {
-            sm.GetComponentTypes(&input_types);
-            sm.GetActuatorVels(&input_vels);
-            sm.GetActuatorTorques(&input_torqs);
+            sm.GetComponentTypes(input_types);
+            sm.GetActuatorVels(input_vels);
+            sm.GetActuatorTorques(input_torqs);
 
             stringvec2d component_versions = preprocess(input_types, input_torqs, input_vels);
             infernodevec2d infer_nodes_vec = initialize(component_versions, input_torqs, input_vels);
@@ -172,8 +172,8 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
             writeDesign(*best_node);
         }
         else if (task_done) {
-             sm.GetActuatorVels(&input_vels);
-             sm.GetActuatorTorques(&input_torqs);
+             sm.GetActuatorVels(input_vels);
+             sm.GetActuatorTorques(input_torqs);
 
             // verify design
             if (doubleCheck(*best_node, input_torqs, input_vels)) {

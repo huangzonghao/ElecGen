@@ -38,8 +38,8 @@ int main(int argc, char *argv[]) {
     // n + 1 vector: n for input components masses,
     // 1 for sum of all other components mass
     stringvec input_types;
-    doublepairs input_vels(sm.GetMotorNumber(), std::pair<double, double>(0.0, 0.0));
-    doublepairs input_torqs(sm.GetMotorNumber(), std::pair<double, double>(0.0, 0.0));
+    doublepairs input_vels;
+    doublepairs input_torqs;
     std::shared_ptr<BBNode> best_node;
 
     sm.AddWaypoint(0.3, 0.3, 0.2);
@@ -52,9 +52,9 @@ int main(int argc, char *argv[]) {
         bool task_done = sm.RunSimulation(true);
 
         if (task_done && !cnt) {
-            sm.GetComponentTypes(&input_types);
-            sm.GetActuatorVels(&input_vels);
-            sm.GetActuatorTorques(&input_torqs);
+            sm.GetComponentTypes(input_types);
+            sm.GetActuatorVels(input_vels);
+            sm.GetActuatorTorques(input_torqs);
 
             stringvec2d component_versions = preprocess(input_types, input_torqs, input_vels);
             infernodevec2d infer_nodes_vec = initialize(component_versions, input_torqs, input_vels);
@@ -63,8 +63,8 @@ int main(int argc, char *argv[]) {
             writeDesign(*best_node);
         }
         else if (task_done) {
-             sm.GetActuatorVels(&input_vels);
-             sm.GetActuatorTorques(&input_torqs);
+             sm.GetActuatorVels(input_vels);
+             sm.GetActuatorTorques(input_torqs);
 
             // verify design
             if (doubleCheck(*best_node, input_torqs, input_vels)) {
