@@ -314,7 +314,7 @@ set(TRAJECTORY_SOURCES
         ${TRAJECTORY_SRC_PATH}/quadrupedal_kinematics.cpp
         ${TRAJECTORY_SRC_PATH}/traj_optimizer.cpp)
 
-set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp,
+set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp
                        ${CHRONOSIM_SRC_PATH}/launch_simulation.cpp)
 
 ## Matlab Interface
