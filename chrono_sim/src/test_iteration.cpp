@@ -1,8 +1,9 @@
 #include <iostream>
 #include "SimulationManager.h"
 
-// const std::string env_filename = "../data/maps/env1.bmp";
-std::string env_filename = "";
+
+std::string env_filename = "../data/maps/env2.bmp";
+// std::string env_filename = "";
 
 const double s_friction = 2.0;
 const double k_friction = 1.9;
@@ -126,6 +127,7 @@ void test_fourleg3(){
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
+    sm.SetTimeout(0.5);
     sm.SetEnv(env_filename, 1, 1, 0.01);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
@@ -150,19 +152,44 @@ void test_fourleg3(){
     sm.AddWaypoint(12, 0, 1);
 
     // use this loop for iterations
-    bool sim_done = false;
-    while (!sim_done){
-        bool task_done = sm.RunSimulation(true);
-        // bool task_done = sm.RunSimulation(false);
+    // bool sim_done = false;
+    // while (!sim_done){
+        // bool task_done = sm.RunSimulation(true);
+        // // bool task_done = sm.RunSimulation(false);
 
-        // now the torques are ready to read
-        std::cout << "motor 1 torque " << sm.GetMotor(0)->GetMaxTorque() << std::endl;
-        std::cout << "motor 2 torque " << sm.GetMotor(1)->GetMaxTorque() << std::endl;
-        std::cout << "motor 3 torque " << sm.GetMotor(2)->GetMaxTorque() << std::endl;
-        std::cout << "motor 4 torque " << sm.GetMotor(3)->GetMaxTorque() << std::endl;
+        // // now the torques are ready to read
+        // std::cout << "motor 1 torque " << sm.GetMotor(0)->GetMaxTorque() << std::endl;
+        // std::cout << "motor 2 torque " << sm.GetMotor(1)->GetMaxTorque() << std::endl;
+        // std::cout << "motor 3 torque " << sm.GetMotor(2)->GetMaxTorque() << std::endl;
+        // std::cout << "motor 4 torque " << sm.GetMotor(3)->GetMaxTorque() << std::endl;
 
-        sim_done = true;
+        // sim_done = true;
+    // }
+    bool task_done = sm.RunSimulation(true);
+    // export data
+    std::vector<std::string> component_types;
+    std::vector<std::pair<double, double> > torqs_vec;
+    std::vector<std::pair<double, double> > vels_vec;
+    sm.GetComponentTypes(component_types);
+    sm.GetActuatorTorques(torqs_vec);
+    sm.GetActuatorVels(vels_vec);
+    std::cout << "// Component Type:" << std::endl;
+    for (int i = 0; i < component_types.size(); ++i){
+        std::cout << "Component_Type::" << component_types[i] << std::endl;
     }
+    std::cout << std::endl;
+
+    std::cout << "// Torque" << std::endl;
+    for (int i = 0; i < torqs_vec.size(); ++i){
+        std::cout << torqs_vec[i].first << " " << torqs_vec[i].second << std::endl;
+    }
+    std::cout << std::endl;
+
+    std::cout << "// Velocity" << std::endl;
+    for (int i = 0; i < vels_vec.size(); ++i){
+        std::cout << vels_vec[i].first << " " << vels_vec[i].second << std::endl;
+    }
+    std::cout << std::endl;
 
 }
 
@@ -175,7 +202,7 @@ int main(int argc, char* argv[]){
         // else std::cerr << "Error: unknown command " << argv[i] << std::endl;
     // }
     if (argc == 1) {
-        test_fourleg();
+        test_fourleg3();
     }
     else {
         if (argc == 3){
