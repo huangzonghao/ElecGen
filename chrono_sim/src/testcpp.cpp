@@ -20,18 +20,18 @@ int main(int argc, char *argv[]) {
     // try to use a wrong body name and see what happened
     // this part will be done by UI
     // TODO: finalize mass of components
-    sm.AddMotor("chassis", "chassis-fl_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "fl_cyl-fl_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "fl_upper-fl_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "chassis-bl_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "bl_cyl-bl_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "bl_upper-bl_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "chassis-fr_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "fr_cyl-fr_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "fr_upper-fr_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "chassis-br_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "br_cyl-br_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "br_upper-br_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "chassis", "chassis-fl_cyl",    1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fl_cyl-fl_upper",   1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fl_upper-fl_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "chassis", "chassis-bl_cyl",    1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "bl_cyl-bl_upper",   1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "bl_upper-bl_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "chassis", "chassis-fr_cyl",    1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fr_cyl-fr_upper",   1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fr_upper-fr_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "chassis", "chassis-br_cyl",    1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "br_cyl-br_upper",   1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "br_upper-br_lower", 1, 0.01, 0.01, 0.01);
     // encoder * 8 camera * 1
     // sm.AddPayload();
     // ...

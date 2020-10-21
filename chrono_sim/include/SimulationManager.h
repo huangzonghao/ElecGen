@@ -35,14 +35,15 @@ class  SimulationManager {
     void SetFrictionK(double fk) {k_friction_ = fk;};
     void SetTimeout(double timeout) {timeout_ = timeout;};
 
-    void AddPayload(const std::string& body_name, double mass,
-                    double size_x, double size_y, double size_z,
-                    double pos_x=0, double pos_y=0, double pos_z=0);
-    void AddMotor(const std::string& link_name,
+    void AddComponent(const std::string& type_name, const std::string& body_name,
+                      double mass, double size_x, double size_y, double size_z,
+                      double pos_x=0, double pos_y=0, double pos_z=0);
+    void AddMotor(const std::string& type_name, const std::string& link_name,
                   double mass, double size_x, double size_y, double size_z,
                   double pos_x=0, double pos_y=0, double pos_z=0);
-    void AddMotor(const std::string& body_name, const std::string& link_name,
-                  double mass, double size_x, double size_y, double size_z,
+    void AddMotor(const std::string& type_name, const std::string& body_name,
+                  const std::string& link_name, double mass,
+                  double size_x, double size_y, double size_z,
                   double pos_x=0, double pos_y=0, double pos_z=0);
     void AddWaypoint(double x, double y, double z);
     void AddWaypoints(const std::shared_ptr<const Eigen::MatrixXd>& waypoints_ptr);

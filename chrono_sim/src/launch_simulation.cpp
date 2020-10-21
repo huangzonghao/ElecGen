@@ -16,10 +16,10 @@ void test_fourwheel(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
-    sm.AddMotor("chassis_wheel_fl", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis_wheel_rl", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis_wheel_fr", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis_wheel_rr", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis_wheel_fl", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis_wheel_rl", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis_wheel_fr", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis_wheel_rr", 1,0.1,0.1,0.1);
 
     sm.AddWaypoints(waypoints);
 
@@ -51,13 +51,13 @@ void test_fourleg(const std::shared_ptr<const Eigen::MatrixXd>& waypoints, const
     // try to use a wrong body name and see what happened
     // this part will be done by UI
     // front left
-    sm.AddMotor("base_link_link1", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "base_link_link1", 1,0.1,0.1,0.1);
     // rear left
-    sm.AddMotor("base_link_link2", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "base_link_link2", 1,0.1,0.1,0.1);
     // front right
-    sm.AddMotor("base_link_link4", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "base_link_link4", 1,0.1,0.1,0.1);
     // rear right
-    sm.AddMotor("base_link_link3", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "base_link_link3", 1,0.1,0.1,0.1);
 
     sm.AddWaypoints(waypoints);
 
@@ -87,14 +87,14 @@ void test_fourleg2(const std::shared_ptr<const Eigen::MatrixXd>& waypoints, cons
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
     // try to use a wrong body name and see what happened
-    sm.AddMotor("chassis", "chassis-fl_upper", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis", "fl_upper-fl_lower", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis", "chassis-bl_upper", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis", "bl_upper-bl_lower", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis", "chassis-fr_upper", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis", "fr_upper-fr_lower", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis", "chassis-br_upper", 1,0.1,0.1,0.1);
-    sm.AddMotor("chassis", "br_upper-br_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis", "chassis-fl_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis", "fl_upper-fl_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis", "chassis-bl_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis", "bl_upper-bl_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis", "chassis-fr_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis", "fr_upper-fr_lower", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis", "chassis-br_upper", 1,0.1,0.1,0.1);
+    sm.AddMotor("MOTOR", "chassis", "br_upper-br_lower", 1,0.1,0.1,0.1);
 
     sm.AddWaypoints(waypoints);
 
@@ -129,18 +129,18 @@ void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
     // try to use a wrong body name and see what happened
     // this part will be done by UI
     // TODO: finalize mass of components
-    sm.AddMotor("chassis", "chassis-fl_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "fl_cyl-fl_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "fl_upper-fl_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "chassis-bl_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "bl_cyl-bl_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "bl_upper-bl_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "chassis-fr_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "fr_cyl-fr_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "fr_upper-fr_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "chassis-br_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "br_cyl-br_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("chassis", "br_upper-br_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "chassis-fl_cyl",    1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fl_cyl-fl_upper",   1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fl_upper-fl_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "chassis-bl_cyl",    1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "bl_cyl-bl_upper",   1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "bl_upper-bl_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "chassis-fr_cyl",    1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fr_cyl-fr_upper",   1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fr_upper-fr_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "chassis-br_cyl",    1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "br_cyl-br_upper",   1, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "br_upper-br_lower", 1, 0.01, 0.01, 0.01);
     // encoder * 8 camera * 1
     // sm.AddPayload();
     // ...

@@ -97,18 +97,19 @@ SimPayload::SimPayload()
     :visible(false), check_collision(false), mass(0), size{0,0,0}
 {}
 
-SimPayload::SimPayload(double mass,
+SimPayload::SimPayload(const std::string& type_name, double mass,
                        double size_x, double size_y, double size_z,
                        double pos_x, double pos_y, double pos_z)
-    :visible(false), check_collision(false), mass(mass),
+    :type_name_(type_name), visible(false), check_collision(false), mass(mass),
      size{size_x, size_y, size_z}, pos(pos_x, pos_y, pos_z)
 {}
 
-SimPayload::SimPayload(const std::string& body_name, double mass,
-                       double size_x, double size_y, double size_z,
+SimPayload::SimPayload(const std::string& type_name, const std::string& body_name,
+                       double mass, double size_x, double size_y, double size_z,
                        double pos_x, double pos_y, double pos_z)
-    :body_name(body_name), visible(false), check_collision(false), mass(mass),
-     size{size_x, size_y, size_z}, pos(pos_x, pos_y, pos_z)
+    :type_name_(type_name), body_name(body_name), visible(false),
+     check_collision(false), mass(mass), size{size_x, size_y, size_z},
+     pos(pos_x, pos_y, pos_z)
 {}
 
 void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
@@ -148,17 +149,18 @@ void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
     }
 }
 
-SimMotor::SimMotor(const std::string& link_name,
+SimMotor::SimMotor(const std::string& type_name, const std::string& link_name,
                    double mass, double size_x, double size_y, double size_z,
                    double pos_x, double pos_y, double pos_z)
-    :SimPayload(mass, size_x, size_y, size_z, pos_x, pos_y, pos_z),
+    :SimPayload(type_name, mass, size_x, size_y, size_z, pos_x, pos_y, pos_z),
      link_name(link_name)
 {}
 
-SimMotor::SimMotor(const std::string& body_name, const std::string& link_name,
-                   double mass, double size_x, double size_y, double size_z,
+SimMotor::SimMotor(const std::string& type_name, const std::string& body_name,
+                   const std::string& link_name, double mass,
+                   double size_x, double size_y, double size_z,
                    double pos_x, double pos_y, double pos_z)
-    :SimPayload(body_name, mass, size_x, size_y, size_z, pos_x, pos_y, pos_z),
+    :SimPayload(type_name, body_name, mass, size_x, size_y, size_z, pos_x, pos_y, pos_z),
      link_name(link_name)
 {}
 

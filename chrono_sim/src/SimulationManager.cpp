@@ -47,19 +47,19 @@ const std::string& SimulationManager::GetUrdfFileName(){
     return urdf_doc_->GetUrdfFileName();
 }
 
-void SimulationManager::AddPayload(const std::string& body_name, double mass,
-                                   double size_x, double size_y, double size_z,
-                                   double pos_x, double pos_y, double pos_z){
-    payloads_.push_back(std::make_shared<SimPayload>(body_name, mass,
+void SimulationManager::AddComponent(const std::string& type_name, const std::string& body_name,
+                                     double mass, double size_x, double size_y, double size_z,
+                                     double pos_x, double pos_y, double pos_z){
+    payloads_.push_back(std::make_shared<SimPayload>(type_name, body_name, mass,
                                                      size_x, size_y, size_z,
                                                      pos_x, pos_y, pos_z));
     auxrefs_.insert(body_name);
 }
 
-void SimulationManager::AddMotor(const std::string& link_name,
+void SimulationManager::AddMotor(const std::string& type_name, const std::string& link_name,
                                  double mass, double size_x, double size_y, double size_z,
                                  double pos_x, double pos_y, double pos_z){
-    motors_.push_back(std::make_shared<SimMotor>(link_name, mass,
+    motors_.push_back(std::make_shared<SimMotor>(type_name, link_name, mass,
                                                  size_x, size_y, size_z,
                                                  pos_x, pos_y, pos_z));
 
@@ -71,11 +71,12 @@ void SimulationManager::AddMotor(const std::string& link_name,
     auxrefs_.insert(body_name);
 }
 
-void SimulationManager::AddMotor(const std::string& body_name, const std::string& link_name,
-                                 double mass, double size_x, double size_y, double size_z,
+void SimulationManager::AddMotor(const std::string& type_name, const std::string& body_name,
+                                 const std::string& link_name, double mass,
+                                 double size_x, double size_y, double size_z,
                                  double pos_x, double pos_y, double pos_z){
-    motors_.push_back(std::make_shared<SimMotor>(body_name, link_name, mass,
-                                                 size_x, size_y, size_z,
+    motors_.push_back(std::make_shared<SimMotor>(type_name, body_name, link_name,
+                                                 mass, size_x, size_y, size_z,
                                                  pos_x, pos_y, pos_z));
     auxrefs_.insert(body_name);
 }
@@ -336,7 +337,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
 void SimulationManager::GetComponentTypes(std::vector<std::string> &types_vec) const {
     if (types_vec.empty()){
         for (int i = 0; i < motors_.size(); ++i){
-            types_vec.push_back("MOTOR");
+            types_vec.push_back(motors_[i]->GetTypeName());
         }
     }
     else{

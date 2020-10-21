@@ -54,7 +54,7 @@ class SimMotorController {
 class SimPayload {
   public:
     std::string body_name;
-    // with respect  to the parent body frame
+    // with respect to the parent body frame
     chrono::ChVector<> pos;
     chrono::ChMatrix33<> inertia;
     double size[3];
@@ -62,11 +62,12 @@ class SimPayload {
     bool visible;
     bool check_collision;
     void SetMass(double new_mass) { mass = new_mass; }
+    const std::string& GetTypeName() {return type_name_;}
     SimPayload();
-    SimPayload(double mass,
+    SimPayload(const std::string& type_name, double mass,
                double size_x, double size_y, double size_z,
                double pos_x, double pos_y, double pos_z);
-    SimPayload(const std::string& body_name, double mass,
+    SimPayload(const std::string& type_name, const std::string& body_name, double mass,
                double size_x, double size_y, double size_z,
                double pos_x, double pos_y, double pos_z);
     ~SimPayload(){};
@@ -74,6 +75,8 @@ class SimPayload {
   protected:
     void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
                      const std::shared_ptr<chrono::ChBody>& parent_body);
+  private:
+    std::string type_name_; ///< type name that will be sent to electronic generator
 };
 
 class SimMotor : public SimPayload {
@@ -87,12 +90,13 @@ class SimMotor : public SimPayload {
     // of the motor will be added to the body specified by body_name
     // i.e. the motor actuating the joint between body B and C could be residing
     // on body A.
-    SimMotor(const std::string& body_name, const std::string& link_name,
-             double mass, double size_x, double size_y, double size_z,
+    SimMotor(const std::string& type_name, const std::string& body_name,
+             const std::string& link_name, double mass,
+             double size_x, double size_y, double size_z,
              double pos_x, double pos_y, double pos_z);
     // if body name is not specified, the mass will be added to the parent body
     // of the link (body 2)
-    SimMotor(const std::string& link_name,
+    SimMotor(const std::string& type_name, const std::string& link_name,
              double mass, double size_x, double size_y, double size_z,
              double pos_x, double pos_y, double pos_z);
     ~SimMotor(){};
@@ -111,7 +115,7 @@ class SimMotor : public SimPayload {
     double GetMaxTorque(){ return motor_controller->get_max_torque(); }
     double GetMaxVel(){ return motor_controller->get_max_vel(); }
 
-  private:
+  protected:
     const chrono::ChLinkBodies *chlinkbody;
     std::shared_ptr<chrono::ChLinkMotorRotationTorque> ch_motor;
     std::shared_ptr<chrono::ChFunction_Setpoint> ch_func;
