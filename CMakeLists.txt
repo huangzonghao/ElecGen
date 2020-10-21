@@ -82,7 +82,8 @@ if (NOT urdfdom_FOUND)
         NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers/.git" OR
         NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/console_bridge/.git")
 
-        execute_process(COMMAND git submodule update --init --recursive --depth 1)
+        execute_process(COMMAND git submodule update --init --recursive --depth 1
+                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     endif()
 
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom
@@ -94,19 +95,19 @@ if (NOT urdfdom_FOUND)
     execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
 
     execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/console_bridge
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
 
     execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/tinyxml
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
 
     if (WIN32) # Windows
@@ -125,7 +126,7 @@ if (NOT urdfdom_FOUND)
                             ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
 
     find_package(urdfdom QUIET)
@@ -147,7 +148,8 @@ find_package(Protobuf QUIET)
 if (NOT Protobuf_FOUND)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
     if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/protobuf/.git")
-        execute_process(COMMAND git submodule update --init --recursive --depth 1)
+        execute_process(COMMAND git submodule update --init --recursive --depth 1
+                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     endif()
     execute_process(COMMAND ${CMAKE_COMMAND}
                             -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
@@ -158,7 +160,7 @@ if (NOT Protobuf_FOUND)
                             ${CMAKE_SOURCE_DIR}/thirdparty/protobuf/cmake
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
     find_package(Protobuf QUIET)
 else()
@@ -177,7 +179,8 @@ if (NOT towr_FOUND)
         NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/ifopt/.git" OR
         NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/towr/.git")
 
-        execute_process(COMMAND git submodule update --init --recursive --depth 1)
+        execute_process(COMMAND git submodule update --init --recursive --depth 1
+                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     endif()
 
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr
@@ -189,7 +192,7 @@ if (NOT towr_FOUND)
     execute_process(COMMAND ${CMAKE_SOURCE_DIR}/thirdparty/Ipopt/configure --prefix ${PROJECT_DEP_INSTALL_DIR}
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/Ipopt)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/Ipopt)
     endif()
 
@@ -200,13 +203,13 @@ if (NOT towr_FOUND)
                             ${CMAKE_SOURCE_DIR}/thirdparty/ifopt
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/ifopt)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/ifopt)
 
     execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/towr/towr
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr)
 
     find_package(towr QUIET)
@@ -286,7 +289,8 @@ include_directories(${ELECTRONICS_INCLUDE_PATH})
 include_directories(${CHRONOSIM_INCLUDE_PATH})
 include_directories(${TRAJECTORY_INCLUDE_PATH})
 if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/discreture/.git")
-    execute_process(COMMAND git submodule update --init --recursive --depth 1)
+    execute_process(COMMAND git submodule update --init --recursive --depth 1
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/discreture/include)
 
@@ -301,7 +305,6 @@ set(ELECTRONICS_SOURCES
         ${ELECTRONICS_SRC_PATH}/Inference.cpp
         ${ELECTRONICS_SRC_PATH}/Matching.cpp
         ${ELECTRONICS_SRC_PATH}/stdafx.cpp
-        ${ELECTRONICS_SRC_PATH}/testfile.cpp
         ${ELECTRONICS_SRC_PATH}/utility_functions.cpp)
 
 set(CHRONOSIM_SOURCES
