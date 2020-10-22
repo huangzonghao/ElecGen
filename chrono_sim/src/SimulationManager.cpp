@@ -335,13 +335,9 @@ bool SimulationManager::RunSimulation(bool do_viz){
 }
 
 void SimulationManager::GetComponentTypes(std::vector<std::string> &types_vec) const {
-    if (types_vec.empty()){
-        for (int i = 0; i < motors_.size(); ++i){
-            types_vec.push_back(motors_[i]->GetTypeName());
-        }
-    }
-    else{
-        std::cerr << "Error: passing in a non-empty ComponentTypes vector. ComponentTypes vector can only be initialized once" << std::endl;
+    types_vec.clear();
+    for (int i = 0; i < motors_.size(); ++i){
+        types_vec.push_back(motors_[i]->GetTypeName());
     }
 }
 
@@ -374,11 +370,11 @@ GetActuatorTorques(std::vector<std::pair<double, double> > &torqs_vec) const {
 }
 
 void SimulationManager::UpdateMassInfo(const std::vector<double>& mass_vec){
-    if (mass_vec.size() != motors_.size()){
-        std::cerr << "Error, simulation motor number is not equal to returned mass number" << std::endl;
+    if (mass_vec.size() < motors_.size()){
+        std::cerr << "Error, simulation motor number is more than returned mass number" << std::endl;
         exit(EXIT_FAILURE);
     }
-    for (int i = 0; i < mass_vec.size() - 1; ++i){
+    for (int i = 0; i < motors_.size(); ++i){
         motors_[i]->SetMass(mass_vec[i]);
     }
     // TODO: the final mass update apply to body
