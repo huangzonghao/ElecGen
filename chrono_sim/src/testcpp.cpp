@@ -3,10 +3,12 @@
 #include "SimulationManager.h"
 #include "Inference.h"
 
+#include "data_dir_path.h"
+
 const double s_friction = 2.0;
 const double k_friction = 1.9;
-const std::string env_file = "../data/maps/env1.bmp";
-const std::string urdf_file = "../data/robots/fourleg3.urdf";
+const std::string env_file = std::string(ELECGEN_DATA_PATH) + "maps/env1.bmp";
+const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/fourleg3.urdf";
 
 int main(int argc, char *argv[]) {
     // first init simulation manager

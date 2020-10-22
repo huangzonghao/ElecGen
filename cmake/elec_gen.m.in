@@ -1,0 +1,6 @@
+% This is an auto-generated file, do not edit
+% If at any time the paths in this file become invalid,
+% try to rebuild the project.
+
+addpath('@ELECGEN_MATLAB_PATH@')
+UI('@ELECGEN_EXE_PATH@', '@ELECGEN_DATA_PATH@')

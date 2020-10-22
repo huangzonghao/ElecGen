@@ -1,4 +1,4 @@
-function UI
+function UI(elecgen_exe_path, elecgen_data_path)
 
 %% INITIALIZATION
 [flag, fignum] = figflag('ElecGen');
@@ -8,7 +8,7 @@ end
 
 % IO file locations
 outputfile = fullfile('..', 'output.txt');
-output_urdffile = fullfile('..', 'data', 'robots', 'robot.urdf.tmp');
+output_urdffile = fullfile(elecgen_data_path, 'robots', 'robot.urdf.tmp');
 
 % colors
 bckclr = [1 1 1];
@@ -69,17 +69,17 @@ redrawEnv;
 
 %% SIMULATION
     function run(~,~)
-        addpath('../build');
         % writeURDF(output_urdffile, robotName, robotLinks, robotJoints, ButtonFunctions, FunctionType);
 
         % swap x y of each way point to align with x y of heightmap.
         if size(trajectory, 1) < 2
-            display('Need to at least assign a start and a goal point');
+            fprintf('Need to at least assign a start and a goal point');
             return;
         end
         sim_trajectory = trajectory(:, [2 1 3]);
         % pass trajectory as a 3xN matrix
-        mexRun(urdf_file, env_file, heightmap, sim_trajectory');
+        % mexRun(urdf_file, env_file, heightmap, sim_trajectory');
+        system(elecgen_exe_path);
 
         % displayOutput;
     end
@@ -473,7 +473,7 @@ redrawEnv;
             {'*.urdf','URDF (*.urdf)';
             '*.*',  'All Files (*.*)'}, ...
             'Select a robot to load.',...
-            fullfile('..', 'data', 'robots'),'MultiSelect', 'off');
+            fullfile(elecgen_data_path, 'robots'),'MultiSelect', 'off');
         if isequal(filename,0)
             disp('No file selected')
         else
@@ -498,7 +498,7 @@ redrawEnv;
             '*.obj', 'OBJ (*.obj)';
             '*.*',  'All Files (*.*)'}, ...
             'Select an environment to load.',...
-            fullfile('..', 'data', 'maps'),'MultiSelect', 'off');
+            fullfile(elecgen_data_path, 'maps'),'MultiSelect', 'off');
 
         if isequal(filename,0)
             disp('No file selected')

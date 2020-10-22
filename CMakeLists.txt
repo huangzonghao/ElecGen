@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Electronics_Generation)
 
+set(PROJECT_TARGET_NAME ${CMAKE_PROJECT_NAME})
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
@@ -294,8 +295,14 @@ if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/discreture/.git")
 endif()
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/discreture/include)
 
-set(DATA_DIRECTORY_PATH ${CMAKE_SOURCE_DIR}/data/)
-set(ELECGEN_OUTPUT_PATH ${CMAKE_BINARY_DIR}/)
+# set project specified paths
+set(ELECGEN_DATA_PATH ${CMAKE_SOURCE_DIR}/data/)
+if (MSVC)
+    set(ELECGEN_OUTPUT_PATH ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+else() # UNIX
+    set(ELECGEN_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+endif()
+set(ELECGEN_EXE_PATH ${ELECGEN_OUTPUT_PATH}/${PROJECT_TARGET_NAME})
 configure_file(${CMAKE_MODULE_PATH}/data_dir_path.h.in data_dir_path.h @ONLY)
 include_directories(${CMAKE_BINARY_DIR})
 
@@ -323,27 +330,31 @@ set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp
 
 ## Matlab Interface
 # =================
-matlab_add_mex(NAME mexRun SRC ${MATLAB_CPP_GATEWAY} ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
+# matlab_add_mex(NAME mexRun SRC ${MATLAB_CPP_GATEWAY} ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
 
-set_target_properties(mexRun PROPERTIES
-        COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-        COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-        LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
-if(MSVC)
-    # to make protobuf run with dll
-    target_compile_definitions(mexRun PUBLIC PROTOBUF_USE_DLLS)
-endif()
+# set_target_properties(mexRun PROPERTIES
+        # COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+        # COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+        # LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+# if(MSVC)
+    # # to make protobuf run with dll
+    # target_compile_definitions(mexRun PUBLIC PROTOBUF_USE_DLLS)
+# endif()
 
-target_link_libraries(mexRun
-                      optimized ${Gurobi_CXX_LIBRARY}
-                      debug ${Gurobi_CXX_DEBUG_LIBRARY})
+# target_link_libraries(mexRun
+                      # optimized ${Gurobi_CXX_LIBRARY}
+                      # debug ${Gurobi_CXX_DEBUG_LIBRARY})
 
-target_link_libraries(mexRun ${CHRONO_LIBRARIES}
-                             ${urdfdom_LIBRARIES}
-                             ${towr_LIBRARIES}
-                             ${Gurobi_LIBRARY}
-                             ${Protobuf_LIBRARIES}
-                             component_structure)
+# target_link_libraries(mexRun ${CHRONO_LIBRARIES}
+                             # ${urdfdom_LIBRARIES}
+                             # # ${towr_LIBRARIES}
+                             # ${Gurobi_LIBRARY}
+                             # ${Protobuf_LIBRARIES}
+                             # component_structure)
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Matlab)
+set(ELECGEN_MATLAB_PATH ${CMAKE_SOURCE_DIR}/ui/)
+configure_file(${CMAKE_MODULE_PATH}/elec_gen.m.in ${CMAKE_BINARY_DIR}/Matlab/elec_gen.m @ONLY)
 # ===========================================================
 
 
@@ -353,22 +364,22 @@ target_link_libraries(mexRun ${CHRONO_LIBRARIES}
 # add_executable(executable ${CHRONOSIM_SRC_PATH}/test_iteration.cpp ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
 
 # single test
-add_executable(executable ${CHRONOSIM_SRC_PATH}/testcpp.cpp ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
+add_executable(${PROJECT_TARGET_NAME} ${CHRONOSIM_SRC_PATH}/testcpp.cpp ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
 
-set_target_properties(executable PROPERTIES
+set_target_properties(${PROJECT_TARGET_NAME} PROPERTIES
         COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
         COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
         LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
 if(MSVC)
     # to make protobuf run with dll
-    target_compile_definitions(executable PUBLIC PROTOBUF_USE_DLLS)
+    target_compile_definitions(${PROJECT_TARGET_NAME} PUBLIC PROTOBUF_USE_DLLS)
 endif()
 
-target_link_libraries(executable
+target_link_libraries(${PROJECT_TARGET_NAME}
                       optimized ${Gurobi_CXX_LIBRARY}
                       debug ${Gurobi_CXX_DEBUG_LIBRARY})
 
-target_link_libraries(executable ${CHRONO_LIBRARIES}
+target_link_libraries(${PROJECT_TARGET_NAME} ${CHRONO_LIBRARIES}
                                  ${urdfdom_LIBRARIES}
                                  ${Gurobi_LIBRARY}
                                  ${Protobuf_LIBRARIES}

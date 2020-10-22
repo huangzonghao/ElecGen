@@ -1,3 +1,8 @@
-#define DATA_DIRECTORY_PATH "@DATA_DIRECTORY_PATH@"
+// This is an auto-generated file, do not edit
+// If at any time the paths in this file become invalid,
+// try to rebuild the project.
+
 #define CHRONO_DATA_DIR "@CHRONO_DATA_DIR@"
+#define ELECGEN_DATA_PATH "@ELECGEN_DATA_PATH@"
 #define ELECGEN_OUTPUT_PATH "@ELECGEN_OUTPUT_PATH@"
+#define ELECGEN_EXE_PATH "@ELECGEN_EXE_PATH@"

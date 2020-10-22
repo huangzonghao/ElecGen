@@ -56,7 +56,7 @@ using connection_relation_vec = std::vector<connection_relation>;
 using connection_relation_vec2d = std::vector<connection_relation_vec>;
 
 // file path
-const std::string data_root(DATA_DIRECTORY_PATH);
+const std::string data_root(ELECGEN_DATA_PATH);
 const std::string output_root(ELECGEN_OUTPUT_PATH);
 const std::string elec_root(data_root + "/electronics/");
 

@@ -3,12 +3,14 @@
 #include "SimulationManager.h"
 #include "Inference.h"
 
+#include "data_dir_path.h"
+
 const double s_friction = 2.0;
 const double k_friction = 1.9;
 
 void test_fourwheel(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
                     const std::string& env_file){
-    const std::string urdf_file = "../data/robots/fourwheels.urdf";
+    const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/fourwheels.urdf";
 
     SimulationManager sm;
     sm.SetUrdfFile(urdf_file);
@@ -40,7 +42,7 @@ void test_fourwheel(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
 }
 
 void test_fourleg(const std::shared_ptr<const Eigen::MatrixXd>& waypoints, const std::string& env_file){
-    const std::string urdf_file = "../data/robots/fourleg.urdf";
+    const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/fourleg.urdf";
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_file);
@@ -78,7 +80,7 @@ void test_fourleg(const std::shared_ptr<const Eigen::MatrixXd>& waypoints, const
 }
 
 void test_fourleg2(const std::shared_ptr<const Eigen::MatrixXd>& waypoints, const std::string& env_file){
-    const std::string urdf_file = "../data/robots/fourleg2.urdf";
+    const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/fourleg2.urdf";
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_file);
@@ -118,7 +120,7 @@ void test_fourleg2(const std::shared_ptr<const Eigen::MatrixXd>& waypoints, cons
 void test_fourleg3(const std::shared_ptr<const Eigen::MatrixXd>& waypoints,
                    const std::string& env_file,
                    const std::shared_ptr<const Eigen::MatrixXd>& heightmap){
-    const std::string urdf_file = "../data/robots/fourleg3.urdf";
+    const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/fourleg3.urdf";
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_file);

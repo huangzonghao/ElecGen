@@ -1,15 +1,16 @@
 #include <iostream>
 #include "SimulationManager.h"
 
+#include "data_dir_path.h"
 
-std::string env_filename = "../data/maps/env2.bmp";
+std::string env_filename = std::string(ELECGEN_DATA_PATH) + "maps/env2.bmp";
 // std::string env_filename = "";
 
 const double s_friction = 2.0;
 const double k_friction = 1.9;
 
 void test_fourwheel(){
-    const std::string urdf_filename = "../data/robots/fourwheels.urdf";
+    const std::string urdf_filename = std::string(ELECGEN_DATA_PATH) + "robots/fourwheels.urdf";
 
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
@@ -43,7 +44,7 @@ void test_fourwheel(){
 }
 
 void test_fourleg(){
-    const std::string urdf_filename = "../data/robots/fourleg.urdf";
+    const std::string urdf_filename = std::string(ELECGEN_DATA_PATH) + "robots/fourleg.urdf";
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
@@ -84,7 +85,7 @@ void test_fourleg(){
 }
 
 void test_fourleg2(){
-    const std::string urdf_filename = "../data/robots/fourleg2.urdf";
+    const std::string urdf_filename = std::string(ELECGEN_DATA_PATH) + "robots/fourleg2.urdf";
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
@@ -123,7 +124,7 @@ void test_fourleg2(){
 }
 
 void test_fourleg3(){
-    const std::string urdf_filename = "../data/robots/fourleg3.urdf";
+    const std::string urdf_filename = std::string(ELECGEN_DATA_PATH) + "robots/fourleg3.urdf";
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
