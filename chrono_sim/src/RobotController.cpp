@@ -62,7 +62,7 @@ bool LeggedController::Update(){
 
         if (gait_lock){
             // TODO:why do i need this.
-            if (update_counter++ < 30)
+            if (update_counter++ < 3000)
                 return false;
             update_counter = 0;
         }
@@ -110,6 +110,7 @@ bool LeggedController::Update(){
             exe_gait2();
             break;
         case M3:
+            gait = FORWARD;
             exe_gait3();
             break;
         default:

@@ -13,27 +13,27 @@ const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/fourleg3.
 int main(int argc, char *argv[]) {
     // first init simulation manager
     SimulationManager sm;
-    sm.SetTimeout(0.1);
+    sm.SetTimeout(50);
     sm.SetUrdfFile(urdf_file);
-    sm.SetEnv(env_file, 1, 1, 0.08);
+    // sm.SetEnv(env_file, 1, 1, 0.08);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
     // try to use a wrong body name and see what happened
     // this part will be done by UI
     // TODO: finalize mass of components
-    sm.AddMotor("SERVO", "chassis", "chassis-fl_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("MOTOR", "chassis", "fl_cyl-fl_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("MOTOR", "chassis", "fl_upper-fl_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("SERVO", "chassis", "chassis-bl_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("MOTOR", "chassis", "bl_cyl-bl_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("MOTOR", "chassis", "bl_upper-bl_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("SERVO", "chassis", "chassis-fr_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("MOTOR", "chassis", "fr_cyl-fr_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("MOTOR", "chassis", "fr_upper-fr_lower", 1, 0.01, 0.01, 0.01);
-    sm.AddMotor("SERVO", "chassis", "chassis-br_cyl",    1, 0.01, 0.01, 0.01);
-    sm.AddMotor("MOTOR", "chassis", "br_cyl-br_upper",   1, 0.01, 0.01, 0.01);
-    sm.AddMotor("MOTOR", "chassis", "br_upper-br_lower", 1, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "chassis", "chassis-fl_cyl",    0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fl_cyl-fl_upper",   0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fl_upper-fl_lower", 0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "chassis", "chassis-bl_cyl",    0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "bl_cyl-bl_upper",   0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "bl_upper-bl_lower", 0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "chassis", "chassis-fr_cyl",    0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fr_cyl-fr_upper",   0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "fr_upper-fr_lower", 0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "chassis", "chassis-br_cyl",    0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "br_cyl-br_upper",   0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("MOTOR", "chassis", "br_upper-br_lower", 0.01, 0.01, 0.01, 0.01);
     // encoder * 8 camera * 1
     // sm.AddPayload();
     // ...
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     doublepairs input_torqs;
     std::shared_ptr<BBNode> best_node;
 
-    sm.AddWaypoint(0.3, 0.3, 0.2);
+    sm.AddWaypoint(0.3, 0.3, 0.4);
     sm.AddWaypoint(0.9, 0.9, 0.2);
 
     // use this loop for iterations

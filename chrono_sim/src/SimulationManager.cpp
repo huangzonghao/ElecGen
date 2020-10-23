@@ -379,7 +379,8 @@ void SimulationManager::UpdateMassInfo(const std::vector<double>& mass_vec){
         exit(EXIT_FAILURE);
     }
     for (int i = 0; i < motors_.size(); ++i){
-        motors_[i]->SetMass(mass_vec[i]);
+        // the incoming mass has unit of g
+        motors_[i]->SetMass(0.001 * mass_vec[i]);
     }
     // TODO: the final mass update apply to body
 }

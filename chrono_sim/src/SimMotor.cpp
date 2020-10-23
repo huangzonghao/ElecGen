@@ -89,7 +89,7 @@ double SimMotorController::get_torque(){
 
     target_torque_ =  vel_pid->Get_Out(target_vel_ - ch_motor->GetMotorRot_dt(), ch_motor->GetChTime());
     if (target_vel_ > max_vel_) max_vel_ = target_vel_;
-    if (target_torque_  >max_torque_) max_torque_ = target_torque_;
+    if (target_torque_ > max_torque_) max_torque_ = target_torque_;
     return target_torque_;
 }
 
@@ -134,7 +134,7 @@ void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
     if (check_collision){
         chrono_types::make_shared<chrono::ChMaterialSurfaceNSC>();
         parent_body->GetCollisionModel()->AddBox(chrono_types::make_shared<chrono::ChMaterialSurfaceNSC>(),
-                                                size[0] / 2, size[1] / 2, size[2] / 2, pos);
+                                                 size[0] / 2, size[1] / 2, size[2] / 2, pos);
         parent_body->GetCollisionModel()->BuildModel();
     }
 

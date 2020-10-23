@@ -13,11 +13,11 @@
 class SimMotorController {
   public:
     static int counter;
-    static constexpr double pos_thresh = 1e-2;
-    static constexpr double vel_P = 80;
+    static constexpr double pos_thresh = 1e-3;
+    static constexpr double vel_P = 1;
     static constexpr double vel_I = 0;
     static constexpr double vel_D = 0;
-    static constexpr double pos_P = 10;
+    static constexpr double pos_P = 1;
     static constexpr double pos_I = 0;
     static constexpr double pos_D = 0;
 
@@ -41,7 +41,7 @@ class SimMotorController {
     double get_max_torque(){ return max_torque_; }
     double get_max_vel(){ return max_vel_; }
   private:
-    double max_pos_control_vel_ = 6;
+    double max_pos_control_vel_ = 0.2;
     double target_pos_ = 0;
     double target_vel_ = 0;
     double target_torque_ = 0;
