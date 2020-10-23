@@ -52,7 +52,7 @@ class  SimulationManager {
 
     const std::shared_ptr<SimMotor> GetMotor(int motor_idx) const { return motors_[motor_idx];}
 
-    bool RunSimulation(bool do_viz=true);
+    bool RunSimulation(bool do_viz=true, bool do_realtime=false);
     const std::string& GetUrdfFileName();
 
     /** Interface functions **/

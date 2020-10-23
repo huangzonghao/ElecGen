@@ -2,6 +2,7 @@
 #include "chrono_irrlicht/ChIrrApp.h"
 #include "chrono/physics/ChBodyEasy.h"
 #include "chrono_vehicle/terrain/RigidTerrain.h"
+#include "chrono/core/ChRealtimeStep.h"
 
 #include "SimulationManager.h"
 #include "data_dir_path.h"
@@ -97,7 +98,7 @@ void SimulationManager::AddWaypoints(const std::shared_ptr<const Eigen::MatrixXd
     }
 }
 
-bool SimulationManager::RunSimulation(bool do_viz){
+bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
     if(!urdf_doc_){
         std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
         exit(EXIT_FAILURE);
@@ -287,6 +288,7 @@ bool SimulationManager::RunSimulation(bool do_viz){
     std::chrono::steady_clock::time_point tik;
     std::chrono::steady_clock::time_point tok;
     if(do_viz){
+        ChRealtimeStepTimer realtime_timer;
         using namespace chrono::irrlicht;
         using namespace irr::core;
         ChIrrApp vis_app(ch_system_.get(),
@@ -312,6 +314,8 @@ bool SimulationManager::RunSimulation(bool do_viz){
             vis_app.EndScene();
 
             task_done_ = controller_->Update();
+
+            if (do_realtime) realtime_timer.Spin(step_size_);
         }
         tok = std::chrono::steady_clock::now();
 
