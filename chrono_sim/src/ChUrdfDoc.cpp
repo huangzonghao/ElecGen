@@ -340,6 +340,10 @@ bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::sha
         std::cerr << "ERROR: No URDF loaded, call Load_URDF first" << std::endl;
         return false;
     }
+    // clear chrono object containers in case this urdf file has been added to system before
+    ch_materials_.clear();
+    ch_link_bodies_.clear();
+
     std::cout << "robot name is: " << urdf_robot_->getName() << std::endl;
     ch_system_ = sys;
 
