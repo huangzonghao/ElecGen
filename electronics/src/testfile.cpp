@@ -1508,12 +1508,13 @@ void system_test()
 		Component_Type::Motor, Component_Type::Motor,
 		Component_Type::Servo, Component_Type::Servo,
 		Component_Type::Servo, Component_Type::Servo,
-		Component_Type::Encoder, Component_Type::Encoder,
-		Component_Type::Encoder, Component_Type::Encoder,
-		Component_Type::Encoder, Component_Type::Encoder,
-		Component_Type::Encoder, Component_Type::Encoder,
-		Component_Type::Camera
+//		Component_Type::Encoder, Component_Type::Encoder,
+//		Component_Type::Encoder, Component_Type::Encoder,
+//		Component_Type::Encoder, Component_Type::Encoder,
+//		Component_Type::Encoder, Component_Type::Encoder,
+//		Component_Type::Camera
 	};
+
 	doublepairs input_torques{
 		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
 		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
@@ -1522,6 +1523,7 @@ void system_test()
 		make_pair<double>(1e-3, 0.14), make_pair<double>(1e-3, 0.14),
 		make_pair<double>(1e-3, 0.14), make_pair<double>(1e-3, 0.14),
 	};
+
 	doublepairs input_velocities{
 		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
 		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
@@ -1530,6 +1532,25 @@ void system_test()
 		make_pair<double>(1e-3, 10.0), make_pair<double>(1e-3, 10.0),
 		make_pair<double>(1e-3, 10.0), make_pair<double>(1e-3, 10.0),
 	};
+
+	// abnormal input tests
+//	doublepairs input_torques{
+//		make_pair<double>(1e-3, 4), make_pair<double>(1e-3, 0.4),
+//		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
+//		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
+//		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
+//		make_pair<double>(1e-3, 0.14), make_pair<double>(1e-3, 0.14),
+//		make_pair<double>(1e-3, 0.14), make_pair<double>(1e-3, 0.14),
+//	};
+
+//	doublepairs input_velocities{
+//		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
+//		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
+//		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
+//		make_pair<double>(1e-3, 6.0), make_pair<double>(1e-3, 6.0),
+//		make_pair<double>(1e-3, 10.0), make_pair<double>(1e-3, 10.0),
+//		make_pair<double>(1e-3, 10.0), make_pair<double>(1e-3, 10.0),
+//	};
 
 	stringvec2d component_versions = preprocess(input_types, input_torques, input_velocities);
 	infernodevec2d infer_nodes_vec = initialize(component_versions, input_torques, input_velocities);
@@ -1671,11 +1692,18 @@ void system_test()
 //		infer_node15, infer_node16, infer_node17, infer_node18,  infer_node19, infer_node20, infer_node21 };
 //	BBNode root(infer_nodes);
 // 	bbnodevec bbnodes{ root };
-	shared_ptr<BBNode> best_node = branchNBound(&bbnodes);
-	writeDesign(*best_node);
-	doublevec mass_vec = getMassVec(*best_node, input_torques.size());
-	bool success = doubleCheck(*best_node, input_torques, input_velocities);
- 	int a = 1;
+	if (bbnodes.size())
+	{
+		shared_ptr<BBNode> best_node = branchNBound(&bbnodes);
+		writeDesign(*best_node);
+		doublevec mass_vec = getMassVec(*best_node, input_torques.size());
+		bool success = doubleCheck(*best_node, input_torques, input_velocities);
+		int a = 1;
+	}
+	else
+	{
+		throw "Invalid inputs";
+	}
 
 }
 

@@ -1,0 +1,468 @@
+component_name: "MTD-01"
+component_type: "H_BRIDGE"
+component_class: "OTHER"
+pin {
+  name: "VCC"
+  pin_class: POWER
+  func_type: MOTOR
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 6
+    ub: 35
+  }
+  i_bound {
+    lb: 0	
+    ub: 4
+  }
+  dependents {
+    others: "5V"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "5V"
+  pin_class: POWER
+  func_type: LOGIC
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 5
+    ub: 5
+  }
+  i_bound {
+    lb: 0	
+    ub: 0.00003
+  }
+  dependents {
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "5V"
+  pin_class: POWER
+  func_type: LOGIC
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 5
+    ub: 5
+  }
+  i_bound {
+    lb: 0	
+    ub: 0.00003
+  }
+  dependents {
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "5V"
+  pin_class: POWER
+  func_type: LOGIC
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 5
+    ub: 5
+  }
+  i_bound {
+    lb: 0	
+    ub: 0.00003
+  }
+  dependents {
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "5V"
+  pin_class: POWER
+  func_type: LOGIC
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 5
+    ub: 5
+  }
+  i_bound {
+    lb: 0	
+    ub: 0.00003
+  }
+  dependents {
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "5V"
+  pin_class: POWER
+  func_type: LOGIC
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 5
+    ub: 5
+  }
+  i_bound {
+    lb: 0	
+    ub: 0.00003
+  }
+  dependents {
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
+  }
+  dependents {
+    others: "5V"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
+  }
+  dependents {
+    others: "5V"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
+  }
+  dependents {
+    others: "5V"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "ENA"
+  pin_class: FUNCTION
+  func_type: ENABLE
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00003
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "ENB"
+  pin_class: FUNCTION
+  func_type: ENABLE
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00003
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "In1"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00003
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "ENA"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "In2"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00003
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "ENA"
+    others: "GND"
+    others: "GND"
+    others: "GND" 
+  }
+}
+pin {
+  name: "In3"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00003 
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "ENB"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "In4"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.00003
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "ENB"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "OUT1"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 35
+  }
+  i_bound {
+    lb: 0 
+    ub: 2
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "ENA"
+    others: "In1"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "OUT2"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 35
+  }
+  i_bound {
+    lb: 0 
+    ub: 2
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "ENA"
+    others: "In2"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "OUT3"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 35
+  }
+  i_bound {
+    lb: 0 
+    ub: 2
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "ENB"
+    others: "In3"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+pin {
+  name: "OUT4"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 35
+  }
+  i_bound {
+    lb: 0 
+    ub: 2
+  }
+  dependents {
+    others: "5V"
+    others: "VCC"
+    others: "ENB" 
+    others: "In4"
+    others: "GND"
+    others: "GND"
+    others: "GND"
+  }
+}
+nonlin: 1
+size {
+  length: 127
+  width: 25.4
+  height: 101.6
+}
+weight: 113.398
+price: 8.95
+[Electronics.H_Bridge.h_bridge] {
+  logic_level {
+    lb: 1.5
+    ub: 2.3
+  }
+}

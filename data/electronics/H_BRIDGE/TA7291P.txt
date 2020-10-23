@@ -1,0 +1,190 @@
+component_name: "TA7291P"
+component_type: "H_BRIDGE"
+component_class: "OTHER"
+pin {
+  name: "7(VCC)"
+  pin_class: POWER
+  func_type: LOGIC
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 4.5
+    ub: 25
+  }
+  i_bound {
+    lb: 0	
+    ub: 0.008
+  }
+  dependents {
+    others: "6(GND)"
+  }
+}
+pin {
+  name: "8(VS)"
+  pin_class: POWER
+  func_type: MOTOR
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 25
+  }
+  i_bound {
+    lb: 0	
+    ub: 2
+  }
+  dependents {
+    others: "7(VCC)"
+    others: "6(GND)"
+  }
+}
+pin {
+  name: "4(Vref)"
+  pin_class: POWER
+  func_type: MOTOR
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 25
+  }
+  i_bound {
+    lb: 0	
+    ub: 2
+  }
+  dependents {
+    others: "7(VCC)"
+    others: "8(VS)"
+    others: "6(GND)"
+  }
+}
+pin {
+  name: "6(GND)"
+  pin_class: POWER
+  func_type: GND
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
+  }
+  dependents {
+    others: "7(VCC)"
+  }
+}
+pin {
+  name: "5(IN1)"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5.5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.000003
+  }
+  dependents {
+    others: "7(VCC)"
+    others: "8(VS)"
+    others: "6(GND)"
+  }
+}
+pin {
+  name: "6(IN2)"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 5.5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.000003
+  }
+  dependents {
+    others: "7(VCC)"
+    others: "8(VS)"
+    others: "6(GND)"
+  }
+}
+pin {
+  name: "2(OUT1)"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 25
+  }
+  i_bound {
+    lb: 0 
+    ub: 2
+  }
+  dependents {
+    others: "7(VCC)"
+    others: "8(VS)"
+    others: "5(IN1)"
+    others: "6(GND)"
+  }
+}
+pin {
+  name: "10(OUT2)"
+  pin_class: FUNCTION
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: OUT
+  connection: OTO
+  status: false
+  v_bound {
+    lb: 0
+    ub: 25
+  }
+  i_bound {
+    lb: 0
+    ub: 2
+  }
+  dependents {
+    others: "7(VCC)"
+    others: "8(VS)"
+    others: "6(IN2)"
+    others: "6(GND)"
+  }
+}
+nonlin: 1
+size {
+  length: 20.5
+  width: 27
+  height: 4
+}
+weight: 0.92
+price: 1.06
+[Electronics.H_Bridge.h_bridge] {
+  logic_level {
+    lb: 0.8
+    ub: 3.5
+  }
+}

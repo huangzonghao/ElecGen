@@ -593,7 +593,7 @@ stringvec2d actuatorPreprocess(const stringvec &actuator_types, const doublepair
 		{
 			if (i == 0)
 			{
-				dc_motor_torq_vels.push_back(torq_vels[i]);
+				dc_motor_torq_vels.push_back(torq_vels[j]);
 			}
 			else
 			{
@@ -618,11 +618,11 @@ stringvec2d actuatorPreprocess(const stringvec &actuator_types, const doublepair
 
 
 	stringvec2d all_motor_versions;
-	if (dc_motor_versions.size() == 0)
+	if (dc_motor_torq_vels.size() == 0)
 	{
 		all_motor_versions = servo_motor_versions;
 	}
-	else if (servo_motor_versions.size() == 0)
+	else if (servo_motor_torq_vels.size() == 0)
 	{
 		all_motor_versions = dc_motor_versions;
 	}
@@ -724,19 +724,22 @@ vector<stringpair> postprocessing(const Pin_Connections &connections,
 	}
 
 	// replace dc motor with encoder connections
-	for (size_t i = 0; i < connection_group_index.size(); i++)
+	if (encoder_index.size())
 	{
-		for (size_t j = connection_group_index[i].first;
-			j < connection_group_index[i].second; j++)
+		for (size_t i = 0; i < connection_group_index.size(); i++)
 		{
-			stringpair name_pair = separateNames(final_connections[j].second);
-			unsigned right_name_index = getPosInVec(name_pair.first, component_names),
-				matched_index = getPosInVec(right_name_index, motor_index);
-			if (matched_index != -1)
+			for (size_t j = connection_group_index[i].first;
+				j < connection_group_index[i].second; j++)
 			{
-				string replace_name = replaceConnections(final_connections[j].second,
-					component_names[encoder_index[matched_index]]);
-				final_connections[j].second = replace_name;
+				stringpair name_pair = separateNames(final_connections[j].second);
+				unsigned right_name_index = getPosInVec(name_pair.first, component_names),
+					matched_index = getPosInVec(right_name_index, motor_index);
+				if (matched_index != -1)
+				{
+					string replace_name = replaceConnections(final_connections[j].second,
+						component_names[encoder_index[matched_index]]);
+					final_connections[j].second = replace_name;
+				}
 			}
 		}
 	}
@@ -2364,10 +2367,6 @@ bbnodevec BBNode::branch()
 
 	bbnodevec next_nodes;
 	this->typeInfer();
-	if (infer_nodes.size() >= 4 && infer_nodes[3].getName() == "L4931-33")
-	{
-		bool stop = true;
-	}
 	this->minCliqueCover();
 	stringvec2d versions = this->versionInfer();
 	infernodevec2d next_infer_nodes_vec = this->numberInfer(versions);
