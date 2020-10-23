@@ -46,7 +46,7 @@ pin {
   pin_class: FUNCTION
   func_type: UART_TX
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
@@ -68,7 +68,7 @@ pin {
   pin_class: FUNCTION
   func_type: UART_RX
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
@@ -90,7 +90,7 @@ pin {
   pin_class: FUNCTION
   func_type: DIGITAL
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
@@ -114,7 +114,7 @@ pin {
   pin_class: FUNCTION
   func_type: DIGITAL
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {

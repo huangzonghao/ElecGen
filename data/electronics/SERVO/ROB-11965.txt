@@ -46,7 +46,7 @@ pin {
   pin_class: FUNCTION
   func_type: DIGITAL
   phys_type: NORMAL
-  io: OUT
+  io: IN
   connection: OTO
   status: 0
   v_bound {

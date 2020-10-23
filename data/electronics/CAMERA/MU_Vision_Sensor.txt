@@ -46,7 +46,7 @@ pin {
   pin_class: FUNCTION
   func_type: UART_RX_I2C_SDA
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
@@ -68,7 +68,7 @@ pin {
   pin_class: FUNCTION
   func_type: UART_TX_I2C_SCL
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {

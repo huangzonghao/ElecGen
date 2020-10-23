@@ -46,7 +46,7 @@ pin {
   pin_class: FUNCTION
   func_type: SPI_SCK
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
@@ -70,7 +70,7 @@ pin {
   pin_class: FUNCTION
   func_type: SPI_MISO
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
@@ -94,7 +94,7 @@ pin {
   pin_class: FUNCTION
   func_type: SPI_MOSI
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
@@ -118,7 +118,7 @@ pin {
   pin_class: FUNCTION
   func_type: SPI_SS
   phys_type: NORMAL
-  io: BIDIRECT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
@@ -142,7 +142,7 @@ pin {
   pin_class: FUNCTION
   func_type: EXTERNAL_INTERRUPT
   phys_type: NORMAL
-  io: OUT
+  io: IN
   connection: OTO
   status: 0
   v_bound {
