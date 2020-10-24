@@ -2178,31 +2178,80 @@ stringvec getAllVersions(const string &dir)
 stringvec2d getAllActuatorVersions(const string &type,
 	const vector<pair<doublepair, doublepair>> &torq_vels)
 {
-	vector<pair<doublepair, doublepair>> uniq_torq_vels =
-		unique_vec(torq_vels);
-	unsignedvec occur_num(uniq_torq_vels.size());
-
-	for (size_t i = 0; i < torq_vels.size(); i++)
+	// unpack torqs and vels
+	doublepairs torqs(torq_vels.size()), vels(torq_vels.size());
+	for (size_t i = 0; i < torqs.size(); i++)
 	{
-		for (size_t j = 0; j < uniq_torq_vels.size(); j++)
+		torqs[i] = torq_vels[i].first;
+		vels[i] = torq_vels[i].second;
+	}
+
+	// group torqs and vels
+	cliquetype torq_result = minCliqueCover(torqs),
+		vel_result = minCliqueCover(vels);
+
+	cliqueindex torq_index = std::get<1>(torq_result),
+		vel_index = std::get<1>(vel_result),
+		uniq_index(torq_index.size() * vel_index.size(), intvec(torqs.size()));
+	int cnt = 0;
+	unsignedvec empty_group_index;
+	for (size_t i = 0; i < torq_index.size(); i++)
+	{
+		for (size_t j = 0; j < vel_index.size(); j++)
 		{
-			if (torq_vels[i] == uniq_torq_vels[j])
+			std::sort(torq_index[i].begin(), torq_index[i].end());
+			std::sort(vel_index[j].begin(), vel_index[j].end());
+
+			auto it = std::set_intersection(torq_index[i].begin(), torq_index[i].end(),
+				vel_index[j].begin(), vel_index[j].end(), uniq_index[cnt].begin());
+			uniq_index[cnt].resize(it - uniq_index[cnt].begin());
+			if (!uniq_index[cnt].size())
 			{
-				occur_num[j]++;
+				empty_group_index.push_back(cnt);
 			}
+			cnt++;
 		}
+	}
+
+	// post-processing
+	for (size_t i = empty_group_index.size(); i > 0; i--)
+	{
+		uniq_index.erase(uniq_index.begin() + empty_group_index[i - 1]);
+	}
+
+	// compute intersected torqs and vels
+	doublepairs uniq_torqs(uniq_index.size()), uniq_vels(uniq_index.size());
+	for (size_t i = 0; i < uniq_index.size(); i++)
+	{
+		doublepairs temp_torqs, temp_vels;
+		for (size_t j = 0; j < uniq_index[i].size(); j++)
+		{
+			temp_torqs.push_back(torqs[uniq_index[i][j]]);
+			temp_vels.push_back(vels[uniq_index[i][j]]);
+		}
+		cliquetype temp_torq_result = minCliqueCover(temp_torqs),
+			temp_vel_result = minCliqueCover(temp_vels);
+		uniq_torqs[i] = std::get<0>(temp_torq_result)[0];
+		uniq_vels[i] = std::get<0>(temp_vel_result)[0];
+	}
+
+
+	vector<pair<doublepair, doublepair>> uniq_torq_vels(uniq_torqs.size());
+	for (size_t i = 0; i < uniq_torqs.size(); i++)
+	{
+		uniq_torq_vels[i] = make_pair(uniq_torqs[i], uniq_vels[i]);
 	}
 
 	stringvec2d motor_versions = getMotorVersions(type, uniq_torq_vels);
 	motor_versions = vectorCombinations(motor_versions);
 	for (size_t i = 0; i < motor_versions.size(); i++)
 	{
-		stringvec new_versions; // consider number
-		for (size_t j = 0; j < occur_num.size(); j++)
+		stringvec new_versions(torqs.size()); // consider number
+		for (size_t j = 0; j < motor_versions[i].size(); j++)
 		{
-			for (size_t k = 0; k < occur_num[j]; k++)
+			for (size_t k = 0; k < uniq_index[j].size(); k++)
 			{
-				new_versions.push_back(motor_versions[i][j]);
+				new_versions[uniq_index[j][k]] = motor_versions[i][j];
 			}
 		}
 		motor_versions[i] = new_versions;

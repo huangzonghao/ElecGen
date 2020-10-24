@@ -1515,6 +1515,38 @@ void system_test()
 //		Component_Type::Camera
 	};
 
+	// INPUT FROM CHRONO
+	doublepairs input_torques{
+		make_pair(0, 0.00498272),
+		make_pair(0, 0.197344),
+		make_pair(0, 0.203817),
+		make_pair(0, 0.00899592),
+		make_pair(0, 0.198498),
+		make_pair(0, 0.200381),
+		make_pair(0, 0.0156094),
+		make_pair(0, 0.189982),
+		make_pair(0, 0.2),
+		make_pair(0, 0.0197238),
+		make_pair(0, 0.198167),
+		make_pair(0, 0.2)
+	};
+
+	doublepairs input_velocities{
+		make_pair(0, 0.00365299),
+		make_pair(0, 0.2),
+		make_pair(0, 0.2),
+		make_pair(0, 0.00749155),
+		make_pair(0, 0.2),
+		make_pair(0, 0.2),
+		make_pair(0, 0.0149782),
+		make_pair(0, 0.2),
+		make_pair(0, 0.2),
+		make_pair(0, 0.0147811),
+		make_pair(0, 0.2),
+		make_pair(0, 0.2)
+	};
+
+	/*
 	doublepairs input_torques{
 		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
 		make_pair<double>(1e-3, 0.4), make_pair<double>(1e-3, 0.4),
@@ -1532,7 +1564,7 @@ void system_test()
 		make_pair<double>(1e-3, 10.0), make_pair<double>(1e-3, 10.0),
 		make_pair<double>(1e-3, 10.0), make_pair<double>(1e-3, 10.0),
 	};
-
+	*/
 	// abnormal input tests
 //	doublepairs input_torques{
 //		make_pair<double>(1e-3, 4), make_pair<double>(1e-3, 0.4),
