@@ -2,6 +2,19 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Electronics_Generation)
 
+#######################################################################
+#                        Project Configuration                        #
+#######################################################################
+if (NOT CONFIG_ELECGEN)
+    set(CONFIG_ELECGEN True CACHE BOOL "Generate Elec_Gen Target")
+endif()
+if (NOT CONFIG_CHRONO_TEST)
+    set(CONFIG_CHRONO_TEST True CACHE BOOL "Generate Chrono_Test Target")
+endif()
+if (NOT CONFIG_ELECTRONICS_TEST)
+    set(CONFIG_ELECTRONICS_TEST True CACHE BOOL "Generate Electronics_Test Target")
+endif()
+
 set(PROJECT_TARGET_NAME ${CMAKE_PROJECT_NAME})
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
@@ -11,6 +24,10 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 set(PROJECT_DEP_INSTALL_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install)
 list(APPEND CMAKE_PREFIX_PATH ${PROJECT_DEP_INSTALL_DIR})
+
+#######################################################################
+#                         Setup Dependencies                          #
+#######################################################################
 
 # first take care of external dependencies
 message(STATUS "Looking for external dependencies")
@@ -220,6 +237,10 @@ endif()
 include_directories(${towr_INCLUDE_DIRS})
 
 
+#######################################################################
+#                           Platform Flags                            #
+#######################################################################
+
 #--------------------------------------------------------------
 # Enable creation of "application bundles" on MacOSX.
 #--------------------------------------------------------------
@@ -273,7 +294,10 @@ endif()
 # Need to use the filesystem of C++17
 set (CMAKE_CXX_STANDARD 17)
 
-# source files
+#######################################################################
+#                            Source Files                             #
+#######################################################################
+
 set(ELECTRONICS_PATH ${CMAKE_SOURCE_DIR}/electronics)
 set(CHRONOSIM_PATH ${CMAKE_SOURCE_DIR}/chrono_sim)
 set(TRAJECTORY_PATH ${CMAKE_SOURCE_DIR}/trajectory)
@@ -306,6 +330,8 @@ set(ELECGEN_EXE_PATH ${ELECGEN_OUTPUT_PATH}/${PROJECT_TARGET_NAME})
 configure_file(${CMAKE_MODULE_PATH}/data_dir_path.h.in data_dir_path.h @ONLY)
 include_directories(${CMAKE_BINARY_DIR})
 
+set(ELECGEN_SOURCES ${CHRONOSIM_SRC_PATH}/elec_gen.cpp)
+
 set(ELECTRONICS_SOURCES
         ${ELECTRONICS_SRC_PATH}/actuator.cpp
         ${ELECTRONICS_SRC_PATH}/Circuit.cpp
@@ -314,11 +340,18 @@ set(ELECTRONICS_SOURCES
         ${ELECTRONICS_SRC_PATH}/stdafx.cpp
         ${ELECTRONICS_SRC_PATH}/utility_functions.cpp)
 
+set(ELECTRONICS_TEST_SOURCES
+        ${ELECTRONICS_SRC_PATH}/main.cpp
+        ${ELECTRONICS_SRC_PATH}/testfile.cpp)
+
 set(CHRONOSIM_SOURCES
         ${CHRONOSIM_SRC_PATH}/ChUrdfDoc.cpp
         ${CHRONOSIM_SRC_PATH}/RobotController.cpp
         ${CHRONOSIM_SRC_PATH}/SimMotor.cpp
         ${CHRONOSIM_SRC_PATH}/SimulationManager.cpp)
+
+set(CHRONOSIM_TEST_SOURCES
+        ${CHRONOSIM_SRC_PATH}/test_chrono.cpp)
 
 set(TRAJECTORY_SOURCES
         ${TRAJECTORY_SRC_PATH}/eigen_heightmap.cpp
@@ -358,18 +391,21 @@ configure_file(${CMAKE_MODULE_PATH}/elec_gen.m.in ${CMAKE_BINARY_DIR}/Matlab/ele
 # ===========================================================
 
 
-## Direct C++ Tests
-# =================
-# tests combined
-# add_executable(executable ${CHRONOSIM_SRC_PATH}/test_iteration.cpp ${CHRONOSIM_SOURCES} ${TRAJECTORY_SOURCES})
+#######################################################################
+#                               TARGETS                               #
+#######################################################################
 
-# single test
-add_executable(${PROJECT_TARGET_NAME} ${CHRONOSIM_SRC_PATH}/testcpp.cpp ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
+#########################
+#  ElecGen Main Target  #
+#########################
+
+if (CONFIG_ELECGEN)
+add_executable(${PROJECT_TARGET_NAME} ${ELECGEN_SOURCES} ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
 
 set_target_properties(${PROJECT_TARGET_NAME} PROPERTIES
-        COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-        COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-        LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+                                             COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+                                             COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+                                             LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
 if(MSVC)
     # to make protobuf run with dll
     target_compile_definitions(${PROJECT_TARGET_NAME} PUBLIC PROTOBUF_USE_DLLS)
@@ -379,14 +415,58 @@ target_link_libraries(${PROJECT_TARGET_NAME}
                       optimized ${Gurobi_CXX_LIBRARY}
                       debug ${Gurobi_CXX_DEBUG_LIBRARY})
 
-target_link_libraries(${PROJECT_TARGET_NAME} ${CHRONO_LIBRARIES}
-                                 ${urdfdom_LIBRARIES}
-                                 ${Gurobi_LIBRARY}
-                                 ${Protobuf_LIBRARIES}
-                                 component_structure)
+target_link_libraries(${PROJECT_TARGET_NAME}
+                      ${CHRONO_LIBRARIES}
+                      ${urdfdom_LIBRARIES}
+                      ${Gurobi_LIBRARY}
+                      ${Protobuf_LIBRARIES}
+                      component_structure)
+endif()
 
-# ===========================================================
+#################
+#  Chrono Test  #
+#################
 
+if (CONFIG_CHRONO_TEST)
+add_executable(Chrono_Test ${CHRONOSIM_TEST_SOURCES} ${CHRONOSIM_SOURCES})
+
+set_target_properties(Chrono_Test PROPERTIES
+                                  COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+                                  COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+                                  LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+
+target_link_libraries(Chrono_Test
+                      ${CHRONO_LIBRARIES}
+                      # ${towr_LIBRARIES}
+                      ${urdfdom_LIBRARIES})
+endif()
+
+######################
+#  Electronics Test  #
+######################
+
+if (CONFIG_ELECTRONICS_TEST)
+add_executable(Electronics_Test ${ELECTRONICS_TEST_SOURCES} ${ELECTRONICS_SOURCES})
+
+if(MSVC)
+    # to make protobuf run with dll
+    target_compile_definitions(${PROJECT_TARGET_NAME} PUBLIC PROTOBUF_USE_DLLS)
+endif()
+
+target_link_libraries(Electronics_Test
+                      optimized ${Gurobi_CXX_LIBRARY}
+                      debug ${Gurobi_CXX_DEBUG_LIBRARY})
+
+target_link_libraries(Electronics_Test
+                      ${urdfdom_LIBRARIES}
+                      ${Gurobi_LIBRARY}
+                      ${Protobuf_LIBRARIES}
+                      component_structure)
+endif()
+
+#######################################################################
+#                       Supplementary Functions                       #
+#######################################################################
 
 # function implemented in ChronoConfig.cmake
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
