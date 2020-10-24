@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "testfile.h"
+﻿#include "testfile.h"
 
 #include <iostream>
 int main() {

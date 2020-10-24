@@ -337,7 +337,6 @@ set(ELECTRONICS_SOURCES
         ${ELECTRONICS_SRC_PATH}/Circuit.cpp
         ${ELECTRONICS_SRC_PATH}/Inference.cpp
         ${ELECTRONICS_SRC_PATH}/Matching.cpp
-        ${ELECTRONICS_SRC_PATH}/stdafx.cpp
         ${ELECTRONICS_SRC_PATH}/utility_functions.cpp)
 
 set(ELECTRONICS_TEST_SOURCES

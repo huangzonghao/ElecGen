@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "actuator.h"
+﻿#include "actuator.h"
 #ifdef WIN32
 #include <io.h>
 #define open(a,b) _open(a,b)
