@@ -36,7 +36,8 @@ public:
 	void report();
 	void updateComponents(const std::vector<std::shared_ptr<Electrical_Component>> &_components);
 	void updateConnections(const Pin_Connections &);
-	void setMotorWorkPoint(GRBModel *, const doublepairs &, const doublepairs &);
+	void setMotorWorkPoint1(GRBModel *, const doublepairs &, const doublepairs &);
+	void setMotorWorkPoint2(GRBModel *, const doublepairs &, const doublepairs &);
 	doublevec getVals(unsigned &, unsigned &, unsigned &);
 	doublevec getMaxVals(unsigned &, unsigned &, unsigned &);
 	unsigned getComponentsSize() { return static_cast<unsigned>(components.size()); }
@@ -55,6 +56,7 @@ public:
 	unsigned getConnectionsSize() const { return static_cast<unsigned>(pin_connections.size()); }
 	int add(int x, int y) { return x + y; }
 	int subtract(int x, int y) { return x - y; }
+	static bool enable_reporting;
 
 private:
 	// one time

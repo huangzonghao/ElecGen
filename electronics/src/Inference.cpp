@@ -5,10 +5,14 @@
 // connection_relation BBNode::final_connections = connection_relation();
 GRBEnv env = GRBEnv();
 unsigned BBNode::num_of_bbnodes = 0;
+unsigned BBNode::num_of_pruned_bbnodes = 0;
 doublevec BBNode::coefficients = { 1, 0, 0, 0, 0, 0 };
 double BBNode::best_metric_val = 0.0;
+std::vector<std::pair<unsigned, double>> BBNode::metric_vec =
+	std::vector<std::pair<unsigned, double>>();
 unsigned BBNode::last_level = 0;
 bool BBNode::pruning_enable = true;
+bool BBNode::solver_info = false;
 unsigned Infer_Node::num_of_nodes = 0;
 
 static std::unordered_map<unsigned, Infer_Node> global_infer_node_map;
@@ -476,12 +480,12 @@ compoundsettype generateNeedSet(Circuit &circuit, GRBModel &model, compstructptr
 }
 */
 
-bool doubleCheck(Circuit &circuit, GRBModel &model,
+bool doubleCheck2(Circuit &circuit, GRBModel &model,
 	const doublepairs &torqs, const doublepairs &vels)
 {
 	bool success;
 	circuit.syncVars(model);
-	circuit.setMotorWorkPoint(&model, torqs, vels);
+	circuit.setMotorWorkPoint2(&model, torqs, vels);
 	model.optimize();
 	model.get(GRB_IntAttr_Status) == GRB_OPTIMAL ? success = true :
 		success = false;
@@ -490,8 +494,28 @@ bool doubleCheck(Circuit &circuit, GRBModel &model,
 
 bool doubleCheck(BBNode &node, const doublepairs &torqs, const doublepairs &vels)
 {
-	return doubleCheck(node.circuit, node.model, torqs, vels);
+	return doubleCheck2(node.circuit, node.model, torqs, vels);
 }
+
+bool doubleCheck1(Circuit& circuit, GRBModel& model,
+	const doublepairs& torqs, const doublepairs& vels)
+{
+	bool success;
+	circuit.syncVars(model);
+	circuit.setMotorWorkPoint1(&model, torqs, vels);
+	model.optimize();
+	model.get(GRB_IntAttr_Status) == GRB_OPTIMAL ? success = true :
+		success = false;
+	return success;
+}
+
+bool reEvaluate(BBNode& node, const doublepairs& torqs, const doublepairs& vels)
+{
+	bool limit1 = doubleCheck1(node.circuit, node.model, torqs, vels),
+		limit2 = doubleCheck2(node.circuit, node.model, torqs, vels);
+	return limit1 && limit2;
+}
+
 
 
 stringvec2d preprocess(const stringvec &component_types, const doublepairs &torqs, const doublepairs &vels)
@@ -1589,6 +1613,7 @@ shared_ptr<BBNode> branchNBound(bbnodevec *roots)
 	bbnodevec descendents;
 	for (size_t i = 0; i < roots->size(); i++)
 	{
+		descendents.clear();
 		if (!roots->at(i).empty())
 		{
 			roots->at(i).evaluate();
@@ -1608,6 +1633,9 @@ shared_ptr<BBNode> branchNBound(bbnodevec *roots)
 				{
 					roots->at(i).reevaluate();
 					BBNode::best_metric_val = roots->at(i).getMetricVal();
+					BBNode::metric_vec.push_back(make_pair(BBNode::num_of_bbnodes,
+						BBNode::best_metric_val));
+
 					// get best node
 					best_node =  make_shared<BBNode>(roots->at(i).infer_nodes, roots->at(i).circuit,
 						roots->at(i).model, roots->at(i).prev_bbnode);
@@ -1621,6 +1649,9 @@ shared_ptr<BBNode> branchNBound(bbnodevec *roots)
 					if (BBNode::best_metric_val > roots->at(i).getMetricVal())
 					{
 						BBNode::best_metric_val = roots->at(i).getMetricVal();
+						BBNode::metric_vec.push_back(make_pair(BBNode::num_of_bbnodes,
+							BBNode::best_metric_val));
+
 						best_node = make_shared<BBNode>(roots->at(i).infer_nodes, roots->at(i).circuit,
 							roots->at(i).model, roots->at(i).prev_bbnode);
 						best_node->copyMetrics(roots->at(i));
@@ -3115,7 +3146,10 @@ BBNode::BBNode(const infernodevec &_infer_nodes, BBNode *_prev_bbnode)
         _prev_bbnode = new BBNode;
     }
     this->prev_bbnode = _prev_bbnode;
-//	this->model.set(GRB_IntParam_LogToConsole, 0);
+	if (!BBNode::solver_info)
+	{
+		this->model.set(GRB_IntParam_LogToConsole, 0);
+	}
 	this->id = num_of_bbnodes++;
 	this->level = _prev_bbnode->level + 1;
 	this->infer_nodes = _infer_nodes;
@@ -3132,7 +3166,10 @@ BBNode::BBNode(const infernodevec &_infer_nodes, const Circuit &_circuit,
     if (!_prev_bbnode){
         _prev_bbnode = new BBNode;
     }
-//	this->model.set(GRB_IntParam_LogToConsole, 0);
+	if (!BBNode::solver_info)
+	{
+		this->model.set(GRB_IntParam_LogToConsole, 0);
+	}
 	this->id = num_of_bbnodes++;
 	this->level = _prev_bbnode->level + 1;
 	this->infer_nodes = _infer_nodes;

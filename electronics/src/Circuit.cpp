@@ -1,4 +1,5 @@
 ﻿#include "Circuit.h"
+bool Circuit::enable_reporting = false;
 
 using std::vector;
 using std::string;
@@ -229,8 +230,11 @@ void Circuit::minUpdateConnectionsSolve(GRBModel *model)
 			components[i]->i_bound_mat(0, 1) = limit_current;
 		}
 	}
-	model->write("min_model.lp");
-	report();
+	if (Circuit::enable_reporting)
+	{
+		model->write("min_model.lp");
+		report();
+	}
 	return;
 }
 
@@ -271,8 +275,12 @@ void Circuit::maxSolve(GRBModel* model)
 	{
 		components[i]->updateUsedPinsVolUB();
 	}
-	model->write("max_model.lp");
-	report();
+
+	if (Circuit::enable_reporting)
+	{
+		model->write("max_model.lp");
+		report();
+	}
 	return;
 }
 
@@ -494,7 +502,11 @@ void Circuit::verify(GRBModel *model, verifyMode mode, const string &method)
 	{
 		components[i]->updateUsedPinsVolLB();
 	}
-	report();
+
+	if (Circuit::enable_reporting)
+	{
+		report();
+	}
 	return;
 }
 
@@ -553,8 +565,11 @@ void Circuit::updateVerify(GRBModel *model, verifyMode mode, const std::string &
 		}
 	}
 
-	report();
-	model->write("min_model.lp");
+	if (Circuit::enable_reporting)
+	{
+		report();
+		model->write("min_model.lp");
+	}
 	return;
 }
 
@@ -592,7 +607,7 @@ void Circuit::updateConnections(const Pin_Connections &_pin_connections)
 	new_pin_connections = _pin_connections;
 }
 
-void Circuit::setMotorWorkPoint(GRBModel *model,
+void Circuit::setMotorWorkPoint2(GRBModel *model,
 	const doublepairs &torqs, const doublepairs &vels)
 {
 	for (size_t i = 0; i < torqs.size(); i++)
@@ -609,6 +624,25 @@ void Circuit::setMotorWorkPoint(GRBModel *model,
 		model->chgCoeff(vel_cons, *components[i]->var_maps["VEL"], -vel);
 	}
 }
+
+void Circuit::setMotorWorkPoint1(GRBModel* model,
+	const doublepairs& torqs, const doublepairs& vels)
+{
+	for (size_t i = 0; i < torqs.size(); i++)
+	{
+		double torq = torqs[i].first, vel = vels[i].second;
+		unsigned torq_cons_index = components[i]->model_index_map["TORQ"],
+			vel_cons_index = components[i]->model_index_map["VEL"];
+		string torq_cons_name = components[i]->model_names[torq_cons_index],
+			vel_cons_name = components[i]->model_names[vel_cons_index];
+		GRBConstr torq_cons = model->getConstrByName(torq_cons_name),
+			vel_cons = model->getConstrByName(vel_cons_name);
+
+		model->chgCoeff(torq_cons, *components[i]->var_maps["TORQ"], -torq);
+		model->chgCoeff(vel_cons, *components[i]->var_maps["VEL"], -vel);
+	}
+}
+
 
 doublevec Circuit::getVals(unsigned &comp_idx, unsigned &var_beg, unsigned &var_end)
 {

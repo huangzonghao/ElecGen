@@ -50,9 +50,12 @@ struct BBNode
 	bool feasibility = true;
 	static doublevec coefficients;
 	static unsigned num_of_bbnodes;
+	static unsigned num_of_pruned_bbnodes;
 	static unsigned last_level;
 	static double best_metric_val;
 	static bool pruning_enable;
+	static bool solver_info;
+	static std::vector<std::pair<unsigned, double>> metric_vec;
 //	static connection_relation final_connections;
 
 	stringvec next_types;
@@ -205,6 +208,10 @@ std::vector<stringpair> postprocessing(const Pin_Connections &, const stringvec 
 std::string replaceConnections(const std::string &, const std::string &);
 doublevec getMassVec(const BBNode &, const unsigned &);
 bool doubleCheck(BBNode &, const doublepairs &, const doublepairs &);
+bool doubleCheck1(Circuit &, GRBModel &, const doublepairs &, const doublepairs &);
+bool doubleCheck2(Circuit &, GRBModel &, const doublepairs &, const doublepairs &);
+bool reEvaluate(BBNode &, const doublepairs &, const doublepairs &);
+
 
 // version/number graph formulation function
 
