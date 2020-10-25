@@ -1,0 +1,75 @@
+<?xml verison="1.0"?>
+<robot name ="manipulator">
+
+<link name = "base_fixed">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 0.03" />
+        <geometry>
+            <box size="0.015 0.015 0.06"/>
+        </geometry>
+    </visual>
+    <inertial>
+        <mass value="0.01"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+</link>
+
+<joint name = "base_middle" type = "continuous">
+  <parent link = "base_fixed"/>
+  <child link = "middle"/>
+  <origin xyz = "0 0 0.06" rpy = "0 0 0" />
+  <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "middle">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0.03 0 0" />
+        <geometry>
+            <box size="0.06 0.015 0.015"/>
+        </geometry>
+    </visual>
+    <inertial>
+        <mass value="0.01"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+</link>
+
+<joint name = "middle_upper" type = "continuous">
+  <parent link = "middle"/>
+  <child link = "upper"/>
+  <origin xyz = "0.06 0 0" rpy = "0 0 0" />
+  <axis xyz = "0 1 0" />
+</joint>
+
+<link name = "upper">
+    <visual>
+        <origin rpy = "0 0 0" xyz = "0 0 -0.03" />
+        <geometry>
+            <box size="0.015 0.015 0.06"/>
+        </geometry>
+    </visual>
+    <inertial>
+        <mass value="0.01"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+</link>
+
+<joint name = "upper_ee" type = "fixed">
+  <parent link = "upper"/>
+  <child link = "endeffector"/>
+  <origin xyz = "0 0 -0.06" rpy = "0 0 0" />
+</joint>
+
+<link name = "endeffector">
+    <visual>
+        <origin rpy = "0 0 -0.01" xyz = "0 0 0" />
+        <geometry>
+            <box size="0.02 0.02 0.02"/>
+        </geometry>
+    </visual>
+    <inertial>
+        <mass value="0.01"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+</link>
+</robot>
