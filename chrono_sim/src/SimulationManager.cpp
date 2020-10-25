@@ -120,68 +120,7 @@ bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
     ch_system_->Set_G_acc(ChVector<>(0, 0, -9.81));
     ch_system_->SetSolverMaxIterations(20);  // the higher, the easier to keep the constraints satisifed.
 
-    auto ground_mat = chrono_types::make_shared<ChMaterialSurfaceNSC>();
-    ground_mat->SetSfriction(s_friction_);
-    ground_mat->SetKfriction(k_friction_);
-    ground_mat->SetRestitution(0.01f);
-
-    if (env_file_.empty()){
-        std::cout << "Map file not initialized, building default ground" << std::endl;
-        // ground body
-        auto my_ground = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 0.01, 1.0, true, true, ground_mat);
-        // make sure (0,0) is at the corner of the environment
-        my_ground->SetPos(ChVector<>(0.5, 0.5, -0.005));
-        my_ground->SetRot(Q_ROTATE_X_TO_Y);
-        my_ground->SetBodyFixed(true);
-        auto ground_texture = chrono_types::make_shared<ChColorAsset>();
-        ground_texture->SetColor(ChColor(0.2f, 0.2f, 0.2f));
-        my_ground->AddAsset(ground_texture);
-        ch_system_->AddBody(my_ground);
-    }
-    else if (env_file_.find(".bmp") != std::string::npos){
-        vehicle::RigidTerrain terrain(ch_system_.get());
-        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(env_x_ / 2, env_y_ / 2, -0.5), Q_ROTATE_X_TO_Y),
-                                      env_file_, "ground_mesh", env_x_, env_y_, 0, env_z_);
-        patch->SetColor(ChColor(0.2, 0.2, 0.2));
-        terrain.Initialize();
-    }
-    else if (env_file_.find(".obj") != std::string::npos){
-        vehicle::RigidTerrain terrain(ch_system_.get());
-        // TODO: need to set map pos offset, to make (0,0) appear at corner
-        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(0, 0, -0.5), Q_ROTATE_X_TO_Y),
-                                      env_file_, "ground_mesh");
-        patch->SetColor(ChColor(0.2, 0.2, 0.2));
-        terrain.Initialize();
-
-        // // For debug purposes
-        // auto x_box = chrono_types::make_shared<ChBodyEasyBox>(20, 1, 1, 1.0, true, true, ground_mat);
-        // x_box->SetPos(ChVector<>(10, 0, 0.5));
-        // x_box->SetBodyFixed(true);
-        // auto x_text = chrono_types::make_shared<ChColorAsset>();
-        // x_text->SetColor(ChColor(0.9f, 0.0f, 0.0f)); // red
-        // x_box->AddAsset(x_text);
-        // ch_system_->AddBody(x_box);
-
-        // auto y_box = chrono_types::make_shared<ChBodyEasyBox>(1, 20, 1, 1.0, true, true, ground_mat);
-        // y_box->SetPos(ChVector<>(0, 10, 0.5));
-        // y_box->SetBodyFixed(true);
-        // auto y_text = chrono_types::make_shared<ChColorAsset>();
-        // y_text->SetColor(ChColor(0.0f, 0.9f, 0.0f)); // green
-        // y_box->AddAsset(y_text);
-        // ch_system_->AddBody(y_box);
-
-        // auto z_box = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 20, 1.0, true, true, ground_mat);
-        // z_box->SetPos(ChVector<>(0, 0, 10));
-        // z_box->SetBodyFixed(true);
-        // auto z_text = chrono_types::make_shared<ChColorAsset>();
-        // z_text->SetColor(ChColor(0.0f, 0.0f, 0.9f)); // blue
-        // z_box->AddAsset(z_text);
-        // ch_system_->AddBody(z_box);
-    }
-    else {
-        std::cerr << "Map file " << env_file_ << " not recognized, exiting" << std::endl;
-        return 1;
-    }
+    load_map();
 
     urdf_doc_->SetAuxRef(auxrefs_);
 
@@ -383,4 +322,80 @@ void SimulationManager::UpdateMassInfo(const std::vector<double>& mass_vec){
         motors_[i]->SetMass(0.001 * mass_vec[i]);
     }
     // TODO: the final mass update apply to body
+}
+
+/***********************
+*  private functions  *
+***********************/
+
+void SimulationManager::load_map(){
+    auto ground_mat = chrono_types::make_shared<ChMaterialSurfaceNSC>();
+    ground_mat->SetSfriction(s_friction_);
+    ground_mat->SetKfriction(k_friction_);
+    ground_mat->SetRestitution(0.01f);
+
+    // the environment is placed in the way that (x,y) = (0,0) is placed at the
+    // corner of the map - corresponds to the (0,0) index of a heightmap matrix
+    // z = 0 is the bottom of the environment
+    if (env_file_.empty()){
+        std::cout << "Map file not initialized, building default ground" << std::endl;
+        // ground body
+        auto flat_ground = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 0.01, 1.0, true, true, ground_mat);
+        flat_ground->SetPos(ChVector<>(0.5, 0.5, 0.005));
+        flat_ground->SetRot(Q_ROTATE_X_TO_Y);
+        flat_ground->SetBodyFixed(true);
+        auto ground_texture = chrono_types::make_shared<ChColorAsset>();
+        ground_texture->SetColor(ChColor(0.2f, 0.2f, 0.2f));
+        flat_ground->AddAsset(ground_texture);
+        ch_system_->AddBody(flat_ground);
+    }
+    else if (env_file_.find(".urdf") != std::string::npos){
+        chrono::ChUrdfDoc urdf_map_doc(env_file_);
+        urdf_map_doc.SetCollisionMaterial(ground_mat);
+        urdf_map_doc.AddtoSystem(ch_system_, env_x_ / 2, env_y_ / 2, env_z_ / 2);
+    }
+    else if (env_file_.find(".bmp") != std::string::npos){
+        vehicle::RigidTerrain terrain(ch_system_.get());
+        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(env_x_ / 2, env_y_ / 2, env_z_ / 2), Q_ROTATE_X_TO_Y),
+                                      env_file_, "ground_mesh", env_x_, env_y_, 0, env_z_);
+        patch->SetColor(ChColor(0.2, 0.2, 0.2));
+        terrain.Initialize();
+    }
+    else if (env_file_.find(".obj") != std::string::npos){
+        vehicle::RigidTerrain terrain(ch_system_.get());
+        auto patch = terrain.AddPatch(ground_mat, ChCoordsys<>(ChVector<>(env_x_ / 2, env_y_ / 2, env_z_ / 2), Q_ROTATE_X_TO_Y),
+                                      env_file_, "ground_mesh");
+        patch->SetColor(ChColor(0.2, 0.2, 0.2));
+        terrain.Initialize();
+
+        // // For debug purposes
+        // auto x_box = chrono_types::make_shared<ChBodyEasyBox>(20, 1, 1, 1.0, true, true, ground_mat);
+        // x_box->SetPos(ChVector<>(10, 0, 0.5));
+        // x_box->SetBodyFixed(true);
+        // auto x_text = chrono_types::make_shared<ChColorAsset>();
+        // x_text->SetColor(ChColor(0.9f, 0.0f, 0.0f)); // red
+        // x_box->AddAsset(x_text);
+        // ch_system_->AddBody(x_box);
+
+        // auto y_box = chrono_types::make_shared<ChBodyEasyBox>(1, 20, 1, 1.0, true, true, ground_mat);
+        // y_box->SetPos(ChVector<>(0, 10, 0.5));
+        // y_box->SetBodyFixed(true);
+        // auto y_text = chrono_types::make_shared<ChColorAsset>();
+        // y_text->SetColor(ChColor(0.0f, 0.9f, 0.0f)); // green
+        // y_box->AddAsset(y_text);
+        // ch_system_->AddBody(y_box);
+
+        // auto z_box = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 20, 1.0, true, true, ground_mat);
+        // z_box->SetPos(ChVector<>(0, 0, 10));
+        // z_box->SetBodyFixed(true);
+        // auto z_text = chrono_types::make_shared<ChColorAsset>();
+        // z_text->SetColor(ChColor(0.0f, 0.0f, 0.9f)); // blue
+        // z_box->AddAsset(z_text);
+        // ch_system_->AddBody(z_box);
+    }
+    else {
+        std::cerr << "Map file " << env_file_ << " not recognized, exiting" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
 }

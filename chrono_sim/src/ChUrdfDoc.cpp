@@ -56,7 +56,6 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
         ch_body = chrono_types::make_shared<ChBody>();
     }
 
-    ch_body->SetIdentifier(link_idx_++);
     ch_body->SetNameString(u_link->name);
     if (u_link->name.find("fixed") != std::string::npos) ch_body->SetBodyFixed(true);
     ch_body->SetMass(u_link->inertial->mass);
@@ -163,14 +162,16 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     // The collsion geometry type could be different from visual, that's why we don't merge them together
     // TODO: Any way to specify collision material in urdf?
     if (u_link->collision){
-        auto tmp_mat = chrono_types::make_shared<ChMaterialSurfaceNSC>();
+        if (!collision_material_){
+            collision_material_ = chrono_types::make_shared<ChMaterialSurfaceNSC>();
+        }
         ch_body->GetCollisionModel()->ClearModel();
         for (auto u_collision : u_link->collision_array){
             switch (u_collision->geometry->type){
                 case urdf::Geometry::BOX:
                 {
                     urdf::BoxSharedPtr tmp_urdf_box_ptr = std::dynamic_pointer_cast<urdf::Box>(u_collision->geometry);
-                    ch_body->GetCollisionModel()->AddBox(tmp_mat,
+                    ch_body->GetCollisionModel()->AddBox(collision_material_,
                                                          tmp_urdf_box_ptr->dim.x / 2,
                                                          tmp_urdf_box_ptr->dim.y / 2,
                                                          tmp_urdf_box_ptr->dim.z / 2,
@@ -185,7 +186,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                 }
                 case urdf::Geometry::SPHERE:
                 {
-                    ch_body->GetCollisionModel()->AddSphere(tmp_mat,
+                    ch_body->GetCollisionModel()->AddSphere(collision_material_,
                                                             std::dynamic_pointer_cast<urdf::Sphere>(u_collision->geometry)->radius,
                                                             ChVector<>(u_collision->origin.position.x,
                                                                        u_collision->origin.position.y,
@@ -196,7 +197,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                 {
                     urdf::CylinderSharedPtr tmp_urdf_cylinder_ptr = std::dynamic_pointer_cast<urdf::Cylinder>(u_collision->geometry);
                     // Chrono defaults cylinders to y axis, so we need to first rotate it to z axis (urdf default) then apply the rotation stored in urdf
-                    ch_body->GetCollisionModel()->AddCylinder(tmp_mat,
+                    ch_body->GetCollisionModel()->AddCylinder(collision_material_,
                                                               tmp_urdf_cylinder_ptr->radius,
                                                               tmp_urdf_cylinder_ptr->radius,
                                                               tmp_urdf_cylinder_ptr->length / 2,
@@ -350,7 +351,6 @@ bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::sha
     convert_materials();
 
     if (u_root_link_){
-        link_idx_ = 0;
         ch_root_body_ = convert_links(u_root_link_, init_pos_body);
     }
     else{

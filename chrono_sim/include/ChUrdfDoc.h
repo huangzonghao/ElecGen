@@ -54,6 +54,8 @@ class ChUrdfDoc {
 
     const std::string& GetLinkBodyName(const std::string& link_name, int body_idx);
 
+    void SetCollisionMaterial(const std::shared_ptr<ChMaterialSurfaceNSC>& new_mat){ collision_material_ = new_mat; }
+
   private:
     struct ChMatPair{
         std::shared_ptr<ChColor> color;
@@ -70,7 +72,6 @@ class ChUrdfDoc {
                                           const std::shared_ptr<ChBody>& ch_parent_body);
     void convert_materials();
     // concatenates the urdf flie path and the relative path to the urdf file
-    int link_idx_;
     std::string urdf_file_;
     urdf::ModelInterfaceSharedPtr urdf_robot_;
     urdf::LinkConstSharedPtr u_root_link_;
@@ -78,6 +79,7 @@ class ChUrdfDoc {
     std::map<std::string, ChMatPair> ch_materials_;
     std::map<std::string, ChLinkBodies> ch_link_bodies_;
     std::shared_ptr<ChBody> ch_root_body_;
+    std::shared_ptr<ChMaterialSurfaceNSC> collision_material_;
     // names of bodies that would use ChBodyAuxRef
     std::unordered_set<std::string> *auxrefs_ = NULL;
 };
