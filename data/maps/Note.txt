@@ -1,0 +1,5 @@
+URDF Map
+=======
+
+For best performance, try to define all objects in a single link in the URDF
+file and void using joints- a link can contain multiple visual and collision shapes
