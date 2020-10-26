@@ -58,13 +58,19 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
 
     ch_body->SetNameString(u_link->name);
     if (u_link->name.find("fixed") != std::string::npos) ch_body->SetBodyFixed(true);
-    ch_body->SetMass(u_link->inertial->mass);
-    ch_body->SetInertia(ChMatrix33<>(ChVector<>(u_link->inertial->ixx,
-                                                u_link->inertial->iyy,
-                                                u_link->inertial->izz),
-                                     ChVector<>(u_link->inertial->ixy,
-                                                u_link->inertial->ixz,
-                                                u_link->inertial->iyz)));
+
+    // Inertia
+    // TODO: what is the default vaule to chrono if no mass and inertia were set,
+    // and would this be a problem?
+    if (u_link->inertial){
+        ch_body->SetMass(u_link->inertial->mass);
+        ch_body->SetInertia(ChMatrix33<>(ChVector<>(u_link->inertial->ixx,
+                                                    u_link->inertial->iyy,
+                                                    u_link->inertial->izz),
+                                         ChVector<>(u_link->inertial->ixy,
+                                                    u_link->inertial->ixz,
+                                                    u_link->inertial->iyz)));
+    }
 
     if (u_parent_joint){
         ChCoordsys<> child_in_parent (ChVector<>(u_parent_joint->parent_to_joint_origin_transform.position.x,
