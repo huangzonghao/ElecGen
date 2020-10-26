@@ -1,18 +1,77 @@
 #include "RobotController.h"
 #include "LeggedGaits.h"
 
+RobotController::
+RobotController(std::vector<std::shared_ptr<SimMotor> > *motors, ControllerType type):
+    motors_(motors), type(type){}
+
 RobotController::RobotController(std::vector<std::shared_ptr<SimMotor> > *motors,
                                  std::vector<chrono::ChVector<> > *waypoints,
                                  ControllerType type):
-    motors(motors), waypoints(waypoints), type(type){}
+    motors_(motors), waypoints_(waypoints), type(type){}
+
+ManipulatorController::ManipulatorController(std::vector<std::shared_ptr<SimMotor> > *motors):
+    RobotController(motors, MANIPULATOR){
+        for (const auto& motor : *motors_){
+            motor->SetMaxVel(joint_max_vel_);
+        }
+}
+
+void ManipulatorController::
+SetJointPos(const std::shared_ptr<std::vector<double> >& start_joint_pos,
+            const std::shared_ptr<std::vector<double> >& goal_joint_pos){
+
+    if (motors_->size() != start_joint_pos->size() || motors_->size() != goal_joint_pos->size()){
+        std::cout << "Error: cannot initialize manipulator controller, number of motors not equal to number of joint vaules" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    start_joint_pos_ = start_joint_pos;
+    goal_joint_pos_ = goal_joint_pos;
+}
+
+void ManipulatorController::SetJointMaxVel(double new_max){
+    if (joint_max_vel_ != new_max){
+        joint_max_vel_ = new_max;
+        for (const auto& motor : *motors_){
+            motor->SetMaxVel(joint_max_vel_);
+        }
+    }
+}
 
 bool ManipulatorController::Update(){
-    return true;
+    // make sure all the motors have moved to the right place
+    if (gait_lock){
+        gait_lock = false;
+        for (auto motor : *motors_){
+            motor->UpdateTorque();
+            // check whether every motor arrived at target pos
+            gait_lock |= !motor->CheckStatus();
+        }
+
+        if (gait_lock){
+            return false;
+        }
+    }
+
+    // now motors arrive at the current joint position. time to target at the next waypoint
+    // check if this is the last one first
+    ++waypoint_idx;
+    if (waypoint_idx == num_waypoints){
+        return true;
+    }
+    // otherwise we have next waypoint to go
+    // TODO: hard code to goal_joint_pos for now
+    for (int i = 0; i < motors_->size(); ++i){
+        motors_->at(i)->SetPhase(goal_joint_pos_->at(i));
+    }
+    gait_lock = true;
+
+    return false;
 }
 
 bool WheelController::Update(){
-    if ((robot_body->GetPos() - waypoints->at(waypoint_idx)).Length() < 2){
-        if (waypoint_idx < waypoints->size() - 1){
+    if ((robot_body->GetPos() - waypoints_->at(waypoint_idx)).Length() < 2){
+        if (waypoint_idx < waypoints_->size() - 1){
             ++waypoint_idx;
         }
         else {
@@ -21,7 +80,7 @@ bool WheelController::Update(){
     }
 
     chrono::ChVector<> goal_local =
-        robot_body->TransformPointParentToLocal(waypoints->at(waypoint_idx));
+        robot_body->TransformPointParentToLocal(waypoints_->at(waypoint_idx));
 
     double yx_ratio = goal_local.y() / (goal_local.x() + 1e-8); // in case x is zero
 
@@ -43,7 +102,7 @@ bool WheelController::Update(){
 
     exe_gait();
 
-    for (auto motor : *motors){
+    for (auto motor : *motors_){
         motor->UpdateTorque();
     }
 
@@ -54,7 +113,7 @@ bool LeggedController::Update(){
     // make sure all the motors have moved to the right place
     if (gait_lock){
         gait_lock = false;
-        for (auto motor : *motors){
+        for (auto motor : *motors_){
             motor->UpdateTorque();
             // check whether every motor arrived at target pos
             gait_lock |= !motor->CheckStatus();
@@ -68,9 +127,9 @@ bool LeggedController::Update(){
         }
     }
 
-    if (gait_lock == 0){
-        if ((robot_body->GetPos() - waypoints->at(waypoint_idx)).Length() < 2){
-            if (waypoint_idx < waypoints->size() - 1){
+    if (gait_steps == 0){
+        if ((robot_body->GetPos() - waypoints_->at(waypoint_idx)).Length() < 2){
+            if (waypoint_idx < waypoints_->size() - 1){
                 ++waypoint_idx;
             }
             else {
@@ -79,7 +138,7 @@ bool LeggedController::Update(){
         }
 
         chrono::ChVector<> goal_local =
-            robot_body->TransformPointParentToLocal(waypoints->at(waypoint_idx));
+            robot_body->TransformPointParentToLocal(waypoints_->at(waypoint_idx));
 
         double yx_ratio = goal_local.y() / (goal_local.x() + 1e-8); // in case x is zero
 
@@ -117,7 +176,7 @@ bool LeggedController::Update(){
             std::cerr << "Error: legged robot model not specified" << std::endl;
     }
 
-    for (auto motor : *motors){
+    for (auto motor : *motors_){
         motor->UpdateTorque();
     }
 

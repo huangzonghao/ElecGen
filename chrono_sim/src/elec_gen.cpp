@@ -9,28 +9,35 @@
 
 const double s_friction = 2.0;
 const double k_friction = 1.9;
-const std::string env_file = std::string(ELECGEN_DATA_PATH) + "maps/env1.bmp";
-const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/fourleg3.urdf";
 
-int main(int argc, char *argv[]) {
+void setup_manipulator(SimulationManager& sm){
+    const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/manipulator.urdf";
 
-    motor_read();
-    h_bridge_read();
-    battery_read();
-    micro_controller_read();
-    force_sensor_read();
-    voltage_regulator_read();
-    servo_read();
-    camera_read();
-    bluetooth_read();
-    encoder_read();
+    sm.SetTimeout(100);
+    sm.SetUrdfFile(urdf_file);
+    sm.SetEnv(false);
 
-    SimulationManager sm;
+    sm.AddMotor("SERVO", "base_fixed", "base_middle",    0.01, 0.01, 0.01, 0.01);
+    sm.AddMotor("SERVO", "middle", "middle_upper",   0.01, 0.01, 0.01, 0.01);
+
+    auto start_joint_pos = std::make_shared<std::vector<double> >();
+    auto goal_joint_pos = std::make_shared<std::vector<double> >();
+    start_joint_pos->push_back(0.0);
+    start_joint_pos->push_back(0.0);
+    goal_joint_pos->push_back(-1.57);
+    goal_joint_pos->push_back(-1.57);
+
+    sm.SetStartJointPos(start_joint_pos);
+    sm.SetGoalJointPos(goal_joint_pos);
+}
+
+void setup_quadrupedal(SimulationManager& sm){
+    const std::string env_file = std::string(ELECGEN_DATA_PATH) + "maps/env1.bmp";
+    const std::string urdf_file = std::string(ELECGEN_DATA_PATH) + "robots/fourleg3.urdf";
+
     sm.SetTimeout(50);
     sm.SetUrdfFile(urdf_file);
     sm.SetEnv(env_file, 1, 1, 0.08);
-    sm.SetFrictionK(k_friction);
-    sm.SetFrictionS(s_friction);
 
     sm.AddMotor("SERVO", "chassis", "chassis-fl_cyl",    0.01, 0.01, 0.01, 0.01);
     sm.AddMotor("MOTOR", "chassis", "fl_cyl-fl_upper",   0.01, 0.01, 0.01, 0.01);
@@ -57,6 +64,36 @@ int main(int argc, char *argv[]) {
 
     sm.AddWaypoint(0.3, 0.3, 0.4);
     sm.AddWaypoint(0.9, 0.9, 0.2);
+}
+
+int main(int argc, char *argv[]) {
+    std::string urdf_file;
+
+    motor_read();
+    h_bridge_read();
+    battery_read();
+    micro_controller_read();
+    force_sensor_read();
+    voltage_regulator_read();
+    servo_read();
+    camera_read();
+    bluetooth_read();
+    encoder_read();
+
+    SimulationManager sm;
+    sm.SetFrictionK(k_friction);
+    sm.SetFrictionS(s_friction);
+
+    // robot specific setup
+    // if (argc == 1) {
+        // setup_quadrupedal(sm);
+    // }
+    // else {
+        // if      (std::string(argv[1]) == "0") setup_quadrupedal(sm);
+        // else if (std::string(argv[1]) == "1") setup_manipulator(sm);
+        // else std::cerr << "Error: unknown command " << argv[1] << std::endl;
+    // }
+    setup_manipulator(sm);
 
     stringvec input_types;
     doublepairs input_vels;
@@ -105,7 +142,6 @@ int main(int argc, char *argv[]) {
             }
             sm.UpdateMassInfo(getMassVec(*best_node, input_torqs.size()));
         }
-
     } while (!sim_done);
 
     return 0;

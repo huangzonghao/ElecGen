@@ -11,6 +11,8 @@ class RobotController {
   public:
     enum ControllerType {MANIPULATOR, WHEEL, LEGGED} type;
 
+    RobotController(std::vector<std::shared_ptr<SimMotor> > *motors, ControllerType type);
+
     RobotController(std::vector<std::shared_ptr<SimMotor> > *motors,
                     std::vector<chrono::ChVector<> > *waypoints,
                     ControllerType type);
@@ -19,23 +21,32 @@ class RobotController {
     virtual bool Update() = 0;
 
   protected:
+    bool gait_lock = false;
     int waypoint_idx = 0;
-    std::vector<std::shared_ptr<SimMotor> > *motors;
-    std::vector<chrono::ChVector<> > *waypoints;
+    std::vector<std::shared_ptr<SimMotor> > *motors_;
+    std::vector<chrono::ChVector<> > *waypoints_;
 
 };
 
 class ManipulatorController : public RobotController {
   public:
-    double speed = 5;
-
-    ManipulatorController(std::vector<std::shared_ptr<SimMotor> > *motors,
-                          std::vector<chrono::ChVector<> > *waypoints):
-        RobotController(motors, waypoints, MANIPULATOR){}
+    ManipulatorController(std::vector<std::shared_ptr<SimMotor> > *motors);
 
     ~ManipulatorController(){};
 
+    void SetJointPos(const std::shared_ptr<std::vector<double> >& start_joint_pos,
+                     const std::shared_ptr<std::vector<double> >& goal_joint_pos);
+
+    // TODO:need to modify simmotor controller
+    void SetJointMaxVel(double new_max);
+
     bool Update() override;
+  private:
+    // TODO: should be the size of waypoint vector
+    int num_waypoints = 2;
+    double joint_max_vel_ = 0.2;
+    std::shared_ptr<std::vector<double> > start_joint_pos_;
+    std::shared_ptr<std::vector<double> > goal_joint_pos_;
 };
 
 class WheelController : public RobotController {
@@ -84,7 +95,6 @@ class LeggedController : public RobotController {
     void exe_gait();
     void exe_gait2();
     void exe_gait3();
-    bool gait_lock = false;
     // remaining steps to executate in the gait
     int gait_steps = 0;
     int update_counter = 0;

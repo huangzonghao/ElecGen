@@ -30,11 +30,21 @@ void SimulationManager::SetUrdfFile(std::string filename){
     urdf_doc_ = std::make_shared<ChUrdfDoc>(filename);
 }
 
+// this function only disables maps, to enable map, use SetEnv(std::string, double, double, double)
+void SimulationManager::SetEnv(bool enable_map){
+    if (enable_map){
+        std::cout << "Error: To enable map, pass in map name and sizes. Map not enabled";
+        return;
+    }
+    load_map_ = false;
+}
+
 void SimulationManager::SetEnv(std::string filename, double env_x, double env_y, double env_z){
     env_file_ = filename;
     env_x_ = env_x;
     env_y_ = env_y;
     env_z_ = env_z;
+    load_map_ = true;
 }
 void SimulationManager::SetEigenHeightmap(const std::shared_ptr<const Eigen::MatrixXd>& heightmap){
     heightmap_ = heightmap;
@@ -120,7 +130,7 @@ bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
     ch_system_->Set_G_acc(ChVector<>(0, 0, -9.81));
     ch_system_->SetSolverMaxIterations(20);  // the higher, the easier to keep the constraints satisifed.
 
-    load_map();
+    if (load_map_) load_map();
 
     urdf_doc_->SetAuxRef(auxrefs_);
 
@@ -140,14 +150,16 @@ bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
     // add waypoint markers
     auto wp_color = chrono_types::make_shared<ChColorAsset>();
     wp_color->SetColor(ChColor(0.8f, 0.0f, 0.0f));
-    // for(auto waypoint : ch_waypoints_){
-    // TODO: put first waypoint marker on the ground
-    for(auto waypoint = ch_waypoints_.begin() + 1; waypoint != ch_waypoints_.end(); ++waypoint){
-        auto wp_marker = chrono_types::make_shared<ChBodyEasyBox>(0.01, 0.01, 0.005, 1.0, true, false);
-        wp_marker->SetPos(*waypoint);
-        wp_marker->SetBodyFixed(true);
-        wp_marker->AddAsset(wp_color);
-        ch_system_->AddBody(wp_marker);
+    if (!ch_waypoints_.empty()){
+        // for(auto waypoint : ch_waypoints_){
+        // TODO: put first waypoint marker on the ground
+        for(auto waypoint = ch_waypoints_.begin() + 1; waypoint != ch_waypoints_.end(); ++waypoint){
+            auto wp_marker = chrono_types::make_shared<ChBodyEasyBox>(0.01, 0.01, 0.005, 1.0, true, false);
+            wp_marker->SetPos(*waypoint);
+            wp_marker->SetBodyFixed(true);
+            wp_marker->AddAsset(wp_color);
+            ch_system_->AddBody(wp_marker);
+        }
     }
 
     // Add motors and extra weights to system
@@ -156,7 +168,11 @@ bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
 
     // init controller
     if (urdf_doc_->GetRobotName().find("manipulator") != std::string::npos) {
-        controller_ = std::make_shared<ManipulatorController>(&motors_, &ch_waypoints_);
+        controller_ = std::make_shared<ManipulatorController>(&motors_);
+        // also need to pass in the joint positions here
+        auto& manipulator_controller = std::dynamic_pointer_cast<ManipulatorController>(controller_);
+        manipulator_controller->SetJointPos(start_joint_pos_, goal_joint_pos_);
+        manipulator_controller->SetJointMaxVel(0.23);
     }
     else if (urdf_doc_->GetRobotName().find("leg") != std::string::npos) {
         controller_ = std::make_shared<LeggedController>(&motors_, &ch_waypoints_, urdf_doc_->GetRootBody());
@@ -220,6 +236,7 @@ bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
     }
     else {
         std::cerr << "Need to specify controller_ type in robot name" << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     const std::shared_ptr<ChBody>& camera_body = urdf_doc_->GetCameraBody();
@@ -279,8 +296,26 @@ bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
 
 void SimulationManager::GetComponentTypes(std::vector<std::string> &types_vec) const {
     types_vec.clear();
-    for (int i = 0; i < motors_.size(); ++i){
-        types_vec.push_back(motors_[i]->GetTypeName());
+    // for (int i = 0; i < motors_.size(); ++i){
+        // types_vec.push_back(motors_[i]->GetTypeName());
+    // }
+    if (!start_joint_pos_){
+        for (int i = 0; i < 8; ++i){
+            types_vec.push_back("MOTOR");
+        }
+        for (int i = 0; i < 4; ++i){
+            types_vec.push_back("SERVO");
+        }
+        for (int i = 0; i < 8; ++i){
+            types_vec.push_back("ENCODER");
+        }
+        for (int i = 0; i < 1; ++i){
+            types_vec.push_back("CAMERA");
+        }
+    }
+    else {
+        types_vec.push_back("SERVO");
+        types_vec.push_back("SERVO");
     }
 }
 
@@ -398,4 +433,20 @@ void SimulationManager::load_map(){
         exit(EXIT_FAILURE);
     }
 
+}
+
+void SimulationManager::PrintMaxTorques(){
+    std::cout << "Now printing motor max torques" << std::endl;
+    for (const auto& motor : motors_){
+        std::cout << motor->GetMaxTorque() << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+void SimulationManager::PrintMaxVels(){
+    std::cout << "Now printing motor max torques" << std::endl;
+    for (const auto& motor : motors_){
+        std::cout << motor->GetMaxVel() << std::endl;
+    }
+    std::cout << std::endl;
 }

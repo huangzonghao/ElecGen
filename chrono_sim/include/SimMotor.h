@@ -15,7 +15,7 @@ class SimMotorController {
     static int counter;
     static constexpr double pos_thresh = 1e-3;
     static constexpr double vel_P = 1;
-    static constexpr double vel_I = 0;
+    static constexpr double vel_I = 0.3;
     static constexpr double vel_D = 0;
     static constexpr double pos_P = 1;
     static constexpr double pos_I = 0;
@@ -114,6 +114,7 @@ class SimMotor : public SimPayload {
 
     double GetMaxTorque(){ return motor_controller->get_max_torque(); }
     double GetMaxVel(){ return motor_controller->get_max_vel(); }
+    void SetMaxVel(double new_vel) { motor_controller->set_max_pos_control_vel(new_vel); }
 
   protected:
     const chrono::ChLinkBodies *chlinkbody;
