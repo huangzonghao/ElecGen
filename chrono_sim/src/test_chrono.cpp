@@ -14,7 +14,7 @@ void test_fourwheel(){
 
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
-    sm.SetEnv(env_filename);
+    sm.SetEnv(env_filename, 50, 50, 0.5);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
@@ -48,7 +48,7 @@ void test_fourleg(){
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
-    sm.SetEnv(env_filename);
+    sm.SetEnv(env_filename, 50, 50, 0.5);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
@@ -89,7 +89,7 @@ void test_fourleg2(){
     // first init simulation manager
     SimulationManager sm;
     sm.SetUrdfFile(urdf_filename);
-    sm.SetEnv(env_filename);
+    sm.SetEnv(env_filename, 50, 50, 0.5);
     sm.SetFrictionK(k_friction);
     sm.SetFrictionS(s_friction);
     // sm.timeout = 10;
