@@ -298,6 +298,9 @@ void SimulationManager::GetComponentTypes(std::vector<std::string> &types_vec) c
     types_vec.clear();
     // for (int i = 0; i < motors_.size(); ++i){
         // types_vec.push_back(motors_[i]->GetTypeName());
+    // for (int i = 0; i < payloads_.size(); ++i){
+        // types_vec.push_back(payloads_[i]->GetTypeName());
+    // }
     // }
     if (!start_joint_pos_){
         for (int i = 0; i < 8; ++i){
