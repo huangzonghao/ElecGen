@@ -12,7 +12,6 @@
 
 class SimMotorController {
   public:
-    static int counter;
     static constexpr double pos_thresh = 1e-3;
     static constexpr double vel_P = 1;
     static constexpr double vel_I = 0.3;
@@ -40,6 +39,14 @@ class SimMotorController {
     void set_max_pos_control_vel(double pos_ctrl_vel){ max_pos_control_vel_ = pos_ctrl_vel; }
     double get_max_torque(){ return max_torque_; }
     double get_max_vel(){ return max_vel_; }
+    int counter = 0;
+    // the first call of pid after each reset will give an outlying output and should
+    // be discarded -- this is due to pid holds no history of the last call, thus
+    // there will be a bump in pid input and time stamp, both will affect the i term
+    // and d term significantly. this is not a big deal in general control problem,
+    // but has a big impact when we want to get the minimized max torque
+    // therefore, for the first vel_pid call, we use p term only, and let go for pos_pid
+    bool first_vel_pid_call = true;
   private:
     double max_pos_control_vel_ = 0.2;
     double target_pos_ = 0;

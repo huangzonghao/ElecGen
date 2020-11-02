@@ -5,7 +5,6 @@
 #include "chrono/physics/ChLinkMotorRotationTorque.h"
 #include "chrono/utils/ChCompositeInertia.h"
 
-int SimMotorController::counter = 0;
 
 SimMotorController::SimMotorController(const std::shared_ptr<chrono::ChLinkMotorRotationTorque>& target_motor){
     ch_motor = target_motor.get();
@@ -26,6 +25,7 @@ void SimMotorController::set_vel(double new_vel){
     mode = VELOCITY;
     target_vel_ = new_vel;
     vel_pid->Reset();
+    first_vel_pid_call = true;
 }
 
 // accumulation behavior
@@ -75,12 +75,19 @@ double SimMotorController::get_torque(){
     if (tmp_vel != target_vel_) {
         // for target_vel change in position & phase control. vel control will skip this
         vel_pid->Reset();
+        first_vel_pid_call = true;
         target_vel_ = tmp_vel;
     }
 
     target_torque_ =  vel_pid->Get_Out(target_vel_ - ch_motor->GetMotorRot_dt(), ch_motor->GetChTime());
-    if (target_vel_ > max_vel_) max_vel_ = target_vel_;
-    if (target_torque_ > max_torque_) max_torque_ = target_torque_;
+    if (first_vel_pid_call) {
+        // see header for details
+        // need to call Get_Out first to have Pcomp updated
+        target_torque_ = vel_pid->Get_Pcomp();
+        first_vel_pid_call = false;
+    }
+    if (abs(target_vel_) > max_vel_) max_vel_ = abs(target_vel_);
+    if (abs(target_torque_) > max_torque_) max_torque_ = abs(target_torque_);
     return target_torque_;
 }
 
