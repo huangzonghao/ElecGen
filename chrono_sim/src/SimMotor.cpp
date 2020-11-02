@@ -21,44 +21,25 @@ SimMotorController::SimMotorController(const std::shared_ptr<chrono::ChLinkMotor
 }
 
 void SimMotorController::set_vel(double new_vel){
-    if (mode == VELOCITY){
-        if (target_vel_ == new_vel)
-            return;
-    }
-    else {
-        mode = VELOCITY;
-        vel_pid->I = vel_I;
-        vel_pid->D = vel_D;
-    }
+    if (target_vel_ == new_vel)
+        return;
+    mode = VELOCITY;
     target_vel_ = new_vel;
     vel_pid->Reset();
 }
 
 // accumulation behavior
 void SimMotorController::set_pos(double new_pos){
-    if (mode == VELOCITY){
-        vel_pid->I = 0;
-        vel_pid->D = 0;
-        vel_pid->Reset();
-    }
     target_pos_ = new_pos + ch_motor->GetMotorRot();
     mode = POSITION;
     pos_pid->Reset();
 }
 
 void SimMotorController::set_phase(double new_phase){
-    if (mode == PHASE){
-        if (target_pos_ == new_phase)
-            return;
+    if (mode == PHASE && target_pos_ == new_phase){
+        return;
     }
-    else{
-        if (mode == VELOCITY){
-            vel_pid->I = 0;
-            vel_pid->D = 0;
-            vel_pid->Reset();
-        }
-        mode = PHASE;
-    }
+    mode = PHASE;
     target_pos_ = new_phase;
     pos_pid->Reset();
 }
@@ -74,17 +55,27 @@ bool SimMotorController::check_status(){
 }
 
 double SimMotorController::get_torque(){
+    double tmp_vel;
     switch(mode){
         case POSITION:
-            target_vel_ = std::clamp(pos_pid->Get_Out(target_pos_ - ch_motor->GetMotorRot(), ch_motor->GetChTime()),
-                                     -max_pos_control_vel_,
-                                     max_pos_control_vel_);
+            tmp_vel = std::clamp(pos_pid->Get_Out(target_pos_ - ch_motor->GetMotorRot(), ch_motor->GetChTime()),
+                                 -max_pos_control_vel_,
+                                 max_pos_control_vel_);
             break;
         case PHASE:
-            target_vel_ = std::clamp(pos_pid->Get_Out(target_pos_ - ch_motor->GetMotorRotPeriodic(), ch_motor->GetChTime()),
-                                     -max_pos_control_vel_,
-                                     max_pos_control_vel_);
+            tmp_vel = std::clamp(pos_pid->Get_Out(target_pos_ - ch_motor->GetMotorRotPeriodic(), ch_motor->GetChTime()),
+                                 -max_pos_control_vel_,
+                                 max_pos_control_vel_);
             break;
+        case VELOCITY:
+            tmp_vel = target_vel_;
+            break;
+    }
+
+    if (tmp_vel != target_vel_) {
+        // for target_vel change in position & phase control. vel control will skip this
+        vel_pid->Reset();
+        target_vel_ = tmp_vel;
     }
 
     target_torque_ =  vel_pid->Get_Out(target_vel_ - ch_motor->GetMotorRot_dt(), ch_motor->GetChTime());
