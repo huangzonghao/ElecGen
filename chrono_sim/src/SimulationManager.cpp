@@ -351,13 +351,17 @@ GetActuatorTorques(std::vector<std::pair<double, double> > &torqs_vec) const {
 }
 
 void SimulationManager::UpdateMassInfo(const std::vector<double>& mass_vec){
-    if (mass_vec.size() < motors_.size()){
-        std::cerr << "Error, simulation motor number is more than returned mass number" << std::endl;
+    if (mass_vec.size() < motors_.size() + payloads_.size()){
+        std::cerr << "Error, returned mass number in short" << std::endl;
         exit(EXIT_FAILURE);
     }
     for (int i = 0; i < motors_.size(); ++i){
         // the incoming mass has unit of g
         motors_[i]->SetMass(0.001 * mass_vec[i]);
+    }
+    for (int i = motors_.size(); i < motors_.size() + payloads_.size(); ++i){
+        // the incoming mass has unit of g
+        payloads_[i - 2]->SetMass(0.001 * mass_vec[i]);
     }
     // TODO: the final mass update apply to body
 }
