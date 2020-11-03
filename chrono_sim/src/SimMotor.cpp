@@ -7,63 +7,63 @@
 
 
 SimMotorController::SimMotorController(const std::shared_ptr<chrono::ChLinkMotorRotationTorque>& target_motor){
-    ch_motor = target_motor.get();
-    vel_pid = chrono_types::make_shared<chrono::ChControllerPID>();
-    vel_pid->P = vel_P;
-    vel_pid->I = vel_I;
-    vel_pid->D = vel_D;
+    ch_motor_ = target_motor.get();
+    vel_pid_ = chrono_types::make_shared<chrono::ChControllerPID>();
+    vel_pid_->P = vel_P;
+    vel_pid_->I = vel_I;
+    vel_pid_->D = vel_D;
 
-    pos_pid = chrono_types::make_shared<chrono::ChControllerPID>();
-    pos_pid->P = pos_P;
-    pos_pid->I = pos_I;
-    pos_pid->D = pos_D;
+    pos_pid_ = chrono_types::make_shared<chrono::ChControllerPID>();
+    pos_pid_->P = pos_P;
+    pos_pid_->I = pos_I;
+    pos_pid_->D = pos_D;
 }
 
 void SimMotorController::set_vel(double new_vel){
     if (target_vel_ == new_vel)
         return;
-    mode = VELOCITY;
+    mode_ = VELOCITY;
     target_vel_ = new_vel;
-    vel_pid->Reset();
-    first_vel_pid_call = true;
+    vel_pid_->Reset();
+    first_vel_pid_call_ = true;
 }
 
 // accumulation behavior
 void SimMotorController::set_pos(double new_pos){
-    target_pos_ = new_pos + ch_motor->GetMotorRot();
-    mode = POSITION;
-    pos_pid->Reset();
+    target_pos_ = new_pos + ch_motor_->GetMotorRot();
+    mode_ = POSITION;
+    pos_pid_->Reset();
 }
 
 void SimMotorController::set_phase(double new_phase){
-    if (mode == PHASE && target_pos_ == new_phase){
+    if (mode_ == PHASE && target_pos_ == new_phase){
         return;
     }
-    mode = PHASE;
+    mode_ = PHASE;
     target_pos_ = new_phase;
-    pos_pid->Reset();
+    pos_pid_->Reset();
 }
 
-bool SimMotorController::check_status(){
-    if (mode == POSITION && std::abs(target_pos_ - ch_motor->GetMotorRot()) > pos_thresh){
+bool SimMotorController::check_status() const {
+    if (mode_ == POSITION && std::abs(target_pos_ - ch_motor_->GetMotorRot()) > pos_thresh){
         return false;
     }
-    else if (mode == PHASE && std::abs(target_pos_ - ch_motor->GetMotorRotPeriodic()) > pos_thresh){
+    else if (mode_ == PHASE && std::abs(target_pos_ - ch_motor_->GetMotorRotPeriodic()) > pos_thresh){
         return false;
     }
     return true;
 }
 
-double SimMotorController::get_torque(){
+double SimMotorController::get_torque() const {
     double tmp_vel;
-    switch(mode){
+    switch(mode_){
         case POSITION:
-            tmp_vel = std::clamp(pos_pid->Get_Out(target_pos_ - ch_motor->GetMotorRot(), ch_motor->GetChTime()),
+            tmp_vel = std::clamp(pos_pid_->Get_Out(target_pos_ - ch_motor_->GetMotorRot(), ch_motor_->GetChTime()),
                                  -max_pos_control_vel_,
                                  max_pos_control_vel_);
             break;
         case PHASE:
-            tmp_vel = std::clamp(pos_pid->Get_Out(target_pos_ - ch_motor->GetMotorRotPeriodic(), ch_motor->GetChTime()),
+            tmp_vel = std::clamp(pos_pid_->Get_Out(target_pos_ - ch_motor_->GetMotorRotPeriodic(), ch_motor_->GetChTime()),
                                  -max_pos_control_vel_,
                                  max_pos_control_vel_);
             break;
@@ -74,17 +74,17 @@ double SimMotorController::get_torque(){
 
     if (tmp_vel != target_vel_) {
         // for target_vel change in position & phase control. vel control will skip this
-        vel_pid->Reset();
-        first_vel_pid_call = true;
+        vel_pid_->Reset();
+        first_vel_pid_call_ = true;
         target_vel_ = tmp_vel;
     }
 
-    target_torque_ =  vel_pid->Get_Out(target_vel_ - ch_motor->GetMotorRot_dt(), ch_motor->GetChTime());
-    if (first_vel_pid_call) {
+    target_torque_ =  vel_pid_->Get_Out(target_vel_ - ch_motor_->GetMotorRot_dt(), ch_motor_->GetChTime());
+    if (first_vel_pid_call_) {
         // see header for details
         // need to call Get_Out first to have Pcomp updated
-        target_torque_ = vel_pid->Get_Pcomp();
-        first_vel_pid_call = false;
+        target_torque_ = vel_pid_->Get_Pcomp();
+        first_vel_pid_call_ = false;
     }
     if (abs(target_vel_) > max_vel_) max_vel_ = abs(target_vel_);
     if (abs(target_torque_) > max_torque_) max_torque_ = abs(target_torque_);
@@ -99,21 +99,27 @@ SimPayload::SimPayload(const std::string& type_name, double mass,
                        double size_x, double size_y, double size_z,
                        double pos_x, double pos_y, double pos_z)
     :type_name_(type_name), visible(false), check_collision(false), mass(mass),
-     size{size_x, size_y, size_z}, pos(pos_x, pos_y, pos_z)
+     size{size_x, size_y, size_z}, ch_pos_(pos_x, pos_y, pos_z)
 {}
 
 SimPayload::SimPayload(const std::string& type_name, const std::string& body_name,
                        double mass, double size_x, double size_y, double size_z,
                        double pos_x, double pos_y, double pos_z)
-    :type_name_(type_name), body_name(body_name), visible(false),
+    :type_name_(type_name), body_name_(body_name), visible(false),
      check_collision(false), mass(mass), size{size_x, size_y, size_z},
-     pos(pos_x, pos_y, pos_z)
+     ch_pos_(pos_x, pos_y, pos_z)
 {}
 
+void SimPayload::SetInertia(double xx, double xy, double xz,
+                                       double yy, double yz,
+                                                  double zz) {
+    ch_inertia_ = chrono::ChMatrix33<>(chrono::ChVector<>(xx, yy, zz), chrono::ChVector<>(xy, xz, yz));
+}
+
 void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
-    const std::shared_ptr<chrono::ChBody>& parent_body = sys->SearchBody(body_name.c_str());
+    const std::shared_ptr<chrono::ChBody>& parent_body = sys->SearchBody(body_name_.c_str());
     if (!parent_body){
-        std::cerr << "Error: Cannot add payload, " << body_name << " doesn't exist in robot" << std::endl;
+        std::cerr << "Error: Cannot add payload, " << body_name_ << " doesn't exist in robot" << std::endl;
         exit(EXIT_FAILURE);
     }
     AddtoSystem(sys, parent_body);
@@ -126,13 +132,13 @@ void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
     if (visible){
         auto viasset = chrono_types::make_shared<chrono::ChBoxShape>();
         viasset->GetBoxGeometry().SetLengths(chrono::ChVector<>(size[0], size[1], size[2]));
-        viasset->Pos = pos;
+        viasset->Pos = ch_pos_;
         parent_body->AddAsset(viasset);
     }
     if (check_collision){
         chrono_types::make_shared<chrono::ChMaterialSurfaceNSC>();
         parent_body->GetCollisionModel()->AddBox(chrono_types::make_shared<chrono::ChMaterialSurfaceNSC>(),
-                                                 size[0] / 2, size[1] / 2, size[2] / 2, pos);
+                                                 size[0] / 2, size[1] / 2, size[2] / 2, ch_pos_);
         parent_body->GetCollisionModel()->BuildModel();
     }
 
@@ -140,7 +146,7 @@ void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
     if (mass != 0){
         chrono::utils::CompositeInertia comp;
         comp.AddComponent(chrono::ChFrame<>(), parent_body->GetMass(), parent_body->GetInertia());
-        comp.AddComponent(chrono::ChFrame<>(pos), mass, chrono::ChMatrix33<>(1));
+        comp.AddComponent(chrono::ChFrame<>(ch_pos_), mass, ch_inertia_);
         parent_body->SetMass(comp.GetMass());
         parent_body->SetInertia(comp.GetInertia());
         std::dynamic_pointer_cast<chrono::ChBodyAuxRef>(parent_body)->SetFrame_COG_to_REF(chrono::ChFrame<>(comp.GetCOM()));
@@ -151,7 +157,7 @@ SimMotor::SimMotor(const std::string& type_name, const std::string& link_name,
                    double mass, double size_x, double size_y, double size_z,
                    double pos_x, double pos_y, double pos_z)
     :SimPayload(type_name, mass, size_x, size_y, size_z, pos_x, pos_y, pos_z),
-     link_name(link_name)
+     link_name_(link_name)
 {}
 
 SimMotor::SimMotor(const std::string& type_name, const std::string& body_name,
@@ -159,43 +165,42 @@ SimMotor::SimMotor(const std::string& type_name, const std::string& body_name,
                    double size_x, double size_y, double size_z,
                    double pos_x, double pos_y, double pos_z)
     :SimPayload(type_name, body_name, mass, size_x, size_y, size_z, pos_x, pos_y, pos_z),
-     link_name(link_name)
+     link_name_(link_name)
 {}
 
 void SimMotor::AddtoSystem(const chrono::ChUrdfDoc& urdf_doc){
     auto& sys = urdf_doc.GetSystem();
-    chlinkbody = &(urdf_doc.GetLinkBodies(link_name));
+    chlinkbody_ = &(urdf_doc.GetLinkBodies(link_name_));
 
-    if (!body_name.empty()){
+    if (!body_name_.empty()){
         SimPayload::AddtoSystem(sys);
     }
     else {
-        SimPayload::AddtoSystem(sys, chlinkbody->body2);
+        SimPayload::AddtoSystem(sys, chlinkbody_->body2);
     }
 
-    ch_motor = chrono_types::make_shared<chrono::ChLinkMotorRotationTorque>();
+    ch_motor_ = chrono_types::make_shared<chrono::ChLinkMotorRotationTorque>();
 
     // flip z axis of motor frame, so that a positive speed would make robot go forward
-    chrono::ChFrame<> motor_frame(chlinkbody->link->GetLinkAbsoluteCoords());
+    chrono::ChFrame<> motor_frame(chlinkbody_->link->GetLinkAbsoluteCoords());
     // motor_frame.ConcatenatePostTransformation(chrono::ChFrame<>(chrono::ChVector<>(), chrono::Q_FLIP_AROUND_X));
-    ch_motor->Initialize(chlinkbody->body1, chlinkbody->body2, motor_frame);
-    ch_func = chrono_types::make_shared<chrono::ChFunction_Setpoint>();
-    ch_motor->SetMotorFunction(ch_func);
-    sys->AddLink(ch_motor);
+    ch_motor_->Initialize(chlinkbody_->body1, chlinkbody_->body2, motor_frame);
+    ch_func_ = chrono_types::make_shared<chrono::ChFunction_Setpoint>();
+    ch_motor_->SetMotorFunction(ch_func_);
+    sys->AddLink(ch_motor_);
 
-    ch_link = chlinkbody->link.get();
-    motor_controller = std::make_shared<SimMotorController>(ch_motor);
+    motor_controller_ = std::make_shared<SimMotorController>(ch_motor_);
 }
 void SimMotor::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
     std::cerr << "Error: Need to pass on the ChUrdfDoc when adding SimMotor to system" << std::endl;
 }
 
 void SimMotor::SetVel(double new_vel){
-    motor_controller->set_vel(new_vel);
+    motor_controller_->set_vel(new_vel);
 }
 
 void SimMotor::SetPos(double new_pos){
-    motor_controller->set_pos(new_pos);
+    motor_controller_->set_pos(new_pos);
 }
 
 // in Chrono, phase is between [0, 2pi], and [0, -2pi] when rotating negatively
@@ -205,7 +210,7 @@ void SimMotor::SetPhase(double new_phase){
         return;
     }
 
-    double current_phase = ch_motor->GetMotorRotPeriodic();
+    double current_phase = ch_motor_->GetMotorRotPeriodic();
     if (current_phase < 0){
         current_phase += chrono::CH_C_2PI;
     }
@@ -217,9 +222,9 @@ void SimMotor::SetPhase(double new_phase){
         new_phase -= chrono::CH_C_2PI;
     }
 
-    motor_controller->set_pos(new_phase);
+    motor_controller_->set_pos(new_phase);
 }
 
 void SimMotor::UpdateTorque(){
-    ch_func->SetSetpoint(motor_controller->get_torque(), ch_motor->GetChTime());
+    ch_func_->SetSetpoint(motor_controller_->get_torque(), ch_motor_->GetChTime());
 }
