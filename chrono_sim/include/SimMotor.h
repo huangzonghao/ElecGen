@@ -28,7 +28,7 @@ class SimMotorController {
     void set_vel(double new_vel);
     void set_pos(double new_pos);
     void set_phase(double new_phase);
-    double get_torque() const;
+    double get_torque();
     bool check_status() const;
     void set_max_pos_control_vel(double pos_ctrl_vel){ max_pos_control_vel_ = pos_ctrl_vel; }
     double get_max_torque() const { return max_torque_; }
@@ -74,10 +74,11 @@ class SimPayload {
   protected:
     void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
                      const std::shared_ptr<chrono::ChBody>& parent_body) const;
-  private:
     std::string body_name_;
+
+  private:
     chrono::ChVector<> ch_pos_;
-    chrono::ChMatrix33<> ch_inertia_(1);
+    chrono::ChMatrix33<> ch_inertia_ {1};
     double size[3];
     double mass;
     bool visible;
@@ -104,7 +105,7 @@ class SimMotor : public SimPayload {
     ~SimMotor(){};
 
     void AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys) const override;
-    void AddtoSystem(const chrono::ChUrdfDoc& urdf_doc) const;
+    void AddtoSystem(const chrono::ChUrdfDoc& urdf_doc);
     void SetVel(double new_vel);
     void SetPos(double new_pos);
     void SetPhase(double new_phase);

@@ -437,20 +437,20 @@ void Circuit::restorePrevModelCons(GRBModel* model)
 		unsignedvec used_index;;
 		for (size_t j = 0; j < used_var_names.size(); j++)
 		{
-			auto& iter = new_components[i]->model_index_map.find(used_var_names[j]);
+			const auto& iter = new_components[i]->model_index_map.find(used_var_names[j]);
 			if (iter != new_components[i]->model_index_map.end())
 			{
 				used_index.push_back(iter->second);
 			}
 		}
-		vector<GRBLinExpr>& lin_exp = new_components[i]->getModelMat() *
+		const vector<GRBLinExpr>& lin_exp = new_components[i]->getModelMat() *
 			new_components[i]->vars;
 		vector<char> model_relations = new_components[i]->getModelRelations();
 		stringvec model_names = new_components[i]->getModelNames();
 		for (size_t j = 0; j < used_index.size(); j++)
 		{
 			size_t row = used_index[j];
-			GRBConstr& cons = model->getConstrByName(model_names[row]);
+			const GRBConstr& cons = model->getConstrByName(model_names[row]);
 			for (size_t k = 0; k < lin_exp[row].size(); k++)
 			{
 				model->chgCoeff(cons, lin_exp[row].getVar(k), lin_exp[row].getCoeff(k));

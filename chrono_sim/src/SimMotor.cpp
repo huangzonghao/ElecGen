@@ -54,7 +54,7 @@ bool SimMotorController::check_status() const {
     return true;
 }
 
-double SimMotorController::get_torque() const {
+double SimMotorController::get_torque() {
     double tmp_vel;
     switch(mode_){
         case POSITION:
@@ -116,7 +116,7 @@ void SimPayload::SetInertia(double xx, double xy, double xz,
     ch_inertia_ = chrono::ChMatrix33<>(chrono::ChVector<>(xx, yy, zz), chrono::ChVector<>(xy, xz, yz));
 }
 
-void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
+void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys) const {
     const std::shared_ptr<chrono::ChBody>& parent_body = sys->SearchBody(body_name_.c_str());
     if (!parent_body){
         std::cerr << "Error: Cannot add payload, " << body_name_ << " doesn't exist in robot" << std::endl;
@@ -126,7 +126,7 @@ void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
 }
 
 void SimPayload::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys,
-                             const std::shared_ptr<chrono::ChBody>& parent_body){
+                             const std::shared_ptr<chrono::ChBody>& parent_body) const {
     // enabling visualization and collision detection
     // may introduce extra complexity in simulation
     if (visible){
@@ -168,7 +168,7 @@ SimMotor::SimMotor(const std::string& type_name, const std::string& body_name,
      link_name_(link_name)
 {}
 
-void SimMotor::AddtoSystem(const chrono::ChUrdfDoc& urdf_doc){
+void SimMotor::AddtoSystem(const chrono::ChUrdfDoc& urdf_doc) {
     auto& sys = urdf_doc.GetSystem();
     chlinkbody_ = &(urdf_doc.GetLinkBodies(link_name_));
 
@@ -191,7 +191,7 @@ void SimMotor::AddtoSystem(const chrono::ChUrdfDoc& urdf_doc){
 
     motor_controller_ = std::make_shared<SimMotorController>(ch_motor_);
 }
-void SimMotor::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys){
+void SimMotor::AddtoSystem(const std::shared_ptr<chrono::ChSystem>& sys) const {
     std::cerr << "Error: Need to pass on the ChUrdfDoc when adding SimMotor to system" << std::endl;
 }
 

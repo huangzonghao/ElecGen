@@ -170,7 +170,7 @@ bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
     if (urdf_doc_->GetRobotName().find("manipulator") != std::string::npos) {
         controller_ = std::make_shared<ManipulatorController>(&motors_);
         // also need to pass in the joint positions here
-        auto& manipulator_controller = std::dynamic_pointer_cast<ManipulatorController>(controller_);
+        const auto& manipulator_controller = std::dynamic_pointer_cast<ManipulatorController>(controller_);
         manipulator_controller->SetJointPos(start_joint_pos_, goal_joint_pos_);
         manipulator_controller->SetJointMaxVel(0.23);
     }
