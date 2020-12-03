@@ -147,6 +147,10 @@ if (NOT urdfdom_FOUND)
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
 
+    mark_as_advanced(console_bridge_DIR)
+    mark_as_advanced(urdfdom_DIR)
+    mark_as_advanced(urdfdom_headers_DIR)
+
     find_package(urdfdom QUIET)
 else()
     message(STATUS "urdfdom Found")
