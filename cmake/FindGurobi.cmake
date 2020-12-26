@@ -4,7 +4,7 @@ find_path(Gurobi_INCLUDE_DIRS
           PATH_SUFFIXES include)
 
 find_library(Gurobi_LIBRARY
-             NAMES gurobi gurobi75 gurobi81 gurobi90
+             NAMES gurobi gurobi75 gurobi81 gurobi90 gurobi91
              HINTS ${Gurobi_DIR} $ENV{Gurobi_HOME}
              PATH_SUFFIXES lib)
 
