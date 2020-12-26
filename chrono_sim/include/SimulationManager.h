@@ -24,6 +24,7 @@ class  SimulationManager {
         payloads_.clear();
         motors_.clear();
         ch_waypoints_.clear();
+        auxrefs_.reset();
     }
 
     void SetSystemType(SystemType new_type){ system_type_ = new_type; }
@@ -99,7 +100,8 @@ class  SimulationManager {
     double env_z_ = 0.08;
 
     // names of bodies that would use ChBodyAuxRef
-    std::unordered_set<std::string> auxrefs_;
+    // this pointer is initialized when a urdf file has been loaded
+    std::shared_ptr<std::unordered_set<std::string> > auxrefs_;
 
 };
 

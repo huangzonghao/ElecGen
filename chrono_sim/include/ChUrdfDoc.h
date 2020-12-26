@@ -33,7 +33,7 @@ class ChUrdfDoc {
 
     urdf::ModelInterfaceSharedPtr GetUrdfRobot() const { return urdf_robot_; }
 
-    void SetAuxRef(std::unordered_set<std::string>& new_auxrefs);
+    const std::shared_ptr<std::unordered_set<std::string> >& GetAuxRef() { return auxrefs_; }
 
     bool Load_URDF(const std::string& filename);
     bool AddtoSystem(const std::shared_ptr<ChSystem>& sys, double x=0, double y=0, double z=0, double rx=0, double ry=0, double rz=0);
@@ -81,7 +81,7 @@ class ChUrdfDoc {
     std::shared_ptr<ChBody> ch_root_body_;
     std::shared_ptr<ChMaterialSurfaceNSC> collision_material_;
     // names of bodies that would use ChBodyAuxRef
-    std::unordered_set<std::string> *auxrefs_ = NULL;
+    std::shared_ptr<std::unordered_set<std::string> > auxrefs_;
 };
 
 }  // END_OF_NAMESPACE____

@@ -49,7 +49,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     urdf::JointSharedPtr u_parent_joint = u_link->parent_joint;
 
     std::shared_ptr<ChBody> ch_body;
-    if (auxrefs_ && auxrefs_->find(u_link->name) != auxrefs_->end()){
+    if (auxrefs_->find(u_link->name) != auxrefs_->end()){
         ch_body = chrono_types::make_shared<ChBodyAuxRef>();
     }
     else {
@@ -317,6 +317,13 @@ bool ChUrdfDoc::Load_URDF(const std::string& filename) {
     if (urdf_file_ == filename){
         return true;
     }
+
+    if (auxrefs_) {
+        auxrefs_->clear();
+    }
+    else {
+        auxrefs_ = std::make_shared<std::unordered_set<std::string> >();
+    }
     urdf_file_ = filename;
     urdf_robot_ = urdf::parseURDFFile(filename);
     u_root_link_ = urdf_robot_->getRoot();
@@ -373,10 +380,6 @@ const ChLinkBodies& ChUrdfDoc::GetLinkBodies(const std::string& name) const {
         exit(EXIT_FAILURE);
     }
     return ch_link_bodies_.find(name)->second;
-}
-
-void ChUrdfDoc::SetAuxRef(std::unordered_set<std::string>& new_auxrefs){
-    auxrefs_ = &new_auxrefs;
 }
 
 const std::string& ChUrdfDoc::GetLinkBodyName(const std::string& link_name, int body_idx){

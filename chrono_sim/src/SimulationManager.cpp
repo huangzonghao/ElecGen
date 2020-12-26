@@ -28,6 +28,7 @@ SimulationManager::SimulationManager(double step_size,
 
 void SimulationManager::SetUrdfFile(std::string filename){
     urdf_doc_ = std::make_shared<ChUrdfDoc>(filename);
+    auxrefs_ = urdf_doc_->GetAuxRef();
 }
 
 // this function only disables maps, to enable map, use SetEnv(std::string, double, double, double)
@@ -61,10 +62,15 @@ const std::string& SimulationManager::GetUrdfFileName(){
 void SimulationManager::AddComponent(const std::string& type_name, const std::string& body_name,
                                      double mass, double size_x, double size_y, double size_z,
                                      double pos_x, double pos_y, double pos_z){
+    if (!urdf_doc_){
+        std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
+        return;
+    }
+
     payloads_.push_back(std::make_shared<SimPayload>(type_name, body_name, mass,
                                                      size_x, size_y, size_z,
                                                      pos_x, pos_y, pos_z));
-    auxrefs_.insert(body_name);
+    auxrefs_->insert(body_name);
 }
 
 void SimulationManager::AddMotor(const std::string& type_name, const std::string& link_name,
@@ -73,23 +79,27 @@ void SimulationManager::AddMotor(const std::string& type_name, const std::string
     motors_.push_back(std::make_shared<SimMotor>(type_name, link_name, mass,
                                                  size_x, size_y, size_z,
                                                  pos_x, pos_y, pos_z));
-
     if (!urdf_doc_){
         std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
         return;
     }
     auto& body_name = urdf_doc_->GetLinkBodyName(link_name, 2);
-    auxrefs_.insert(body_name);
+    auxrefs_->insert(body_name);
 }
 
 void SimulationManager::AddMotor(const std::string& type_name, const std::string& body_name,
                                  const std::string& link_name, double mass,
                                  double size_x, double size_y, double size_z,
                                  double pos_x, double pos_y, double pos_z){
+    if (!urdf_doc_){
+        std::cerr << "Error: URDF file not set yet, call SetUrdfFile() first" << std::endl;
+        return;
+    }
+
     motors_.push_back(std::make_shared<SimMotor>(type_name, body_name, link_name,
                                                  mass, size_x, size_y, size_z,
                                                  pos_x, pos_y, pos_z));
-    auxrefs_.insert(body_name);
+    auxrefs_->insert(body_name);
 }
 
 void SimulationManager::AddWaypoint(double x, double y, double z){
@@ -131,8 +141,6 @@ bool SimulationManager::RunSimulation(bool do_viz, bool do_realtime){
     ch_system_->SetSolverMaxIterations(20);  // the higher, the easier to keep the constraints satisifed.
 
     if (load_map_) load_map();
-
-    urdf_doc_->SetAuxRef(auxrefs_);
 
     bool add_ok;
     if (!ch_waypoints_.empty()){
