@@ -49,19 +49,31 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     urdf::JointSharedPtr u_parent_joint = u_link->parent_joint;
 
     std::shared_ptr<ChBody> ch_body;
-    if (auxrefs_->find(u_link->name) != auxrefs_->end()){
+    // the same trimesh instance will be used in both visualization and collision
+    std::shared_ptr<geometry::ChTriangleMeshConnected> trimesh;
+    // Use auxref when seperate CoG is set in inertia tag or required by user
+    bool body_use_aux;
+    if (check_inertial_pose_set(u_link) || auxrefs_->find(u_link->name) != auxrefs_->end()){
         ch_body = chrono_types::make_shared<ChBodyAuxRef>();
+        body_use_aux = true;
     }
     else {
         ch_body = chrono_types::make_shared<ChBody>();
+        body_use_aux = false;
+    }
+
+    bool body_fixed = false;
+    if (u_link->name.find("fixed") != std::string::npos){
+        ch_body->SetBodyFixed(true);
+        body_fixed = true;
     }
 
     ch_body->SetNameString(u_link->name);
-    if (u_link->name.find("fixed") != std::string::npos) ch_body->SetBodyFixed(true);
 
     // Inertia
     // TODO: what is the default vaule to chrono if no mass and inertia were set,
     // and would this be a problem?
+    // TODO: mass info could be computed for mesh given density, might be useful?
     if (u_link->inertial){
         ch_body->SetMass(u_link->inertial->mass);
         ch_body->SetInertia(ChMatrix33<>(ChVector<>(u_link->inertial->ixx,
@@ -72,20 +84,32 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                                                     u_link->inertial->iyz)));
     }
 
+    ChFrame<> child_in_world;
     if (u_parent_joint){
-        ChCoordsys<> child_in_parent (ChVector<>(u_parent_joint->parent_to_joint_origin_transform.position.x,
-                                                 u_parent_joint->parent_to_joint_origin_transform.position.y,
-                                                 u_parent_joint->parent_to_joint_origin_transform.position.z),
-                                      ChQuaternion<>(u_parent_joint->parent_to_joint_origin_transform.rotation.w,
-                                                     u_parent_joint->parent_to_joint_origin_transform.rotation.x,
-                                                     u_parent_joint->parent_to_joint_origin_transform.rotation.y,
-                                                     u_parent_joint->parent_to_joint_origin_transform.rotation.z));
-        ch_body->SetCoord(child_in_parent >> ch_parent_body->GetCoord());
+        ChFrame<> child_in_parent (ChVector<>(u_parent_joint->parent_to_joint_origin_transform.position.x,
+                                              u_parent_joint->parent_to_joint_origin_transform.position.y,
+                                              u_parent_joint->parent_to_joint_origin_transform.position.z),
+                                   ChQuaternion<>(u_parent_joint->parent_to_joint_origin_transform.rotation.w,
+                                                  u_parent_joint->parent_to_joint_origin_transform.rotation.x,
+                                                  u_parent_joint->parent_to_joint_origin_transform.rotation.y,
+                                                  u_parent_joint->parent_to_joint_origin_transform.rotation.z));
+
+        child_in_world = child_in_parent >> ch_parent_body->GetFrame_REF_to_abs();
     }
     else{
-        ch_body->SetCoord(ch_parent_body->GetCoord());
+       child_in_world = ChFrame<>(ch_parent_body->GetCoord());
     }
 
+    if (body_use_aux) {
+        std::dynamic_pointer_cast<ChBodyAuxRef>(ch_body)->SetFrame_REF_to_abs(child_in_world);
+        // when the CoG is not set in URDF's inertia, it's default to no translation (0,0,0) by urdf reader
+        std::dynamic_pointer_cast<ChBodyAuxRef>(ch_body)->SetFrame_COG_to_REF(ChFrame<>(ChVector<>(u_link->inertial->origin.position.x,
+                                                                                                   u_link->inertial->origin.position.y,
+                                                                                                   u_link->inertial->origin.position.z)));
+    }
+    else {
+        ch_body->SetCoord(child_in_world.GetCoord());
+    }
 
     // Visual
     if (u_link->visual){
@@ -121,14 +145,18 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                 case urdf::Geometry::MESH:
                 {
                     urdf::MeshSharedPtr tmp_urdf_mesh_ptr = std::dynamic_pointer_cast<urdf::Mesh>(u_visual->geometry);
-                    auto trimesh = chrono_types::make_shared<geometry::ChTriangleMeshConnected>();
+                    trimesh = chrono_types::make_shared<geometry::ChTriangleMeshConnected>();
                     trimesh->LoadWavefrontMesh(urdf_abs_path(tmp_urdf_mesh_ptr->filename));
                     trimesh->Transform(VNULL, ChMatrix33<>(ChVector<>(tmp_urdf_mesh_ptr->scale.x,
                                                                       tmp_urdf_mesh_ptr->scale.y,
                                                                       tmp_urdf_mesh_ptr->scale.z)));
+                    trimesh->RepairDuplicateVertexes(1e-9); // if meshes are not watertight
+
                     auto trimesh_shape = chrono_types::make_shared<ChTriangleMeshShape>();
                     trimesh_shape->SetMesh(trimesh);
                     trimesh_shape->SetName(ch_body->GetNameString() + "_vis_mesh");
+                    trimesh_shape->SetBackfaceCull(true);
+                    trimesh_shape->SetStatic(true); // mesh object is considered static if it's non-deformable
                     // for some reason this SetScale method doesn't work
                     // trimesh_shape->SetScale(ChVector<>(tmp_urdf_mesh_ptr->scale.x,
                                                        // tmp_urdf_mesh_ptr->scale.y,
@@ -162,7 +190,6 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
             ch_body->AddAsset(tmp_viasset);
         }
     }
-
 
     // Collision
     // The collsion geometry type could be different from visual, that's why we don't merge them together
@@ -219,8 +246,35 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                 }
                 case urdf::Geometry::MESH:
                 {
-                    // TODO: Let go for now
-                    std::cout << "Chrono_urdf: MESH is not supported in urdf-link yet" << std::endl;
+                    break;
+                    if (body_fixed){
+                        ch_body->GetCollisionModel()->AddTriangleMesh(collision_material_,
+                                                                      trimesh,
+                                                                      true,   // is static
+                                                                      true,  // use convex hull
+                                                                      ChVector<>(u_collision->origin.position.x,
+                                                                                 u_collision->origin.position.y,
+                                                                                 u_collision->origin.position.z),
+                                                                      ChMatrix33<>(ChQuaternion<>(u_collision->origin.rotation.w,
+                                                                                                  u_collision->origin.rotation.x,
+                                                                                                  u_collision->origin.rotation.y,
+                                                                                                  u_collision->origin.rotation.z)),
+                                                                      0); // sphereswept_thickness
+                    }
+                    else {
+                        ch_body->GetCollisionModel()->AddTriangleMesh(collision_material_,
+                                                                      trimesh,
+                                                                      false,  // is static
+                                                                      true,  // use convex hull
+                                                                      ChVector<>(u_collision->origin.position.x,
+                                                                                 u_collision->origin.position.y,
+                                                                                 u_collision->origin.position.z),
+                                                                      ChMatrix33<>(ChQuaternion<>(u_collision->origin.rotation.w,
+                                                                                                  u_collision->origin.rotation.x,
+                                                                                                  u_collision->origin.rotation.y,
+                                                                                                  u_collision->origin.rotation.z)),
+                                                                      0); // sphereswept_thickness
+                    }
                     break;
                 }
             }
@@ -241,11 +295,11 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                 ch_parent_link = chrono_types::make_shared<ChLinkLockRevolute>();
                 ch_parent_link->Initialize(ch_body,
                                            ch_parent_body,
-                                           ChCoordsys<>(ch_body->GetPos(),
+                                           ChCoordsys<>(ch_body->GetFrame_REF_to_abs().GetPos(),
                                                         Q_from_Vect_to_Vect(VECT_Z,
                                                                             ChVector<>(u_parent_joint->axis.x,
                                                                                        u_parent_joint->axis.y,
-                                                                                       u_parent_joint->axis.z)).GetNormalized() >> ch_body->GetRot()));
+                                                                                       u_parent_joint->axis.z)).GetNormalized() >> ch_body->GetFrame_REF_to_abs().GetRot()));
                 if (u_parent_joint->limits){
                     ch_parent_link->GetLimit_Rz().SetMin(u_parent_joint->limits->lower);
                     ch_parent_link->GetLimit_Rz().SetMax(u_parent_joint->limits->upper);
@@ -259,11 +313,11 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                 ch_parent_link = chrono_types::make_shared<ChLinkLockPrismatic>();
                 ch_parent_link->Initialize(ch_body,
                                            ch_parent_body,
-                                           ChCoordsys<>(ch_body->GetPos(),
+                                           ChCoordsys<>(ch_body->GetFrame_REF_to_abs().GetPos(),
                                                         Q_from_Vect_to_Vect(VECT_Z,
                                                                             ChVector<>(u_parent_joint->axis.x,
                                                                                        u_parent_joint->axis.y,
-                                                                                       u_parent_joint->axis.z)) >> ch_body->GetRot()));
+                                                                                       u_parent_joint->axis.z)) >> ch_body->GetFrame_REF_to_abs().GetRot()));
                 break;
             case urdf::Joint::CONTINUOUS:
                 // the difference between continuous joint and revolute joint is that
@@ -272,11 +326,11 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                 ch_parent_link = chrono_types::make_shared<ChLinkLockRevolute>();
                 ch_parent_link->Initialize(ch_body,
                                            ch_parent_body,
-                                           ChCoordsys<>(ch_body->GetPos(),
+                                           ChCoordsys<>(ch_body->GetFrame_REF_to_abs().GetPos(),
                                                         Q_from_Vect_to_Vect(VECT_Z,
                                                                             ChVector<>(u_parent_joint->axis.x,
                                                                                        u_parent_joint->axis.y,
-                                                                                       u_parent_joint->axis.z)).GetNormalized() >> ch_body->GetRot()));
+                                                                                       u_parent_joint->axis.z)).GetNormalized() >> ch_body->GetFrame_REF_to_abs().GetRot()));
                 break;
             case urdf::Joint::FLOATING:
                 // TODO: Let go for now
@@ -301,6 +355,49 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
         ch_system_->AddLink(ch_parent_link);
 
         ch_link_bodies_.emplace(u_parent_joint->name, ChLinkBodies{ch_body, ch_parent_body, ch_parent_link});
+
+        if (u_parent_joint->dynamics) {
+            if (u_parent_joint->dynamics->damping != 0){
+                switch(u_parent_joint->type){
+                case urdf::Joint::REVOLUTE:
+                case urdf::Joint::CONTINUOUS:
+                {
+                    auto ch_parent_link_spring = chrono_types::make_shared<ChLinkRotSpringCB>();
+                    // TODO: how to pass in spring coefficient from urdf
+                    auto torque_functor = chrono_types::make_shared<RotSpringConstDampingTorque>(0, u_parent_joint->dynamics->damping);
+                    ch_parent_link_spring->Initialize(ch_body, ch_parent_body, ch_parent_link->GetLinkAbsoluteCoords());
+                    ch_parent_link_spring->RegisterTorqueFunctor(torque_functor);
+                    ch_system_->AddLink(ch_parent_link_spring);
+                    break;
+                }
+                case urdf::Joint::PRISMATIC:
+                    // auto ch_parent_link_spring = chrono_types::make_shared<ChLinkTSDA>();
+                    std::cout << "Chrono_urdf: damping for PRISMATIC joint has not been implemented yet" <<std::endl;
+                    break;
+                }
+            }
+            if (u_parent_joint->dynamics->friction != 0){
+                std::cout << "Chrono_urdf: friction for joint has not been implemented yet" <<std::endl;
+            }
+        }
+    }
+
+    if (u_link->name.find("5") != std::string::npos) {
+        std::cout << "Creating the close loop joint" << std::endl;
+        std::shared_ptr<ChLinkLock> ch_final_link = chrono_types::make_shared<ChLinkLockRevolute>();
+        ch_final_link->Initialize(ch_body,
+                                  body_list_->at(0),
+                                  ChCoordsys<>(ch_body->GetFrame_REF_to_abs().GetPos(),
+                                               Q_from_Vect_to_Vect(VECT_Z,
+                                                                   ChVector<>(0.7071, 0.7071, 0)).GetNormalized() >> ch_body->GetFrame_REF_to_abs().GetRot()));
+        ch_final_link->SetNameString("link5_link0");
+        ch_system_->AddLink(ch_final_link);
+
+        auto ch_final_link_spring = chrono_types::make_shared<ChLinkRotSpringCB>();
+        auto final_torque_functor = chrono_types::make_shared<RotSpringConstDampingTorque>(0, 0.5);
+        ch_final_link_spring->Initialize(ch_body, body_list_->at(0), ch_final_link->GetLinkAbsoluteCoords());
+        ch_final_link_spring->RegisterTorqueFunctor(final_torque_functor);
+        ch_system_->AddLink(ch_final_link_spring);
     }
 
     // finally process all child links
@@ -310,6 +407,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
 
         convert_links(*link_iter, ch_body);
     }
+
     return ch_body;
 }
 
@@ -404,6 +502,15 @@ const std::string& ChUrdfDoc::GetLinkBodyName(const std::string& link_name, int 
         std::cerr << "ERROR: Invalid body_idx, has to be 1 or 2" << std::endl;
         exit(EXIT_FAILURE);
     }
+}
+
+bool ChUrdfDoc::check_inertial_pose_set(const urdf::LinkConstSharedPtr& u_link) {
+    if (u_link->inertial) {
+        auto& pos = u_link->inertial->origin.position;
+        if (pos.x != 0 || pos.y != 0 || pos.z != 0) return true;
+    }
+
+    return false;
 }
 
 }  // END_OF_NAMESPACE____

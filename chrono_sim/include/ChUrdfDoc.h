@@ -71,6 +71,7 @@ class ChUrdfDoc {
     std::shared_ptr<ChBody> convert_links(const urdf::LinkConstSharedPtr& u_link,
                                           const std::shared_ptr<ChBody>& ch_parent_body);
     void convert_materials();
+    bool check_inertial_pose_set(const urdf::LinkConstSharedPtr& u_link);
     // concatenates the urdf flie path and the relative path to the urdf file
     std::string urdf_file_;
     urdf::ModelInterfaceSharedPtr urdf_robot_;
@@ -82,6 +83,23 @@ class ChUrdfDoc {
     std::shared_ptr<ChMaterialSurfaceNSC> collision_material_;
     // names of bodies that would use ChBodyAuxRef
     std::shared_ptr<std::unordered_set<std::string> > auxrefs_;
+};
+
+// torque functor for a rot spring with constant spring coefficient and constant damping coefficient
+class RotSpringConstDampingTorque : public ChLinkRotSpringCB::TorqueFunctor {
+  public:
+    RotSpringConstDampingTorque(double spring_coef, double damping_coef) : spring_coef(spring_coef), damping_coef(damping_coef){}
+
+    virtual double operator()(double time,             // current time
+                              double angle,            // relative angle of rotation
+                              double vel,              // relative angular speed
+                              ChLinkRotSpringCB* link  // back-pointer to associated link
+                              ) override {
+        return -spring_coef * angle - damping_coef * vel;
+    }
+  private:
+    double spring_coef;
+    double damping_coef;
 };
 
 }  // END_OF_NAMESPACE____
