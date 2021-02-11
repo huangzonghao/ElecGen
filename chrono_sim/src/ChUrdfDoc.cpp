@@ -49,6 +49,14 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     urdf::JointSharedPtr u_parent_joint = u_link->parent_joint;
 
     std::shared_ptr<ChBody> ch_body;
+
+    if (u_link->name.find("dummy") != std::string::npos){
+        std::string actual_link(u_link->name.substr(u_link->name.find("dummy") + 6));
+        process_joints(u_parent_joint, ch_parent_body, ch_system_->SearchBody(actual_link.c_str()));
+
+        return ch_body;
+    }
+
     // the same trimesh instance will be used in both visualization and collision
     std::shared_ptr<geometry::ChTriangleMeshConnected> trimesh;
     // Use auxref when seperate CoG is set in inertia tag or required by user
@@ -259,7 +267,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                                                                                                   u_collision->origin.rotation.x,
                                                                                                   u_collision->origin.rotation.y,
                                                                                                   u_collision->origin.rotation.z)),
-                                                                      0); // sphereswept_thickness
+                                                                      -0.01); // sphereswept_thickness
                     }
                     else {
                         ch_body->GetCollisionModel()->AddTriangleMesh(collision_material_,
@@ -273,7 +281,7 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
                                                                                                   u_collision->origin.rotation.x,
                                                                                                   u_collision->origin.rotation.y,
                                                                                                   u_collision->origin.rotation.z)),
-                                                                      0); // sphereswept_thickness
+                                                                      -0.01); // sphereswept_thickness
                     }
                     break;
                 }
@@ -288,117 +296,11 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     // then process the joint with parent link
     // TODO: Chrono supports different types of joints, blindly choose ChLinkLock family for now
     if (u_parent_joint){
-
-        std::shared_ptr<ChLinkLock> ch_parent_link;
-        switch (u_parent_joint->type){
-            case urdf::Joint::REVOLUTE:
-                ch_parent_link = chrono_types::make_shared<ChLinkLockRevolute>();
-                ch_parent_link->Initialize(ch_body,
-                                           ch_parent_body,
-                                           ChCoordsys<>(ch_body->GetFrame_REF_to_abs().GetPos(),
-                                                        Q_from_Vect_to_Vect(VECT_Z,
-                                                                            ChVector<>(u_parent_joint->axis.x,
-                                                                                       u_parent_joint->axis.y,
-                                                                                       u_parent_joint->axis.z)).GetNormalized() >> ch_body->GetFrame_REF_to_abs().GetRot()));
-                if (u_parent_joint->limits){
-                    ch_parent_link->GetLimit_Rz().SetMin(u_parent_joint->limits->lower);
-                    ch_parent_link->GetLimit_Rz().SetMax(u_parent_joint->limits->upper);
-                    ch_parent_link->GetLimit_Rz().SetActive(true);
-                    std::cout << "joint limits lower: " << u_parent_joint->limits->lower << " , upper: " << u_parent_joint->limits->upper << std::endl;
-                    // u_parent_joint->limits->effort - max joint effort
-                    // u_parent_joint->limits->velocity - max joint velocity
-                }
-                break;
-            case urdf::Joint::PRISMATIC:
-                ch_parent_link = chrono_types::make_shared<ChLinkLockPrismatic>();
-                ch_parent_link->Initialize(ch_body,
-                                           ch_parent_body,
-                                           ChCoordsys<>(ch_body->GetFrame_REF_to_abs().GetPos(),
-                                                        Q_from_Vect_to_Vect(VECT_Z,
-                                                                            ChVector<>(u_parent_joint->axis.x,
-                                                                                       u_parent_joint->axis.y,
-                                                                                       u_parent_joint->axis.z)) >> ch_body->GetFrame_REF_to_abs().GetRot()));
-                break;
-            case urdf::Joint::CONTINUOUS:
-                // the difference between continuous joint and revolute joint is that
-                // continuous joint has no upper or lower limit
-                // TODO:Currently using ChLinkLockRevolute, more efficient with ChLinkRevolute?
-                ch_parent_link = chrono_types::make_shared<ChLinkLockRevolute>();
-                ch_parent_link->Initialize(ch_body,
-                                           ch_parent_body,
-                                           ChCoordsys<>(ch_body->GetFrame_REF_to_abs().GetPos(),
-                                                        Q_from_Vect_to_Vect(VECT_Z,
-                                                                            ChVector<>(u_parent_joint->axis.x,
-                                                                                       u_parent_joint->axis.y,
-                                                                                       u_parent_joint->axis.z)).GetNormalized() >> ch_body->GetFrame_REF_to_abs().GetRot()));
-                break;
-            case urdf::Joint::FLOATING:
-                // TODO: Let go for now
-                std::cout << "Chrono_urdf: FLOATTING is not supported in urdf-joint yet" << std::endl;
-                break;
-            case urdf::Joint::PLANAR:
-                // TODO: Let go for now
-                std::cout << "Chrono_urdf: PLANAR is not supported in urdf-joint yet" << std::endl;
-                break;
-            case urdf::Joint::FIXED:
-                ch_parent_link = chrono_types::make_shared<ChLinkLockLock>();
-                ch_parent_link->Initialize(ch_body,
-                                           ch_parent_body,
-                                           ChCoordsys<>(ch_body->GetPos(),QUNIT));
-                break;
-            case urdf::Joint::UNKNOWN:
-                // TODO: Let go for now
-                std::cout << "Chrono_urdf: UNKNOWN is not supported in urdf-joint yet" << std::endl;
-                break;
-        }
-        ch_parent_link->SetNameString(u_parent_joint->name);
-        ch_system_->AddLink(ch_parent_link);
-
+        std::shared_ptr<ChLinkLock>& ch_parent_link = process_joints(u_parent_joint, ch_parent_body, ch_body);
         ch_link_bodies_.emplace(u_parent_joint->name, ChLinkBodies{ch_body, ch_parent_body, ch_parent_link});
-
-        if (u_parent_joint->dynamics) {
-            if (u_parent_joint->dynamics->damping != 0){
-                switch(u_parent_joint->type){
-                case urdf::Joint::REVOLUTE:
-                case urdf::Joint::CONTINUOUS:
-                {
-                    auto ch_parent_link_spring = chrono_types::make_shared<ChLinkRotSpringCB>();
-                    // TODO: how to pass in spring coefficient from urdf
-                    auto torque_functor = chrono_types::make_shared<RotSpringConstDampingTorque>(0, u_parent_joint->dynamics->damping);
-                    ch_parent_link_spring->Initialize(ch_body, ch_parent_body, ch_parent_link->GetLinkAbsoluteCoords());
-                    ch_parent_link_spring->RegisterTorqueFunctor(torque_functor);
-                    ch_system_->AddLink(ch_parent_link_spring);
-                    break;
-                }
-                case urdf::Joint::PRISMATIC:
-                    // auto ch_parent_link_spring = chrono_types::make_shared<ChLinkTSDA>();
-                    std::cout << "Chrono_urdf: damping for PRISMATIC joint has not been implemented yet" <<std::endl;
-                    break;
-                }
-            }
-            if (u_parent_joint->dynamics->friction != 0){
-                std::cout << "Chrono_urdf: friction for joint has not been implemented yet" <<std::endl;
-            }
-        }
     }
 
-    if (u_link->name.find("5") != std::string::npos) {
-        std::cout << "Creating the close loop joint" << std::endl;
-        std::shared_ptr<ChLinkLock> ch_final_link = chrono_types::make_shared<ChLinkLockRevolute>();
-        ch_final_link->Initialize(ch_body,
-                                  body_list_->at(0),
-                                  ChCoordsys<>(ch_body->GetFrame_REF_to_abs().GetPos(),
-                                               Q_from_Vect_to_Vect(VECT_Z,
-                                                                   ChVector<>(0.7071, 0.7071, 0)).GetNormalized() >> ch_body->GetFrame_REF_to_abs().GetRot()));
-        ch_final_link->SetNameString("link5_link0");
-        ch_system_->AddLink(ch_final_link);
-
-        auto ch_final_link_spring = chrono_types::make_shared<ChLinkRotSpringCB>();
-        auto final_torque_functor = chrono_types::make_shared<RotSpringConstDampingTorque>(0, 0.5);
-        ch_final_link_spring->Initialize(ch_body, body_list_->at(0), ch_final_link->GetLinkAbsoluteCoords());
-        ch_final_link_spring->RegisterTorqueFunctor(final_torque_functor);
-        ch_system_->AddLink(ch_final_link_spring);
-    }
+    body_list_->push_back(ch_body);
 
     // finally process all child links
     for (auto link_iter = u_link->child_links.begin();
@@ -409,6 +311,107 @@ std::shared_ptr<ChBody> ChUrdfDoc::convert_links(const urdf::LinkConstSharedPtr&
     }
 
     return ch_body;
+}
+
+std::shared_ptr<ChLinkLock> ChUrdfDoc::process_joints(const urdf::JointConstSharedPtr& u_joint,
+                                                      const std::shared_ptr<ChBody>& ch_parent_body,
+                                                      const std::shared_ptr<ChBody>& ch_child_body) {
+    assert(!u_joint);
+
+    std::shared_ptr<ChLinkLock> ch_link;
+    switch (u_joint->type){
+        case urdf::Joint::REVOLUTE:
+            ch_link = chrono_types::make_shared<ChLinkLockRevolute>();
+            ch_link->Initialize(ch_child_body,
+                                ch_parent_body,
+                                ChCoordsys<>(ch_child_body->GetFrame_REF_to_abs().GetPos(),
+                                             Q_from_Vect_to_Vect(VECT_Z,
+                                                                 ChVector<>(u_joint->axis.x,
+                                                                            u_joint->axis.y,
+                                                                            u_joint->axis.z)).GetNormalized() >> ch_child_body->GetFrame_REF_to_abs().GetRot()));
+            if (u_joint->limits){
+                ch_link->GetLimit_Rz().SetMin(u_joint->limits->lower);
+                ch_link->GetLimit_Rz().SetMax(u_joint->limits->upper);
+                ch_link->GetLimit_Rz().SetActive(true);
+                // u_joint->limits->effort - max joint effort
+                // u_joint->limits->velocity - max joint velocity
+            }
+            break;
+        case urdf::Joint::PRISMATIC:
+            ch_link = chrono_types::make_shared<ChLinkLockPrismatic>();
+            ch_link->Initialize(ch_child_body,
+                                ch_parent_body,
+                                ChCoordsys<>(ch_child_body->GetFrame_REF_to_abs().GetPos(),
+                                             Q_from_Vect_to_Vect(VECT_Z,
+                                                                 ChVector<>(u_joint->axis.x,
+                                                                            u_joint->axis.y,
+                                                                            u_joint->axis.z)) >> ch_child_body->GetFrame_REF_to_abs().GetRot()));
+            break;
+        case urdf::Joint::CONTINUOUS:
+            // the difference between continuous joint and revolute joint is that
+            // continuous joint has no upper or lower limit
+            // TODO:Currently using ChLinkLockRevolute, more efficient with ChLinkRevolute?
+            ch_link = chrono_types::make_shared<ChLinkLockRevolute>();
+            ch_link->Initialize(ch_child_body,
+                                ch_parent_body,
+                                ChCoordsys<>(ch_child_body->GetFrame_REF_to_abs().GetPos(),
+                                             Q_from_Vect_to_Vect(VECT_Z,
+                                                                 ChVector<>(u_joint->axis.x,
+                                                                            u_joint->axis.y,
+                                                                            u_joint->axis.z)).GetNormalized() >> ch_child_body->GetFrame_REF_to_abs().GetRot()));
+            break;
+        case urdf::Joint::FLOATING:
+            // TODO: Let go for now
+            std::cout << "Chrono_urdf: FLOATTING is not supported in urdf-joint yet" << std::endl;
+            exit(EXIT_FAILURE);
+            break;
+        case urdf::Joint::PLANAR:
+            // TODO: Let go for now
+            std::cout << "Chrono_urdf: PLANAR is not supported in urdf-joint yet" << std::endl;
+            exit(EXIT_FAILURE);
+            break;
+        case urdf::Joint::FIXED:
+            ch_link = chrono_types::make_shared<ChLinkLockLock>();
+            ch_link->Initialize(ch_child_body,
+                                ch_parent_body,
+                                ChCoordsys<>(ch_child_body->GetPos(),QUNIT));
+            break;
+        case urdf::Joint::UNKNOWN:
+            // TODO: Let go for now
+            std::cout << "Chrono_urdf: UNKNOWN is not supported in urdf-joint yet" << std::endl;
+            exit(EXIT_FAILURE);
+            break;
+    }
+
+    if (u_joint->dynamics) {
+        if (u_joint->dynamics->damping != 0){
+            switch(u_joint->type){
+            case urdf::Joint::REVOLUTE:
+            case urdf::Joint::CONTINUOUS:
+            {
+                auto ch_parent_link_spring = chrono_types::make_shared<ChLinkRotSpringCB>();
+                // TODO: how to pass in spring coefficient from urdf
+                auto torque_functor = chrono_types::make_shared<RotSpringConstDampingTorque>(0, u_joint->dynamics->damping);
+                ch_parent_link_spring->Initialize(ch_child_body, ch_parent_body, ch_link->GetLinkAbsoluteCoords());
+                ch_parent_link_spring->RegisterTorqueFunctor(torque_functor);
+                ch_system_->AddLink(ch_parent_link_spring);
+                break;
+            }
+            case urdf::Joint::PRISMATIC:
+                // auto ch_parent_link_spring = chrono_types::make_shared<ChLinkTSDA>();
+                std::cout << "Chrono_urdf: damping for PRISMATIC joint has not been implemented yet" <<std::endl;
+                break;
+            }
+        }
+        if (u_joint->dynamics->friction != 0){
+            std::cout << "Chrono_urdf: friction for joint has not been implemented yet" <<std::endl;
+        }
+    }
+
+    ch_link->SetNameString(u_joint->name);
+    ch_system_->AddLink(ch_link);
+
+    return ch_link;
 }
 
 bool ChUrdfDoc::Load_URDF(const std::string& filename) {
@@ -458,6 +461,8 @@ bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::sha
 
     std::cout << "robot name is: " << urdf_robot_->getName() << std::endl;
     ch_system_ = sys;
+
+    body_list_ = std::make_shared<std::vector<std::shared_ptr<ChBody> > >();
 
     convert_materials();
 

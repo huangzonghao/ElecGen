@@ -56,6 +56,8 @@ class ChUrdfDoc {
 
     void SetCollisionMaterial(const std::shared_ptr<ChMaterialSurfaceNSC>& new_mat){ collision_material_ = new_mat; }
 
+    std::shared_ptr<std::vector<std::shared_ptr<ChBody> > >& GetBodyList() {return body_list_;}
+
   private:
     struct ChMatPair{
         std::shared_ptr<ChColor> color;
@@ -70,6 +72,10 @@ class ChUrdfDoc {
     std::string urdf_abs_path(const std::string& relative_path);
     std::shared_ptr<ChBody> convert_links(const urdf::LinkConstSharedPtr& u_link,
                                           const std::shared_ptr<ChBody>& ch_parent_body);
+
+    std::shared_ptr<ChLinkLock> process_joints(const urdf::JointConstSharedPtr& u_joint,
+                                               const std::shared_ptr<ChBody>& ch_parent_body,
+                                               const std::shared_ptr<ChBody>& ch_child_body);
     void convert_materials();
     bool check_inertial_pose_set(const urdf::LinkConstSharedPtr& u_link);
     // concatenates the urdf flie path and the relative path to the urdf file
@@ -83,6 +89,8 @@ class ChUrdfDoc {
     std::shared_ptr<ChMaterialSurfaceNSC> collision_material_;
     // names of bodies that would use ChBodyAuxRef
     std::shared_ptr<std::unordered_set<std::string> > auxrefs_;
+
+    std::shared_ptr<std::vector<std::shared_ptr<ChBody> > > body_list_;
 };
 
 // torque functor for a rot spring with constant spring coefficient and constant damping coefficient
