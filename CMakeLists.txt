@@ -21,13 +21,13 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set (PROJECT_IN_FILE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 if (NOT DEFINED PROJECT_IN_FILE_OUTPUT_DIR)
     file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/include)
     set(PROJECT_IN_FILE_OUTPUT_DIR ${PROJECT_BINARY_DIR}/include)
 endif()
-set(PROJECT_DEP_INSTALL_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install)
+set(PROJECT_DEP_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/Install)
 list(APPEND CMAKE_PREFIX_PATH ${PROJECT_DEP_INSTALL_DIR})
 
 #######################################################################
@@ -96,56 +96,56 @@ endif()
 
 find_package(urdfdom QUIET)
 if (NOT urdfdom_FOUND)
-    if( NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/.git" OR
-        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers/.git" OR
-        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/console_bridge/.git")
+    if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom/.git" OR
+        NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom_headers/.git" OR
+        NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/console_bridge/.git")
 
         execute_process(COMMAND git submodule update --init --recursive --depth 1
-                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom
-                        ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers
-                        ${CMAKE_BINARY_DIR}/thirdparty/console_bridge
-                        ${CMAKE_BINARY_DIR}/thirdparty/tinyxml
-                        ${CMAKE_BINARY_DIR}/thirdparty/Install)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/urdfdom
+                        ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/urdfdom_headers
+                        ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/console_bridge
+                        ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/tinyxml
+                        ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/Install)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom_headers
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
-
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom_headers)
-
-    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/console_bridge
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
+    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom_headers
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/urdfdom_headers)
 
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/console_bridge)
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/urdfdom_headers)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/tinyxml
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
+    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/console_bridge
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/console_bridge)
 
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/tinyxml)
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/console_bridge)
+
+    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/tinyxml
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/tinyxml)
+
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/tinyxml)
 
     if (WIN32) # Windows
         # set(ENV{CL} /D_USE_MATH_DEFINES $ENV{CL})
         # Need to do this due to a flaw of upstream library -- https://github.com/ros/urdfdom/issues/42
-        file(COPY ${CMAKE_SOURCE_DIR}/cmake/urdfdom_cmakelists_patched.txt DESTINATION ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/)
-        file(COPY ${CMAKE_SOURCE_DIR}/cmake/urdfparser_cmakelists_patched.txt DESTINATION ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser)
-        file(RENAME ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdfdom_cmakelists_patched.txt ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/CMakeLists.txt)
-        file(RENAME ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser/urdfparser_cmakelists_patched.txt ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser/CMakeLists.txt)
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/cmake/urdfdom_cmakelists_patched.txt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom/)
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/cmake/urdfparser_cmakelists_patched.txt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser)
+        file(RENAME ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom/urdfdom_cmakelists_patched.txt ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom/CMakeLists.txt)
+        file(RENAME ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser/urdfparser_cmakelists_patched.txt ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom/urdf_parser/CMakeLists.txt)
     endif()
 
     execute_process(COMMAND ${CMAKE_COMMAND}
                             -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
                             -DTinyXML_ROOT_DIR:PATH=${PROJECT_DEP_INSTALL_DIR}
                             -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=True
-                            ${CMAKE_SOURCE_DIR}/thirdparty/urdfdom
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/urdfdom)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/urdfdom
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/urdfdom)
 
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
-                    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/thirdparty/urdfdom")
+                    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/thirdparty/urdfdom")
 
     mark_as_advanced(console_bridge_DIR)
     mark_as_advanced(urdfdom_DIR)
@@ -167,10 +167,10 @@ mark_as_advanced(Matlab_ROOT_DIR)
 
 find_package(Protobuf QUIET)
 if (NOT Protobuf_FOUND)
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
-    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/protobuf/.git")
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/protobuf)
+    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/protobuf/.git")
         execute_process(COMMAND git submodule update --init --recursive --depth 1
-                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
     execute_process(COMMAND ${CMAKE_COMMAND}
                             -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
@@ -178,58 +178,58 @@ if (NOT Protobuf_FOUND)
                             -Dprotobuf_MSVC_STATIC_RUNTIME=OFF
                             -Dprotobuf_WITH_ZLIB=OFF
                             -Dprotobuf_BUILD_SHARED_LIBS=ON
-                            ${CMAKE_SOURCE_DIR}/thirdparty/protobuf/cmake
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/protobuf/cmake
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/protobuf)
 
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/protobuf)
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/protobuf)
     find_package(Protobuf QUIET)
 else()
     message(STATUS "Protobuf Found")
 endif()
 mark_as_advanced(Protobuf_SRC_ROOT_FOLDER)
-add_subdirectory(${CMAKE_SOURCE_DIR}/electronics/proto)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/electronics/proto)
 
-set (Discreture_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/thirdparty/discreture/include)
+set (Discreture_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/discreture/include)
 
 find_package(towr QUIET)
 if (NOT towr_FOUND)
-    if( NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/Ipopt/.git" OR
-        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/ifopt/.git" OR
-        NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/towr/.git")
+    if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Ipopt/.git" OR
+        NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/ifopt/.git" OR
+        NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/towr/.git")
 
         execute_process(COMMAND git submodule update --init --recursive --depth 1
-                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr
-                        ${CMAKE_BINARY_DIR}/thirdparty/ifopt
-                        ${CMAKE_BINARY_DIR}/thirdparty/Ipopt)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/towr
+                        ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/ifopt
+                        ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/Ipopt)
 
     # TODO: Ipopt compilation on windows
     if (NOT WIN32)
-    execute_process(COMMAND ${CMAKE_SOURCE_DIR}/thirdparty/Ipopt/configure --prefix ${PROJECT_DEP_INSTALL_DIR}
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/Ipopt)
+    execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Ipopt/configure --prefix ${PROJECT_DEP_INSTALL_DIR}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/Ipopt)
 
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/Ipopt)
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/Ipopt)
     endif()
 
     execute_process(COMMAND ${CMAKE_COMMAND}
                             -DIPOPT_DIR:PATH=${PROJECT_DEP_INSTALL_DIR}
                             -DEIGEN3_INCLUDE_DIR:PATH=${EIGEN3_INCLUDE_DIR}
                             -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR}
-                            ${CMAKE_SOURCE_DIR}/thirdparty/ifopt
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/ifopt)
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/ifopt
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/ifopt)
 
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/ifopt)
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/ifopt)
 
-    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/thirdparty/towr/towr
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr)
+    execute_process(COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_DEP_INSTALL_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/towr/towr
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/towr)
 
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target install
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/thirdparty/towr)
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thirdparty/towr)
 
     find_package(towr QUIET)
 else()
@@ -298,9 +298,9 @@ set (CMAKE_CXX_STANDARD 17)
 #                            Source Files                             #
 #######################################################################
 
-set(ELECTRONICS_PATH ${CMAKE_SOURCE_DIR}/electronics)
-set(CHRONOSIM_PATH ${CMAKE_SOURCE_DIR}/chrono_sim)
-set(TRAJECTORY_PATH ${CMAKE_SOURCE_DIR}/trajectory)
+set(ELECTRONICS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/electronics)
+set(CHRONOSIM_PATH ${CMAKE_CURRENT_SOURCE_DIR}/chrono_sim)
+set(TRAJECTORY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/trajectory)
 
 set(ELECTRONICS_SRC_PATH ${ELECTRONICS_PATH}/src)
 set(CHRONOSIM_SRC_PATH ${CHRONOSIM_PATH}/src)
@@ -309,17 +309,17 @@ set(ELECTRONICS_INCLUDE_PATH ${ELECTRONICS_PATH}/include)
 set(CHRONOSIM_INCLUDE_PATH ${CHRONOSIM_PATH}/include)
 set(TRAJECTORY_INCLUDE_PATH ${TRAJECTORY_PATH})
 
-if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/discreture/.git")
+if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/discreture/.git")
     execute_process(COMMAND git submodule update --init --recursive --depth 1
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
 # set project specified paths
-set(ELECGEN_DATA_PATH ${CMAKE_SOURCE_DIR}/data/)
+set(ELECGEN_DATA_PATH ${CMAKE_CURRENT_SOURCE_DIR}/data/)
 if (MSVC)
-    set(ELECGEN_OUTPUT_PATH ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+    set(ELECGEN_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 else() # UNIX
-    set(ELECGEN_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+    set(ELECGEN_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 set(ELECGEN_EXE_PATH ${ELECGEN_OUTPUT_PATH}/${PROJECT_TARGET_NAME})
 configure_file(${PROJECT_IN_FILE_DIR}/data_dir_path.h.in ${PROJECT_IN_FILE_OUTPUT_DIR}/data_dir_path.h @ONLY)
@@ -378,9 +378,9 @@ set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp
                              # ${Gurobi_LIBRARY}
                              # component_structure)
 
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Matlab)
-set(ELECGEN_MATLAB_PATH ${CMAKE_SOURCE_DIR}/ui/)
-configure_file(${PROJECT_IN_FILE_DIR}/elec_gen.m.in ${CMAKE_BINARY_DIR}/Matlab/elec_gen.m @ONLY)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Matlab)
+set(ELECGEN_MATLAB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ui/)
+configure_file(${PROJECT_IN_FILE_DIR}/elec_gen.m.in ${CMAKE_CURRENT_BINARY_DIR}/Matlab/elec_gen.m @ONLY)
 # ===========================================================
 
 
@@ -493,6 +493,6 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     file(GLOB PROJECT_DEP_DLLS "${PROJECT_DEP_INSTALL_DIR}/bin/*.dll")
     list(APPEND PROJECT_DEP_DLLS ${Gurobi_DLL_LIBRARY} ${CHRONO_DLLS})
-    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
     add_DLL_copy_command("${PROJECT_DEP_DLLS}")
 endif()
