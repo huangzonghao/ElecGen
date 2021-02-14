@@ -15,7 +15,6 @@ if (NOT CONFIG_ELECTRONICS_TEST)
     set(CONFIG_ELECTRONICS_TEST True CACHE BOOL "Generate Electronics_Test Target")
 endif()
 
-set(PROJECT_TARGET_NAME ${CMAKE_PROJECT_NAME})
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
@@ -321,7 +320,7 @@ if (MSVC)
 else() # UNIX
     set(ELECGEN_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
 endif()
-set(ELECGEN_EXE_PATH ${ELECGEN_OUTPUT_PATH}/${PROJECT_TARGET_NAME})
+set(ELECGEN_EXE_PATH ${ELECGEN_OUTPUT_PATH}/${PROJECT_NAME})
 configure_file(${PROJECT_IN_FILE_DIR}/data_dir_path.h.in ${PROJECT_IN_FILE_OUTPUT_DIR}/data_dir_path.h @ONLY)
 
 set(ELECGEN_SOURCES ${CHRONOSIM_SRC_PATH}/elec_gen.cpp)
@@ -393,18 +392,18 @@ configure_file(${PROJECT_IN_FILE_DIR}/elec_gen.m.in ${CMAKE_CURRENT_BINARY_DIR}/
 #########################
 
 if (CONFIG_ELECGEN)
-add_executable(${PROJECT_TARGET_NAME} ${ELECGEN_SOURCES} ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
+add_executable(${PROJECT_NAME} ${ELECGEN_SOURCES} ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
 
-set_target_properties(${PROJECT_TARGET_NAME} PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
                                              COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
                                              COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
                                              LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
 if(MSVC)
     # to make protobuf run with dll
-    target_compile_definitions(${PROJECT_TARGET_NAME} PUBLIC PROTOBUF_USE_DLLS)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC PROTOBUF_USE_DLLS)
 endif()
 
-target_include_directories(${PROJECT_TARGET_NAME} PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
                            ${Boost_INCLUDE_DIRS}
                            ${EIGEN3_INCLUDE_DIR}
                            ${Gurobi_INCLUDE_DIRS}
@@ -417,11 +416,11 @@ target_include_directories(${PROJECT_TARGET_NAME} PRIVATE
                            ${CHRONOSIM_INCLUDE_PATH}
                            ${TRAJECTORY_INCLUDE_PATH})
 
-target_link_libraries(${PROJECT_TARGET_NAME}
+target_link_libraries(${PROJECT_NAME}
                       optimized ${Gurobi_CXX_LIBRARY}
                       debug ${Gurobi_CXX_DEBUG_LIBRARY})
 
-target_link_libraries(${PROJECT_TARGET_NAME}
+target_link_libraries(${PROJECT_NAME}
                       ${CHRONO_LIBRARIES}
                       ${urdfdom_LIBRARIES}
                       ${Gurobi_LIBRARY}
@@ -433,14 +432,16 @@ endif()
 #################
 
 if (CONFIG_CHRONO_TEST)
-add_executable(Chrono_Test ${CHRONOSIM_TEST_SOURCES} ${CHRONOSIM_SOURCES})
+project(Chrono_Test)
 
-set_target_properties(Chrono_Test PROPERTIES
+add_executable(${PROJECT_NAME} ${CHRONOSIM_TEST_SOURCES} ${CHRONOSIM_SOURCES})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
                                   COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
                                   COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
                                   LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
 
-target_include_directories(Chrono_Test PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
                            ${EIGEN3_INCLUDE_DIR}
                            ${urdfdom_INCLUDE_DIRS}
                            ${CHRONO_INCLUDE_DIRS}
@@ -449,7 +450,7 @@ target_include_directories(Chrono_Test PRIVATE
                            ${CHRONOSIM_INCLUDE_PATH}
                            ${TRAJECTORY_INCLUDE_PATH})
 
-target_link_libraries(Chrono_Test
+target_link_libraries(${PROJECT_NAME}
                       ${CHRONO_LIBRARIES}
                       # ${towr_LIBRARIES}
                       ${urdfdom_LIBRARIES})
@@ -460,14 +461,16 @@ endif()
 ######################
 
 if (CONFIG_ELECTRONICS_TEST)
-add_executable(Electronics_Test ${ELECTRONICS_TEST_SOURCES} ${ELECTRONICS_SOURCES})
+project(Electronics_Test)
+
+add_executable(${PROJECT_NAME} ${ELECTRONICS_TEST_SOURCES} ${ELECTRONICS_SOURCES})
 
 if(MSVC)
     # to make protobuf run with dll
-    target_compile_definitions(${PROJECT_TARGET_NAME} PUBLIC PROTOBUF_USE_DLLS)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC PROTOBUF_USE_DLLS)
 endif()
 
-target_include_directories(Electronics_Test PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
                            ${Boost_INCLUDE_DIRS}
                            ${EIGEN3_INCLUDE_DIR}
                            ${Gurobi_INCLUDE_DIRS}
@@ -475,11 +478,11 @@ target_include_directories(Electronics_Test PRIVATE
                            ${Discreture_INCLUDE_DIRS}
                            ${ELECTRONICS_INCLUDE_PATH})
 
-target_link_libraries(Electronics_Test
+target_link_libraries(${PROJECT_NAME}
                       optimized ${Gurobi_CXX_LIBRARY}
                       debug ${Gurobi_CXX_DEBUG_LIBRARY})
 
-target_link_libraries(Electronics_Test
+target_link_libraries(${PROJECT_NAME}
                       ${urdfdom_LIBRARIES}
                       ${Gurobi_LIBRARY}
                       component_structure)
