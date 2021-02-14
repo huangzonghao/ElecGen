@@ -9,4 +9,8 @@ endif()
 
 set_target_properties(component_structure PROPERTIES PUBLIC_HEADER ${PROTO_HEADER})
 
-set(PROTO_COMPILED_INCLUDE ${CMAKE_CURRENT_BINARY_DIR} PARENT_SCOPE)
+target_include_directories(component_structure PUBLIC ${Protobuf_INCLUDE_DIRS}
+                                               INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
+
+target_link_libraries(component_structure ${Protobuf_LIBRARIES})
+

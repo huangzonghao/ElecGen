@@ -22,6 +22,11 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set (PROJECT_IN_FILE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+if (NOT DEFINED PROJECT_IN_FILE_OUTPUT_DIR)
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/include)
+    set(PROJECT_IN_FILE_OUTPUT_DIR ${PROJECT_BINARY_DIR}/include)
+endif()
 set(PROJECT_DEP_INSTALL_DIR ${CMAKE_BINARY_DIR}/thirdparty/Install)
 list(APPEND CMAKE_PREFIX_PATH ${PROJECT_DEP_INSTALL_DIR})
 
@@ -89,11 +94,6 @@ if (NEED_TO_RETURN)
     return()
 endif()
 
-include_directories(${EIGEN3_INCLUDE_DIR})
-include_directories(${CHRONO_INCLUDE_DIRS})
-include_directories(${Gurobi_INCLUDE_DIRS})
-include_directories(${Boost_INCLUDE_DIRS})
-
 find_package(urdfdom QUIET)
 if (NOT urdfdom_FOUND)
     if( NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/urdfdom/.git" OR
@@ -155,7 +155,6 @@ if (NOT urdfdom_FOUND)
 else()
     message(STATUS "urdfdom Found")
 endif()
-include_directories(${urdfdom_INCLUDE_DIRS})
 
 find_package(Matlab QUIET)
 if (NOT Matlab_FOUND)
@@ -189,11 +188,9 @@ else()
     message(STATUS "Protobuf Found")
 endif()
 mark_as_advanced(Protobuf_SRC_ROOT_FOLDER)
-include_directories(${Protobuf_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 add_subdirectory(${CMAKE_SOURCE_DIR}/electronics/proto)
-include_directories(${PROTO_COMPILED_INCLUDE})
+
+set (Discreture_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/thirdparty/discreture/include)
 
 find_package(towr QUIET)
 if (NOT towr_FOUND)
@@ -238,7 +235,6 @@ if (NOT towr_FOUND)
 else()
     message(STATUS "Towr Found")
 endif()
-include_directories(${towr_INCLUDE_DIRS})
 
 
 #######################################################################
@@ -313,15 +309,10 @@ set(ELECTRONICS_INCLUDE_PATH ${ELECTRONICS_PATH}/include)
 set(CHRONOSIM_INCLUDE_PATH ${CHRONOSIM_PATH}/include)
 set(TRAJECTORY_INCLUDE_PATH ${TRAJECTORY_PATH})
 
-# include project headers
-include_directories(${ELECTRONICS_INCLUDE_PATH})
-include_directories(${CHRONOSIM_INCLUDE_PATH})
-include_directories(${TRAJECTORY_INCLUDE_PATH})
 if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/discreture/.git")
     execute_process(COMMAND git submodule update --init --recursive --depth 1
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/discreture/include)
 
 # set project specified paths
 set(ELECGEN_DATA_PATH ${CMAKE_SOURCE_DIR}/data/)
@@ -331,8 +322,7 @@ else() # UNIX
     set(ELECGEN_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 endif()
 set(ELECGEN_EXE_PATH ${ELECGEN_OUTPUT_PATH}/${PROJECT_TARGET_NAME})
-configure_file(${CMAKE_MODULE_PATH}/data_dir_path.h.in data_dir_path.h @ONLY)
-include_directories(${CMAKE_BINARY_DIR})
+configure_file(${PROJECT_IN_FILE_DIR}/data_dir_path.h.in ${PROJECT_IN_FILE_OUTPUT_DIR}/data_dir_path.h @ONLY)
 
 set(ELECGEN_SOURCES ${CHRONOSIM_SRC_PATH}/elec_gen.cpp)
 
@@ -386,12 +376,11 @@ set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp
                              # ${urdfdom_LIBRARIES}
                              # # ${towr_LIBRARIES}
                              # ${Gurobi_LIBRARY}
-                             # ${Protobuf_LIBRARIES}
                              # component_structure)
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Matlab)
 set(ELECGEN_MATLAB_PATH ${CMAKE_SOURCE_DIR}/ui/)
-configure_file(${CMAKE_MODULE_PATH}/elec_gen.m.in ${CMAKE_BINARY_DIR}/Matlab/elec_gen.m @ONLY)
+configure_file(${PROJECT_IN_FILE_DIR}/elec_gen.m.in ${CMAKE_BINARY_DIR}/Matlab/elec_gen.m @ONLY)
 # ===========================================================
 
 
@@ -415,6 +404,19 @@ if(MSVC)
     target_compile_definitions(${PROJECT_TARGET_NAME} PUBLIC PROTOBUF_USE_DLLS)
 endif()
 
+target_include_directories(${PROJECT_TARGET_NAME} PRIVATE
+                           ${Boost_INCLUDE_DIRS}
+                           ${EIGEN3_INCLUDE_DIR}
+                           ${Gurobi_INCLUDE_DIRS}
+                           ${urdfdom_INCLUDE_DIRS}
+                           ${CHRONO_INCLUDE_DIRS}
+                           ${PROJECT_IN_FILE_OUTPUT_DIR}
+                           ${Discreture_INCLUDE_DIRS}
+                           # ${towr_INCLUDE_DIRS}
+                           ${ELECTRONICS_INCLUDE_PATH}
+                           ${CHRONOSIM_INCLUDE_PATH}
+                           ${TRAJECTORY_INCLUDE_PATH})
+
 target_link_libraries(${PROJECT_TARGET_NAME}
                       optimized ${Gurobi_CXX_LIBRARY}
                       debug ${Gurobi_CXX_DEBUG_LIBRARY})
@@ -423,7 +425,6 @@ target_link_libraries(${PROJECT_TARGET_NAME}
                       ${CHRONO_LIBRARIES}
                       ${urdfdom_LIBRARIES}
                       ${Gurobi_LIBRARY}
-                      ${Protobuf_LIBRARIES}
                       component_structure)
 endif()
 
@@ -438,6 +439,15 @@ set_target_properties(Chrono_Test PROPERTIES
                                   COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
                                   COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
                                   LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+
+target_include_directories(Chrono_Test PRIVATE
+                           ${EIGEN3_INCLUDE_DIR}
+                           ${urdfdom_INCLUDE_DIRS}
+                           ${CHRONO_INCLUDE_DIRS}
+                           # ${towr_INCLUDE_DIRS}
+                           ${PROJECT_IN_FILE_OUTPUT_DIR}
+                           ${CHRONOSIM_INCLUDE_PATH}
+                           ${TRAJECTORY_INCLUDE_PATH})
 
 target_link_libraries(Chrono_Test
                       ${CHRONO_LIBRARIES}
@@ -457,6 +467,14 @@ if(MSVC)
     target_compile_definitions(${PROJECT_TARGET_NAME} PUBLIC PROTOBUF_USE_DLLS)
 endif()
 
+target_include_directories(Electronics_Test PRIVATE
+                           ${Boost_INCLUDE_DIRS}
+                           ${EIGEN3_INCLUDE_DIR}
+                           ${Gurobi_INCLUDE_DIRS}
+                           ${PROJECT_IN_FILE_OUTPUT_DIR}
+                           ${Discreture_INCLUDE_DIRS}
+                           ${ELECTRONICS_INCLUDE_PATH})
+
 target_link_libraries(Electronics_Test
                       optimized ${Gurobi_CXX_LIBRARY}
                       debug ${Gurobi_CXX_DEBUG_LIBRARY})
@@ -464,7 +482,6 @@ target_link_libraries(Electronics_Test
 target_link_libraries(Electronics_Test
                       ${urdfdom_LIBRARIES}
                       ${Gurobi_LIBRARY}
-                      ${Protobuf_LIBRARIES}
                       component_structure)
 endif()
 
