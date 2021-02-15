@@ -5,17 +5,14 @@ project(Electronics_Generation)
 #######################################################################
 #                        Project Configuration                        #
 #######################################################################
-if (NOT CONFIG_ELECGEN)
-    set(CONFIG_ELECGEN True CACHE BOOL "Generate Elec_Gen Target")
-endif()
-if (NOT CONFIG_CHRONO_TEST)
+if (NOT DEFINED CONFIG_CHRONO_TEST)
     set(CONFIG_CHRONO_TEST True CACHE BOOL "Generate Chrono_Test Target")
 endif()
-if (NOT CONFIG_ELECTRONICS_TEST)
+if (NOT DEFINED CONFIG_ELECTRONICS_TEST)
     set(CONFIG_ELECTRONICS_TEST True CACHE BOOL "Generate Electronics_Test Target")
 endif()
 
-if(NOT CMAKE_BUILD_TYPE)
+if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
@@ -189,6 +186,10 @@ endif()
 mark_as_advanced(Protobuf_SRC_ROOT_FOLDER)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/electronics/proto)
 
+if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/discreture/.git")
+    execute_process(COMMAND git submodule update --init --recursive --depth 1
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 set (Discreture_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/discreture/include)
 
 find_package(towr QUIET)
@@ -235,6 +236,7 @@ else()
     message(STATUS "Towr Found")
 endif()
 
+include(DLL_Copy_Command)
 
 #######################################################################
 #                           Platform Flags                            #
@@ -296,63 +298,8 @@ set (CMAKE_CXX_STANDARD 17)
 #######################################################################
 #                            Source Files                             #
 #######################################################################
-
-set(ELECTRONICS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/electronics)
-set(CHRONOSIM_PATH ${CMAKE_CURRENT_SOURCE_DIR}/chrono_sim)
-set(TRAJECTORY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/trajectory)
-
-set(ELECTRONICS_SRC_PATH ${ELECTRONICS_PATH}/src)
-set(CHRONOSIM_SRC_PATH ${CHRONOSIM_PATH}/src)
-set(TRAJECTORY_SRC_PATH ${TRAJECTORY_PATH})
-set(ELECTRONICS_INCLUDE_PATH ${ELECTRONICS_PATH}/include)
-set(CHRONOSIM_INCLUDE_PATH ${CHRONOSIM_PATH}/include)
-set(TRAJECTORY_INCLUDE_PATH ${TRAJECTORY_PATH})
-
-if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/discreture/.git")
-    execute_process(COMMAND git submodule update --init --recursive --depth 1
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()
-
-# set project specified paths
-set(ELECGEN_DATA_PATH ${CMAKE_CURRENT_SOURCE_DIR}/data/)
-if (MSVC)
-    set(ELECGEN_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
-else() # UNIX
-    set(ELECGEN_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
-endif()
-set(ELECGEN_EXE_PATH ${ELECGEN_OUTPUT_PATH}/${PROJECT_NAME})
-configure_file(${PROJECT_IN_FILE_DIR}/data_dir_path.h.in ${PROJECT_IN_FILE_OUTPUT_DIR}/data_dir_path.h @ONLY)
-
-set(ELECGEN_SOURCES ${CHRONOSIM_SRC_PATH}/elec_gen.cpp)
-
-set(ELECTRONICS_SOURCES
-        ${ELECTRONICS_SRC_PATH}/actuator.cpp
-        ${ELECTRONICS_SRC_PATH}/Circuit.cpp
-        ${ELECTRONICS_SRC_PATH}/Inference.cpp
-        ${ELECTRONICS_SRC_PATH}/Matching.cpp
-        ${ELECTRONICS_SRC_PATH}/testfile.cpp
-        ${ELECTRONICS_SRC_PATH}/utility_functions.cpp)
-
-set(ELECTRONICS_TEST_SOURCES
-        ${ELECTRONICS_SRC_PATH}/main.cpp
-        ${ELECTRONICS_SRC_PATH}/testfile.cpp)
-
-set(CHRONOSIM_SOURCES
-        ${CHRONOSIM_SRC_PATH}/ChUrdfDoc.cpp
-        ${CHRONOSIM_SRC_PATH}/RobotController.cpp
-        ${CHRONOSIM_SRC_PATH}/SimMotor.cpp
-        ${CHRONOSIM_SRC_PATH}/SimulationManager.cpp)
-
-set(CHRONOSIM_TEST_SOURCES
-        ${CHRONOSIM_SRC_PATH}/test_chrono.cpp)
-
-set(TRAJECTORY_SOURCES
-        ${TRAJECTORY_SRC_PATH}/eigen_heightmap.cpp
-        ${TRAJECTORY_SRC_PATH}/quadrupedal_kinematics.cpp
-        ${TRAJECTORY_SRC_PATH}/traj_optimizer.cpp)
-
-set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp
-                       ${CHRONOSIM_SRC_PATH}/launch_simulation.cpp)
+# set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp
+                       # ${CHRONOSIM_SRC_PATH}/launch_simulation.cpp)
 
 ## Matlab Interface
 # =================
@@ -379,123 +326,47 @@ set(MATLAB_CPP_GATEWAY ${CHRONOSIM_SRC_PATH}/mexRun.cpp
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Matlab)
 set(ELECGEN_MATLAB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ui/)
+
+# set project specified paths
+set(ELECGEN_DATA_PATH ${CMAKE_CURRENT_SOURCE_DIR}/data/)
+if (MSVC)
+    set(ELECGEN_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+else() # UNIX
+    set(ELECGEN_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+set(ELECGEN_EXE_PATH ${ELECGEN_OUTPUT_PATH}/${PROJECT_NAME})
+
+configure_file(${PROJECT_IN_FILE_DIR}/data_dir_path.h.in ${PROJECT_IN_FILE_OUTPUT_DIR}/data_dir_path.h @ONLY)
 configure_file(${PROJECT_IN_FILE_DIR}/elec_gen.m.in ${CMAKE_CURRENT_BINARY_DIR}/Matlab/elec_gen.m @ONLY)
-# ===========================================================
-
 
 #######################################################################
-#                               TARGETS                               #
+#                           Subdirectories                            #
+#######################################################################
+add_subdirectory(electronics)
+add_subdirectory(chrono_sim)
+# add_subdirectory(trajectory)
+
+#######################################################################
+#                               TARGET                                #
 #######################################################################
 
-#########################
-#  ElecGen Main Target  #
-#########################
-
-if (CONFIG_ELECGEN)
-add_executable(${PROJECT_NAME} ${ELECGEN_SOURCES} ${ELECTRONICS_SOURCES} ${CHRONOSIM_SOURCES})
+add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/chrono_sim/src/elec_gen.cpp
+                               ${CMAKE_CURRENT_SOURCE_DIR}/electronics/src/testfile.cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-                                             COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-                                             COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-                                             LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
-if(MSVC)
-    # to make protobuf run with dll
-    target_compile_definitions(${PROJECT_NAME} PUBLIC PROTOBUF_USE_DLLS)
-endif()
+                      COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
+                      COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
+                      LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-                           ${Boost_INCLUDE_DIRS}
-                           ${EIGEN3_INCLUDE_DIR}
-                           ${Gurobi_INCLUDE_DIRS}
-                           ${urdfdom_INCLUDE_DIRS}
-                           ${CHRONO_INCLUDE_DIRS}
-                           ${PROJECT_IN_FILE_OUTPUT_DIR}
-                           ${Discreture_INCLUDE_DIRS}
-                           # ${towr_INCLUDE_DIRS}
-                           ${ELECTRONICS_INCLUDE_PATH}
-                           ${CHRONOSIM_INCLUDE_PATH}
-                           ${TRAJECTORY_INCLUDE_PATH})
-
-target_link_libraries(${PROJECT_NAME}
-                      optimized ${Gurobi_CXX_LIBRARY}
-                      debug ${Gurobi_CXX_DEBUG_LIBRARY})
-
-target_link_libraries(${PROJECT_NAME}
-                      ${CHRONO_LIBRARIES}
-                      ${urdfdom_LIBRARIES}
-                      ${Gurobi_LIBRARY}
-                      component_structure)
-endif()
-
-#################
-#  Chrono Test  #
-#################
-
-if (CONFIG_CHRONO_TEST)
-project(Chrono_Test)
-
-add_executable(${PROJECT_NAME} ${CHRONOSIM_TEST_SOURCES} ${CHRONOSIM_SOURCES})
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-                                  COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-                                  COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-                                  LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
-
-target_include_directories(${PROJECT_NAME} PRIVATE
-                           ${EIGEN3_INCLUDE_DIR}
-                           ${urdfdom_INCLUDE_DIRS}
-                           ${CHRONO_INCLUDE_DIRS}
-                           # ${towr_INCLUDE_DIRS}
-                           ${PROJECT_IN_FILE_OUTPUT_DIR}
-                           ${CHRONOSIM_INCLUDE_PATH}
-                           ${TRAJECTORY_INCLUDE_PATH})
-
-target_link_libraries(${PROJECT_NAME}
-                      ${CHRONO_LIBRARIES}
-                      # ${towr_LIBRARIES}
-                      ${urdfdom_LIBRARIES})
-endif()
-
-######################
-#  Electronics Test  #
-######################
-
-if (CONFIG_ELECTRONICS_TEST)
-project(Electronics_Test)
-
-add_executable(${PROJECT_NAME} ${ELECTRONICS_TEST_SOURCES} ${ELECTRONICS_SOURCES})
+target_link_libraries(${PROJECT_NAME} Electronics Simulator)
 
 if(MSVC)
-    # to make protobuf run with dll
-    target_compile_definitions(${PROJECT_NAME} PUBLIC PROTOBUF_USE_DLLS)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-                           ${Boost_INCLUDE_DIRS}
-                           ${EIGEN3_INCLUDE_DIR}
-                           ${Gurobi_INCLUDE_DIRS}
-                           ${PROJECT_IN_FILE_OUTPUT_DIR}
-                           ${Discreture_INCLUDE_DIRS}
-                           ${ELECTRONICS_INCLUDE_PATH})
-
-target_link_libraries(${PROJECT_NAME}
-                      optimized ${Gurobi_CXX_LIBRARY}
-                      debug ${Gurobi_CXX_DEBUG_LIBRARY})
-
-target_link_libraries(${PROJECT_NAME}
-                      ${urdfdom_LIBRARIES}
-                      ${Gurobi_LIBRARY}
-                      component_structure)
-endif()
-
-#######################################################################
-#                       Supplementary Functions                       #
-#######################################################################
-
-# function implemented in ChronoConfig.cmake
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     file(GLOB PROJECT_DEP_DLLS "${PROJECT_DEP_INSTALL_DIR}/bin/*.dll")
     list(APPEND PROJECT_DEP_DLLS ${Gurobi_DLL_LIBRARY} ${CHRONO_DLLS})
     set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
-    add_DLL_copy_command("${PROJECT_DEP_DLLS}")
+    DLL_Copy_Command(${PROJECT_NAME}_COPY_DLLS "${PROJECT_DEP_DLLS}")
 endif()
