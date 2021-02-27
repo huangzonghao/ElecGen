@@ -299,13 +299,13 @@ pin {
 pin {
   name: "MOD"
   pin_class: FUNCTION
-  func_type: OTHER
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
   status: false
   v_bound {
-    lb: 0
+    lb: 5
     ub: 5
   }
   i_bound {
@@ -315,7 +315,7 @@ pin {
   dependents {
   }
 }
-nonlin: 1;
+nonlin: 1
 size {
   length: 10.2
   width: 17.8
