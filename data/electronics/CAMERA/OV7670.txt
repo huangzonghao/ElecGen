@@ -1,0 +1,375 @@
+component_name: "OV7670"
+component_type: "CAMERA"
+component_class: "SENSOR"
+pin {
+  name: "3.3V"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 3.3
+  }
+  i_bound {
+    lb: 0
+    ub: 0.02
+  }
+  dependents {
+    others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND 
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+	lb: 0
+	ub: 0
+  }
+  dependents {
+	others: "3.3V"
+  }
+}
+pin {
+  name: "SDA"
+  pin_class: FUNCTION
+  func_type: I2C_SDA
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "SCL"
+	others: "GND"
+  }
+}
+pin {
+  name: "SCL"
+  pin_class: FUNCTION
+  func_type: I2C_SCL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "SDA"
+	others: "GND"
+  }
+}
+pin {
+  name: "VS"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "HS"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "MCLK"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "D0"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "D1"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "D2"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "D3"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "D4"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "D5"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "D6"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "D7"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 1.7
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "RESET"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 3.3
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+pin {
+  name: "PWDN"
+  pin_class: FUNCTION
+  func_type: DIGTAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "3.3V"
+	others: "GND"
+  }
+}
+nonlin: 0
+size {
+  length: 35
+  width: 35
+  height: 26
+}
+weight: 12.7
+price: 8.99
+[Electronics.Camera.camera] {
+  frequency: 9600
+}
+
+
+
+

@@ -1,0 +1,178 @@
+component_name: "OV5642"
+component_type: "CAMERA"
+component_class: "SENSOR"
+pin {
+  name: "VCC"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 5
+  }
+  i_bound {
+    lb: 0
+    ub: 0.26
+  }
+  dependents {
+    others: "GND"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: GND 
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: 0
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+	lb: 0
+	ub: 0
+  }
+  dependents {
+	others: "VCC"
+  }
+}
+pin {
+  name: "CS"
+  pin_class: FUNCTION
+  func_type: SPI_SS
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 5
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VCC"
+	others: "MOSI"
+	others: "MISO"
+	others: "SCK"
+	others: "GND"
+  }
+}
+pin {
+  name: "MOSI"
+  pin_class: FUNCTION
+  func_type: SPI_MOSI
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 5
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VCC"
+	others: "CS"
+	others: "MISO"
+	others: "SCK"
+	others: "GND"
+  }
+}
+pin {
+  name: "MISO"
+  pin_class: FUNCTION
+  func_type: SPI_MISO
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 5
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VCC"
+	others: "CS"
+	others: "MOSI"
+	others: "SCK"
+	others: "GND"
+  }
+}
+pin {
+  name: "MISO"
+  pin_class: FUNCTION
+  func_type: SPI_MISO
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 5
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VCC"
+	others: "CS"
+	others: "MOSI"
+	others: "SCK"
+	others: "GND"
+  }
+}
+pin {
+  name: "SCK"
+  pin_class: FUNCTION
+  func_type: SPI_SCK
+  phys_type: NORMAL
+  io: IN
+  connection: OTO
+  status: 0
+  v_bound {
+    lb: 3.3
+    ub: 5
+  }
+  i_bound {
+	lb: 0
+	ub: 0.00001
+  }
+  dependents {
+	others: "VCC"
+	others: "CS"
+	others: "MOSI"
+	others: "MISO"
+	others: "GND"
+  }
+}
+nonlin: 0
+size {
+  length: 34
+  width: 24
+  height: 33
+}
+weight: 20
+price: 39.99
+[Electronics.Camera.camera] {
+  frequency: 9600
+}
+
+
+
+
