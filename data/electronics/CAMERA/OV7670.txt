@@ -88,7 +88,7 @@ pin {
 pin {
   name: "VS"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -109,7 +109,7 @@ pin {
 pin {
   name: "HS"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -130,7 +130,7 @@ pin {
 pin {
   name: "MCLK"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -151,7 +151,7 @@ pin {
 pin {
   name: "D0"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -172,7 +172,7 @@ pin {
 pin {
   name: "D1"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -193,7 +193,7 @@ pin {
 pin {
   name: "D2"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -214,7 +214,7 @@ pin {
 pin {
   name: "D3"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -235,7 +235,7 @@ pin {
 pin {
   name: "D4"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -256,7 +256,7 @@ pin {
 pin {
   name: "D5"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -277,7 +277,7 @@ pin {
 pin {
   name: "D6"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -298,7 +298,7 @@ pin {
 pin {
   name: "D7"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -319,7 +319,7 @@ pin {
 pin {
   name: "RESET"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -340,7 +340,7 @@ pin {
 pin {
   name: "PWDN"
   pin_class: FUNCTION
-  func_type: DIGTAL
+  func_type: DIGITAL
   phys_type: NORMAL
   io: IN
   connection: OTO
