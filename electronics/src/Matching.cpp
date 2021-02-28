@@ -156,6 +156,8 @@ compatible_type_map{
 	{Electronics::ANALOG_I2C_SCL, Electronics::UART_TX_I2C_SCL},
 	{Electronics::I2C_SDA, Electronics::UART_RX_I2C_SDA},
 	{Electronics::I2C_SCL, Electronics::UART_TX_I2C_SCL},
+	{Electronics::DIGITAL_I2C_SDA, Electronics::UART_RX_I2C_SDA},
+	{Electronics::DIGITAL_I2C_SCL, Electronics::UART_TX_I2C_SCL},
 	{Electronics::DIGITAL_UART_RX, Electronics::UART_TX_I2C_SCL},
 	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_UART_TX, Electronics::UART_RX_I2C_SDA},
 	{Electronics::DIGITAL_EXTERNAL_INTERRUPT_I2C_SDA, Electronics::UART_RX_I2C_SDA},

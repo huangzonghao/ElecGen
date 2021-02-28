@@ -65,18 +65,19 @@ enum FUNCTION_TYPE{
 	 DIGITAL_EXTERNAL_INTERRUPT_UART_RX = 52;
 	 DIGITAL_EXTERNAL_INTERRUPT_UART_TX = 53;
      ADJUST = 54;
-	 
+	 DIGITAL_I2C_SDA = 55;
+	 DIGITAL_I2C_SCL = 56;
 }
 
 enum PHYSICAL_TYPE{
-     NORMAL = 55;
-     USB = 56;
-     POWER_JACK = 57;
+     NORMAL = 57;
+     USB = 58;
+     POWER_JACK = 59;
 }
 
 enum CONNECTION{
-     OTO = 39;
-     OTM = 40;
+     OTO = 60;
+     OTM = 61;
 }
 
 message bbox{
