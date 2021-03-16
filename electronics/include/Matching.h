@@ -1,6 +1,6 @@
-#pragma once
-#ifndef MATCHING
-#define MATCHING
+#ifndef MATCHING_H_ZKEAHIWW
+#define MATCHING_H_ZKEAHIWW
+
 #include "actuator.h"
 #include <bitset>
 
@@ -35,8 +35,6 @@ std::pair<bool, Pin*> funcTypeCompare(Electronics::FUNCTION_TYPE &, Electronics:
 
 template <typename T> std::vector<T> unique_vec(std::vector<T>);
 
-#endif // !MATCHING
-
 template <typename T>
 inline std::vector<T> unique_vec(std::vector<T> vec)
 {
@@ -50,3 +48,5 @@ inline std::vector<T> unique_vec(std::vector<T> vec)
 // Connection_Structure clearPinConnections(Connection_Structure &);
 // std::vector<Connection_Structure> initializeConnectionVec(const std::string &, stringvec &);
 // unsigned determineConnectionFolder(const std::string &);
+
+#endif /* end of include guard: MATCHING_H_ZKEAHIWW */

@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef INFERENCE_H_XP6WDY50
+#define INFERENCE_H_XP6WDY50
+
 #include "Circuit.h"
 struct Infer_Node;
 struct BBNode;
@@ -322,3 +324,5 @@ namespace Current_Operation {
 	double add(const doublevec &vec);
 	double max(const doublevec &vec);
 }
+
+#endif /* end of include guard: INFERENCE_H_XP6WDY50 */

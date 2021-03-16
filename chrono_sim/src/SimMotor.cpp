@@ -1,10 +1,8 @@
 #include "SimMotor.h"
 
-#include "chrono/assets/ChBoxShape.h"
-// #include "chrono/physics/ChLinkMotorRotationSpeed.h"
-#include "chrono/physics/ChLinkMotorRotationTorque.h"
-#include "chrono/utils/ChCompositeInertia.h"
-
+#include <chrono/assets/ChBoxShape.h>
+#include <chrono/physics/ChLinkMotorRotationTorque.h>
+#include <chrono/utils/ChCompositeInertia.h>
 
 SimMotorController::SimMotorController(const std::shared_ptr<chrono::ChLinkMotorRotationTorque>& target_motor){
     ch_motor_ = target_motor.get();

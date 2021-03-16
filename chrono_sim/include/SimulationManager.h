@@ -1,11 +1,11 @@
-#ifndef SIMULATION_MANAGER_H
-#define SIMULATION_MANAGER_H
+#ifndef SIMULATIONMANAGER_H_TQPVGDZV
+#define SIMULATIONMANAGER_H_TQPVGDZV
 
-#include "chrono/physics/ChSystem.h"
+#include <Eigen/Core>
+#include <chrono/physics/ChSystem.h>
 #include "SimMotor.h"
 #include "RobotController.h"
 #include "ChUrdfDoc.h"
-#include <Eigen/Core>
 
 class  SimulationManager {
   public:
@@ -105,4 +105,4 @@ class  SimulationManager {
 
 };
 
-#endif /* end of SIMULATION_MANAGER_H */
+#endif /* end of include guard: SIMULATIONMANAGER_H_TQPVGDZV */

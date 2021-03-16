@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TESTFILE_H_7WN4LDYW
+#define TESTFILE_H_7WN4LDYW
+
 #include "Circuit.h"
 #include "Matching.h"
 #include "Inference.h"
@@ -39,7 +41,4 @@ void motor_encoder_hbridge_battery_connect();
 // SYSTEM TEST
 void system_test();
 
-
-
-
-
+#endif /* end of include guard: TESTFILE_H_7WN4LDYW */

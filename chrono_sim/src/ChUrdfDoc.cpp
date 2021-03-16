@@ -2,10 +2,10 @@
 
 #include <iostream>
 #include <filesystem>
-#include "chrono/assets/ChBoxShape.h"
-#include "chrono/assets/ChSphereShape.h"
-#include "chrono/assets/ChCylinderShape.h"
-#include "chrono/assets/ChTriangleMeshShape.h"
+#include <chrono/assets/ChBoxShape.h>
+#include <chrono/assets/ChSphereShape.h>
+#include <chrono/assets/ChCylinderShape.h>
+#include <chrono/assets/ChTriangleMeshShape.h>
 
 namespace chrono {
 

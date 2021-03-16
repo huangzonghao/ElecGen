@@ -1,12 +1,12 @@
-#ifndef ELECTRONIC_COMPONENTS
-#define ElECTRONIC_COMPONENTS
+#ifndef ACTUATOR_H_OVPFYACD
+#define ACTUATOR_H_OVPFYACD
 
-#include "gurobi_c++.h"
-#include "utility_functions.h"
+#include <gurobi_c++.h>
 #include <Eigen/Dense>
 #include <fcntl.h>
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include "utility_functions.h"
 #include "component_structure.pb.h"
 
 class Circuit;
@@ -616,4 +616,4 @@ void initializeAllForceSensors(const std::string &);
 
 // std::vector<Actu_components>& replicate(std::vector<Actu_components> &);
 
-#endif // !ELECTRONIC_COMPONENTS
+#endif /* end of include guard: ACTUATOR_H_OVPFYACD */

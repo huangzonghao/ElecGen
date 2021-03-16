@@ -1,5 +1,6 @@
-﻿#ifndef CIRCUIT
-#define CIRCUIT
+﻿#ifndef CIRCUIT_H_DMCIUXFF
+#define CIRCUIT_H_DMCIUXFF
+
 #include "Matching.h"
 
 class Electrical_Component;
@@ -100,5 +101,5 @@ private:
 	{OPT_METHOD::STOC, &Circuit::stochastic_optimize} };
 };
 bool isDutyCycle(const std::string &);
-#endif // !CIRCUIT
 
+#endif /* end of include guard: CIRCUIT_H_DMCIUXFF */

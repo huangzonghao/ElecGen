@@ -1,8 +1,8 @@
-#ifndef ROBOT_CONTROLLER_H
-#define ROBOT_CONTROLLER_H
+#ifndef ROBOTCONTROLLER_H_WU5YVSBW
+#define ROBOTCONTROLLER_H_WU5YVSBW
 
-#include "chrono/core/ChMathematics.h"
-#include "chrono/physics/ChBody.h"
+#include <chrono/core/ChMathematics.h>
+#include <chrono/physics/ChBody.h>
 
 #include "quadrupedal_kinematics.h"
 #include "SimMotor.h"
@@ -103,4 +103,4 @@ class LeggedController : public RobotController {
 };
 
 
-#endif /* end of include guard: ROBOT_CONTROLLER_H */
+#endif /* end of include guard: ROBOTCONTROLLER_H_WU5YVSBW */

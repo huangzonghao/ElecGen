@@ -1,10 +1,11 @@
-#include <chrono>
-#include "chrono_irrlicht/ChIrrApp.h"
-#include "chrono/physics/ChBodyEasy.h"
-#include "chrono_vehicle/terrain/RigidTerrain.h"
-#include "chrono/core/ChRealtimeStep.h"
-
 #include "SimulationManager.h"
+
+#include <chrono>
+#include <chrono_irrlicht/ChIrrApp.h>
+#include <chrono/physics/ChBodyEasy.h>
+#include <chrono_vehicle/terrain/RigidTerrain.h>
+#include <chrono/core/ChRealtimeStep.h>
+
 #include "data_dir_path.h"
 #include "traj_optimizer.h"
 

@@ -1,14 +1,16 @@
-#pragma once
+#ifndef UTILITY_FUNCTIONS_H_HPBEY59I
+#define UTILITY_FUNCTIONS_H_HPBEY59I
 
 #include <utility>
 #include <random>
 #include <iostream>
 #include <fstream>
-#include "typefile.h"
 #include <numeric>
 #include <memory>
 #include <discreture.hpp>
 #include <bitset>
+
+#include "typefile.h"
 
 // check if two ranges intersect
 bool isIntersect(const doublepair &, const doublepair &);
@@ -110,3 +112,5 @@ bool isForceSensor(const std::string &);
 bool isCamera(const std::string &);
 bool isEncoder(const std::string &);
 bool isFileInFolder(const std::string &, const stringvec &);
+
+#endif /* end of include guard: UTILITY_FUNCTIONS_H_HPBEY59I */

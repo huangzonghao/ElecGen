@@ -1,13 +1,13 @@
-#ifndef CHURDFDOC_H
-#define CHURDFDOC_H
+#ifndef CHURDFDOC_H_XVMVTRQF
+#define CHURDFDOC_H_XVMVTRQF
 
-#include "urdf_parser/urdf_parser.h"
+#include <urdf_parser/urdf_parser.h>
 
 #include <map>
-#include "chrono/physics/ChSystemNSC.h"
-#include "chrono/physics/ChSystemSMC.h"
-#include "chrono/assets/ChColorAsset.h"
-#include "chrono/assets/ChTexture.h"
+#include <chrono/physics/ChSystemNSC.h>
+#include <chrono/physics/ChSystemSMC.h>
+#include <chrono/assets/ChColorAsset.h>
+#include <chrono/assets/ChTexture.h>
 
 namespace chrono {
 
@@ -110,6 +110,6 @@ class RotSpringConstDampingTorque : public ChLinkRotSpringCB::TorqueFunctor {
     double damping_coef;
 };
 
-}  // END_OF_NAMESPACE____
+}  // END_OF_NAMESPACE_
 
-#endif  // END of header
+#endif /* end of include guard: CHURDFDOC_H_XVMVTRQF */

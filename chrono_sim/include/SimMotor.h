@@ -1,12 +1,12 @@
-#ifndef MOTOR_H
-#define MOTOR_H
+#ifndef SIMMOTOR_H_07I4VJGL
+#define SIMMOTOR_H_07I4VJGL
 
-#include "chrono/core/ChCoordsys.h"
-#include "chrono/core/ChMathematics.h"
-#include "chrono/physics/ChSystem.h"
-#include "chrono/physics/ChLinkMotorRotation.h"
-#include "chrono/physics/ChLinkMotorRotationTorque.h"
-#include "chrono/physics/ChController.h"
+#include <chrono/core/ChCoordsys.h>
+#include <chrono/core/ChMathematics.h>
+#include <chrono/physics/ChSystem.h>
+#include <chrono/physics/ChLinkMotorRotation.h>
+#include <chrono/physics/ChLinkMotorRotationTorque.h>
+#include <chrono/physics/ChController.h>
 
 #include "ChUrdfDoc.h"
 
@@ -125,4 +125,4 @@ class SimMotor : public SimPayload {
     std::shared_ptr<chrono::ChFunction_Setpoint> ch_func_;
 };
 
-#endif /* end of include guard: MOTOR_H */
+#endif /* end of include guard: SIMMOTOR_H_07I4VJGL */

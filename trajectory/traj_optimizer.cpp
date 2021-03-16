@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "ifopt/ipopt_solver.h"
+#include <ifopt/ipopt_solver.h>
 
 
 using namespace towr;

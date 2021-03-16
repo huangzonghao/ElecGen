@@ -1,13 +1,12 @@
-#pragma once
-#ifndef TYPE_FILE
-#define TYPE_FILE
+#ifndef TYPEFILE_H_LGAK8JKF
+#define TYPEFILE_H_LGAK8JKF
+
 #include <string>
 #include <vector>
 #include <tuple>
 #include <unordered_map>
 #include <filesystem>
 #include "data_dir_path.h"
-
 
 //extern struct CurrentTracker;
 //extern struct CopyCurrentTracker;
@@ -102,4 +101,4 @@ NEGATIVE_VELOCITY = "input velocity is negative";
 
 const double tol = 1e-3;
 
-#endif // !
+#endif /* end of include guard: TYPEFILE_H_LGAK8JKF */
