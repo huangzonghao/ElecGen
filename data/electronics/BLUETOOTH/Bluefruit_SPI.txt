@@ -212,6 +212,6 @@ size {
 }
 weight: 3
 price: 17.5
-[Electronics.Bluetooth.bluetooth] {
+[Electronics.Bluetooth.Info] {
   frequency: 4000000
 }

@@ -49,7 +49,7 @@ size {
 }
 weight: 9.5
 price: 18.95
-[Electronics.Motor.motor] {
+[Electronics.Motor.Info] {
   kt: 0.0719
   ke: 0.1244
   r: 4

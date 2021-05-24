@@ -284,10 +284,9 @@ void Micro_Controller::getUsedVarsName(const stringvec &pin_names)
 	}
 }
 
-void Micro_Controller::extractInfo(Electronics::Component *micro_controller)
+void Micro_Controller::extractInfo(const Electronics::Component *component)
 {
-	Electronics::Micro_Controller ext = micro_controller->GetExtension(
-		Electronics::Micro_Controller::micro_controller);
+	Electronics::Micro_Controller ext = component->GetExtension(Electronics::Micro_Controller::Info);
 	logic_level.first = ext.logic_level().lb();
 	logic_level.second = ext.logic_level().ub();
 
@@ -575,10 +574,9 @@ void Battery::getUsedVarsName(const stringvec &pin_names)
 	}
 }
 
-void Battery::extractInfo(Electronics::Component *battery)
+void Battery::extractInfo(const Electronics::Component *component)
 {
-	Electronics::Battery ext = battery->GetExtension(
-		Electronics::Battery::battery);
+	Electronics::Battery ext = component->GetExtension(Electronics::Battery::Info);
 	capacity = ext.capacity();
 
 	// config info
@@ -1108,9 +1106,9 @@ void Motor::setWorkPoint(double _torq_des, double _vel_des)
 	var_bound_mat.row(vel_col) << vel_des, vel_des;
 }
 
-void Motor::extractInfo(const Electronics::Component *motor)
+void Motor::extractInfo(const Electronics::Component *component)
 {
-	Electronics::Motor ext = motor->GetExtension(Electronics::Motor::motor);
+	Electronics::Motor ext = component->GetExtension(Electronics::Motor::Info);
 	v = v_bound_mat(0, 1);
 	i = i_bound_mat(0, 1);
 	kt = ext.kt();
@@ -1218,7 +1216,7 @@ H_Bridge::H_Bridge(const string &file) : Electrical_Component(file)
 	else
 	{
 		Electronics::Component *h_bridge = read(file);
-		extractInfor(h_bridge);
+		extractInfo(h_bridge);
 		delete h_bridge;
 	}
 }
@@ -1355,18 +1353,18 @@ unsigned H_Bridge::getFuncInSize()
 	return func_in_size;
 }
 
-void H_Bridge::extractInfor(const Electronics::Component *h_bridge)
+void H_Bridge::extractInfo(const Electronics::Component *component)
 {
-	Electronics::H_Bridge ext = h_bridge->GetExtension(Electronics::H_Bridge::h_bridge);
+	Electronics::H_Bridge ext = component->GetExtension(Electronics::H_Bridge::Info);
 	logic_level.first = ext.logic_level().lb();
 	logic_level.second = ext.logic_level().ub();
 
 	unsignedvec pin_nums = getPinNumberInfo(pins);
-	log_pin_num = pin_nums[0], mot_pin_num = pin_nums[1],
-		ena_pin_num = pin_nums[2], in_pin_num = pin_nums[3],
-		out_pin_num = pin_nums[4], gnd_pin_num = pin_nums[5],
-		other_pin_num = pin_nums[6],
-		total_pin_num = std::accumulate(pin_nums.begin(), pin_nums.end(), 0);
+	log_pin_num   = pin_nums[0], mot_pin_num = pin_nums[1],
+	ena_pin_num   = pin_nums[2], in_pin_num  = pin_nums[3],
+	out_pin_num   = pin_nums[4], gnd_pin_num = pin_nums[5],
+	other_pin_num = pin_nums[6],
+	total_pin_num = std::accumulate(pin_nums.begin(), pin_nums.end(), 0);
 
 	// config part
 	unsigned extra_var_size = in_pin_num + 1,
@@ -1905,7 +1903,7 @@ void Force_Sensor::getUsedVarsName(const stringvec &pin_names)
 	}
 }
 
-void Force_Sensor::extractInfo(Electronics::Component *force_sensor)
+void Force_Sensor::extractInfo(const Electronics::Component *component)
 {
 	// config info
 	size_t extra_var_size = 1;
@@ -1969,10 +1967,9 @@ void Voltage_Regulator::getUsedVarsName(const stringvec &pin_names)
 	}
 }
 
-void Voltage_Regulator::extractInfo(Electronics::Component *voltage_regulator)
+void Voltage_Regulator::extractInfo(const Electronics::Component *component)
 {
-	Electronics::Voltage_Regulator ext = voltage_regulator->
-		GetExtension(Electronics::Voltage_Regulator::voltage_regulator);
+	Electronics::Voltage_Regulator ext = component->GetExtension(Electronics::Voltage_Regulator::Info);
 	for (size_t i = 0; i < ext.cons_size(); i++)
 	{
 		linear_constraints.push_back(lincons2LinCons(ext.cons(i)));
@@ -2110,10 +2107,9 @@ void Camera::getUsedVarsName(const stringvec &pin_names)
 	}
 }
 
-void Camera::extractInfo(Electronics::Component *camera)
+void Camera::extractInfo(const Electronics::Component *component)
 {
-	Electronics::Camera ext = camera->GetExtension(
-		Electronics::Camera::camera);
+	Electronics::Camera ext = component->GetExtension(Electronics::Camera::Info);
 	frequency = ext.frequency();
 
 	this->getPinNumberInfo();
@@ -2324,10 +2320,9 @@ void Bluetooth::getUsedVarsName(const stringvec &pin_names)
 	}
 }
 
-void Bluetooth::extractInfo(Electronics::Component *bluetooth)
+void Bluetooth::extractInfo(const Electronics::Component *component)
 {
-	Electronics::Bluetooth ext = bluetooth->GetExtension(
-		Electronics::Bluetooth::bluetooth);
+	Electronics::Bluetooth ext = component->GetExtension(Electronics::Bluetooth::Info);
 	frequency = ext.frequency();
 
 	this->getPinNumberInfo();
@@ -2461,10 +2456,9 @@ void Bluetooth::getPinNumberInfo()
 	}
 }
 
-void Encoder::extractInfo(Electronics::Component *encoder)
+void Encoder::extractInfo(const Electronics::Component *component)
 {
-	Electronics::Encoder ext = encoder->GetExtension(
-		Electronics::Encoder::encoder);
+	Electronics::Encoder ext = component->GetExtension(Electronics::Encoder::Info);
 	frequency = ext.frequency();
 
 	this->getPinNumberInfo();

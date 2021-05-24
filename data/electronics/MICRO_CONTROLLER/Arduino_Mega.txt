@@ -1770,10 +1770,10 @@ size {
 }
 weight: 37
 price: 38.50
-[Electronics.Micro_Controller.micro_controller] {
-logic_level
-{
-  lb: 0.8
-  ub: 3.3
-}
+[Electronics.Micro_Controller.Info] {
+  logic_level
+  {
+    lb: 0.8
+    ub: 3.3
+  }
 }

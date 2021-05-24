@@ -93,6 +93,6 @@ size {
 }
 weight: 7
 price: 59
-[Electronics.Camera.camera] {
+[Electronics.Camera.Info] {
   frequency: 9600
 }

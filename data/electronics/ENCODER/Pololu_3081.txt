@@ -133,7 +133,7 @@ size {
 }
 weight: 1
 price: 8.95
-[Electronics.Encoder.encoder]
+[Electronics.Encoder.Info]
 {
   frequency: 320000
 }

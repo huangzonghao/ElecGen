@@ -49,6 +49,6 @@ size {
 }
 weight: 45.6
 price: 1.37
-[Electronics.Battery.battery] {
+[Electronics.Battery.Info] {
   capacity: 700
 }

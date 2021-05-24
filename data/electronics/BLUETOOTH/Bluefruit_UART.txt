@@ -183,6 +183,6 @@ size {
 }
 weight: 3.4
 price: 17.5
-[Electronics.Bluetooth.bluetooth] {
+[Electronics.Bluetooth.Info] {
   frequency: 9600
 }

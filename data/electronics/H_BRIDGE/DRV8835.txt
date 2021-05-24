@@ -323,7 +323,7 @@ size {
 }
 weight: 0.5
 price: 4.49
-[Electronics.H_Bridge.h_bridge] {
+[Electronics.H_Bridge.Info] {
   logic_level {
     lb: 2.1
     ub: 3.5

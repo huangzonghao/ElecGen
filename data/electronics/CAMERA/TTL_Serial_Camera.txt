@@ -136,6 +136,6 @@ size {
 }
 weight: 10
 price: 39.95
-[Electronics.Camera.camera] {
+[Electronics.Camera.Info] {
   frequency: 38400
 }

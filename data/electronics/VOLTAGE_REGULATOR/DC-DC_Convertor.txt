@@ -91,7 +91,7 @@ size {
 }
 weight: 22
 price: 4.9
-[Electronics.Voltage_Regulator.voltage_regulator] {
+[Electronics.Voltage_Regulator.Info] {
   cons {
     var_name: "VIN+"
     var_name: "VOUT+"
@@ -99,5 +99,5 @@ price: 4.9
     coefficient: -1
     constant: 1.5
     type: GREATER
-    }
+  }
 }

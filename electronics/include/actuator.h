@@ -287,7 +287,7 @@ public:
 	unsigned getFuncOutSize() override { return 0; }
 
 private:
-	void extractInfo(Electronics::Component *);
+	void extractInfo(const Electronics::Component *);
 	void getPinNumberInfo();
 
 	// pins
@@ -328,7 +328,7 @@ public:
 	std::unordered_map<std::string, std::string> getInDutyCycleMap() { return in_duty_cycle_map; }
 
 private:
-	void extractInfor(const Electronics::Component *);
+	void extractInfo(const Electronics::Component *);
 	void constructDutyCycleMap();
 	unsignedvec getPinNumberInfo(const std::vector<Pin> &);
 
@@ -379,7 +379,7 @@ public:
 	std::unordered_map<std::string, std::string> getOutDutyCycleMap() { return out_duty_cycle_map; }
 
 private:
-	void extractInfo(Electronics::Component *);
+	void extractInfo(const Electronics::Component *);
 	void constructDutyCycleMap();
 	void getPinNumberInfo();
 
@@ -434,7 +434,7 @@ public:
 	unsigned getFuncOutSize() override { return 0; }
 
 private:
-	void extractInfo(Electronics::Component *);
+	void extractInfo(const Electronics::Component *);
 	double capacity;
 };
 void initializeAllBatteries(const std::string &);
@@ -469,7 +469,7 @@ public:
 	unsigned getFuncOutSize() override { return 0; }
 
 private:
-	void extractInfo(Electronics::Component *);
+	void extractInfo(const Electronics::Component *);
 	void getPinNumberInfo();
 
 	// pins
@@ -511,7 +511,7 @@ public:
 	unsigned getFuncOutSize() override { return 0; }
 
 private:
-	void extractInfo(Electronics::Component *);
+	void extractInfo(const Electronics::Component *);
 	void getPinNumberInfo();
 
 	// pins
@@ -555,7 +555,7 @@ public:
 	unsigned getFuncOutSize() override { return 0; }
 
 private:
-	void extractInfo(Electronics::Component *);
+	void extractInfo(const Electronics::Component *);
 	void getPinNumberInfo();
 
 	// pins
@@ -601,7 +601,7 @@ public:
 	unsigned getFuncOutSize() override { return 0; }
 
 private:
-	void extractInfo(Electronics::Component *);
+	void extractInfo(const Electronics::Component *);
 };
 void initializeAllForceSensors(const std::string &);
 

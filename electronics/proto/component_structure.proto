@@ -134,7 +134,7 @@ message Component{
 message Motor{
 
     extend Component{
-        optional Motor motor = 101;
+        optional Motor Info = 101;
     }
 
     optional double kt = 1;
@@ -149,7 +149,7 @@ message Motor{
 
 message Voltage_Regulator{
     extend Component{
-        optional Voltage_Regulator voltage_regulator = 106;
+        optional Voltage_Regulator Info = 106;
     }
     repeated lin_cons cons = 1;
 }
@@ -157,7 +157,7 @@ message Voltage_Regulator{
 
 message H_Bridge{
     extend Component{
-        optional H_Bridge h_bridge = 102;
+        optional H_Bridge Info = 102;
     }
 
     optional bounds logic_level = 1;
@@ -166,14 +166,14 @@ message H_Bridge{
 
 message Micro_Controller{
     extend Component{
-        optional Micro_Controller micro_controller = 104;
+        optional Micro_Controller Info = 104;
     }
     optional bounds logic_level = 1;
 }
 
 message Battery{
     extend Component{
-        optional Battery battery = 103;
+        optional Battery Info = 103;
     }
 
     optional double capacity = 1;
@@ -182,14 +182,14 @@ message Battery{
 
 message Encoder{
     extend Component{
-        optional Encoder encoder = 109;
+        optional Encoder Info = 109;
     }
     optional double frequency = 1;
 }
 
 message Bluetooth{
     extend Component{
-        optional Bluetooth bluetooth = 108;
+        optional Bluetooth Info = 108;
     }
 
     optional double frequency = 1;
@@ -197,7 +197,7 @@ message Bluetooth{
 
 message Camera{
     extend Component{
-        optional Camera camera = 107;
+        optional Camera Info = 107;
     }
 
     optional double frequency = 1;
@@ -205,6 +205,6 @@ message Camera{
 
 message Force_Sensor{
     extend Component{
-        optional Force_Sensor force_sensor = 105;
+        optional Force_Sensor Info = 105;
     }
 }
