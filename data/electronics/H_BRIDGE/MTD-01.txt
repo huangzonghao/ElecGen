@@ -14,7 +14,7 @@ pin {
     ub: 35
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 4
   }
   dependents {
@@ -37,7 +37,7 @@ pin {
     ub: 5
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 0.00003
   }
   dependents {
@@ -59,7 +59,7 @@ pin {
     ub: 5
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 0.00003
   }
   dependents {
@@ -81,7 +81,7 @@ pin {
     ub: 5
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 0.00003
   }
   dependents {
@@ -103,7 +103,7 @@ pin {
     ub: 5
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 0.00003
   }
   dependents {
@@ -125,7 +125,7 @@ pin {
     ub: 5
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 0.00003
   }
   dependents {
@@ -295,7 +295,7 @@ pin {
     others: "ENA"
     others: "GND"
     others: "GND"
-    others: "GND" 
+    others: "GND"
   }
 }
 pin {
@@ -312,7 +312,7 @@ pin {
   }
   i_bound {
     lb: 0
-    ub: 0.00003 
+    ub: 0.00003
   }
   dependents {
     others: "5V"
@@ -361,7 +361,7 @@ pin {
     ub: 35
   }
   i_bound {
-    lb: 0 
+    lb: 0
     ub: 2
   }
   dependents {
@@ -387,7 +387,7 @@ pin {
     ub: 35
   }
   i_bound {
-    lb: 0 
+    lb: 0
     ub: 2
   }
   dependents {
@@ -413,7 +413,7 @@ pin {
     ub: 35
   }
   i_bound {
-    lb: 0 
+    lb: 0
     ub: 2
   }
   dependents {
@@ -439,13 +439,13 @@ pin {
     ub: 35
   }
   i_bound {
-    lb: 0 
+    lb: 0
     ub: 2
   }
   dependents {
     others: "5V"
     others: "VCC"
-    others: "ENB" 
+    others: "ENB"
     others: "In4"
     others: "GND"
     others: "GND"

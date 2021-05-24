@@ -15,7 +15,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RIGHT"

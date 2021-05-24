@@ -15,7 +15,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 1
+    ub: 1
   }
   dependents {
     others: "GND"
@@ -35,11 +35,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.8
+    ub: 0.8
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -56,31 +56,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.8 
+    ub: 0.8
   }
   dependents {
     others: "Vin"
-	others: "GND"
-  }
-}
-pin {
-  name: "GND"
-  pin_class: POWER
-  func_type: ELECTRICAL
-  phys_type: NORMAL 
-  io: IN
-  connection: OTM
-  status: false
-  v_bound {
-    lb: 0
-    ub: 0
-  }
-  i_bound {
-    lb: 0
-	ub: 0
-  }
-  dependents {
-    others: "Vin"
+    others: "GND"
   }
 }
 pin {
@@ -117,7 +97,27 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
   }
   dependents {
     others: "Vin"
@@ -137,16 +137,16 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "1"
-	others: "GND"
+    others: "1"
+    others: "GND"
   }
 }
 pin {
-  name: "1" 
+  name: "1"
   pin_class: FUNCTION
   func_type: DIGITAL_UART_TX
   phys_type: NORMAL
@@ -159,12 +159,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "0"
-	others: "GND"
+    others: "0"
+    others: "GND"
   }
 }
 pin {
@@ -181,11 +181,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -202,11 +202,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -223,11 +223,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -244,11 +244,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -265,11 +265,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -286,11 +286,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -307,11 +307,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -328,11 +328,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -349,11 +349,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -370,11 +370,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -391,11 +391,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -412,11 +412,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -433,16 +433,16 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "15"
-	others: "GND"
+    others: "15"
+    others: "GND"
   }
 }
 pin {
-  name: "15" 
+  name: "15"
   pin_class: FUNCTION
   func_type: DIGITAL_UART_RX
   phys_type: NORMAL
@@ -455,12 +455,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "14"
-	others: "GND"
+    others: "14"
+    others: "GND"
   }
 }
 pin {
@@ -477,12 +477,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "17"
-	others: "GND"
+    others: "17"
+    others: "GND"
   }
 }
 pin {
@@ -499,12 +499,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "16"
-	others: "GND"
+    others: "16"
+    others: "GND"
   }
 }
 pin {
@@ -521,12 +521,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "19"
-	others: "GND"
+    others: "19"
+    others: "GND"
   }
 }
 pin {
@@ -543,12 +543,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "18"
-	others: "GND"
+    others: "18"
+    others: "GND"
   }
 }
 pin {
@@ -565,12 +565,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "21"
-	others: "GND"
+    others: "21"
+    others: "GND"
   }
 }
 pin {
@@ -587,12 +587,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "20"
-	others: "GND"
+    others: "20"
+    others: "GND"
   }
 }
 pin {
@@ -609,11 +609,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -630,11 +630,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -651,11 +651,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -672,11 +672,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -693,11 +693,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -714,11 +714,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -735,15 +735,15 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
-  name: "29" 
+  name: "29"
   pin_class: FUNCTION
   func_type: DIGITAL
   phys_type: NORMAL
@@ -756,11 +756,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -777,11 +777,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -798,11 +798,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -819,11 +819,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -840,11 +840,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -861,11 +861,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -882,11 +882,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -903,11 +903,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -924,11 +924,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -945,11 +945,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -966,11 +966,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -987,11 +987,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1008,11 +1008,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1029,15 +1029,15 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
-  name: "43" 
+  name: "43"
   pin_class: FUNCTION
   func_type: DIGITAL
   phys_type: NORMAL
@@ -1050,11 +1050,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1071,11 +1071,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1092,11 +1092,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1113,11 +1113,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1134,11 +1134,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1155,11 +1155,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1176,11 +1176,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1197,17 +1197,17 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
   name: "51"
   pin_class: FUNCTION
-  func_type: DIGITAL	
+  func_type: DIGITAL
   phys_type: NORMAL
   io: BIDIRECT
   connection: OTO
@@ -1218,11 +1218,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1239,11 +1239,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1260,11 +1260,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1281,11 +1281,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1302,11 +1302,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1323,11 +1323,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1344,11 +1344,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1365,11 +1365,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1386,11 +1386,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1407,11 +1407,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1428,11 +1428,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1449,11 +1449,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1470,11 +1470,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1491,11 +1491,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1512,11 +1512,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.03
+    ub: 0.03
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1533,11 +1533,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1554,11 +1554,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -1570,7 +1570,7 @@ size {
 weight: 36
 price: 40.3
 [Electronics.Micro_Controller.micro_controller] {
-logic_level 
+logic_level
 {
   lb: 0.8
   ub: 3.3

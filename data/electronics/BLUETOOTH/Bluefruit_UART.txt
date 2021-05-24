@@ -4,7 +4,7 @@ component_class: "SENSOR"
 pin {
   name: "VIN"
   pin_class: POWER
-  func_type: ELECTRICAL 
+  func_type: ELECTRICAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -14,11 +14,11 @@ pin {
     ub: 16
   }
   i_bound {
-	lb: 0
-	ub: 0.03
+    lb: 0
+    ub: 0.03
   }
   dependents {
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -34,11 +34,11 @@ pin {
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
+    lb: 0
+    ub: 0
   }
   dependents {
-	others: "VIN"
+    others: "VIN"
   }
 }
 pin {
@@ -54,13 +54,13 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "VIN"
-	others: "RXI"
-	others: "GND"
+    others: "VIN"
+    others: "RXI"
+    others: "GND"
   }
 }
 pin {
@@ -76,13 +76,13 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "VIN"
-	others: "TXO"
-	others: "GND"
+    others: "VIN"
+    others: "TXO"
+    others: "GND"
   }
 }
 pin {
@@ -98,15 +98,15 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "VIN"
-	others: "TXO"
-	others: "RXI"
-	others: "RTS"
-	others: "GND"
+    others: "VIN"
+    others: "TXO"
+    others: "RXI"
+    others: "RTS"
+    others: "GND"
   }
 }
 pin {
@@ -122,15 +122,15 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "VIN"
-	others: "TXO"
-	others: "RXI"
-	others: "CTS"
-	others: "GND"
+    others: "VIN"
+    others: "TXO"
+    others: "RXI"
+    others: "CTS"
+    others: "GND"
   }
 }
 pin {
@@ -146,12 +146,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "VIN"
-	others: "GND"
+    others: "VIN"
+    others: "GND"
   }
 }
 pin {
@@ -167,12 +167,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "VIN"
-	others: "GND"
+    others: "VIN"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -186,12 +186,3 @@ price: 17.5
 [Electronics.Bluetooth.bluetooth] {
   frequency: 9600
 }
-
-
-
-
-
-
-
-
-

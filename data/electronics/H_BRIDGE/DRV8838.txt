@@ -14,7 +14,7 @@ pin {
     ub: 7
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 0.0003
   }
   dependents {
@@ -35,7 +35,7 @@ pin {
     ub: 11
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 1.7
   }
   dependents {
@@ -57,7 +57,7 @@ pin {
     ub: 11
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 1.7
   }
   dependents {
@@ -101,7 +101,7 @@ pin {
   }
   i_bound {
     lb: 0
-    ub: 0 
+    ub: 0
   }
   dependents {
     others: "VCC"
@@ -127,7 +127,7 @@ pin {
   dependents {
     others: "VCC"
     others: "VIN"
-    others: "GND" 
+    others: "GND"
     others: "GND"
   }
 }
@@ -167,14 +167,14 @@ pin {
     ub: 11
   }
   i_bound {
-    lb: 0 
+    lb: 0
     ub: 1.7
   }
   dependents {
     others: "VCC"
     others: "VIN"
     others: "ENABLE"
-    others: "GND" 
+    others: "GND"
     others: "GND"
   }
 }

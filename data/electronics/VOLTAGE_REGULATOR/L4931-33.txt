@@ -15,10 +15,10 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.25
+    ub: 0.25
   }
   dependents {
-	others: "2(GND)"
+    others: "2(GND)"
   }
 }
 pin {
@@ -35,11 +35,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.25
+    ub: 0.25
   }
   dependents {
-	others: "3(VIN)"
-	others: "2(GND)"
+    others: "3(VIN)"
+    others: "2(GND)"
   }
 }
 pin {
@@ -56,7 +56,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
   }
   dependents {
     others: "3(VIN)"
@@ -73,10 +73,10 @@ price: 0.81
 [Electronics.Voltage_Regulator.voltage_regulator] {
   cons {
     var_name: "3(VIN)"
-	var_name: "1(VOUT)"
-	coefficient: 1
-	coefficient: -1
-	constant: 0.4
-	type: GREATER
-	}
+    var_name: "1(VOUT)"
+    coefficient: 1
+    coefficient: -1
+    constant: 0.4
+    type: GREATER
+    }
 }

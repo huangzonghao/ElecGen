@@ -1,7 +1,7 @@
 component_name: "6LR61"
 component_type: "BATTERY"
 component_class: "OTHER"
- pin {
+pin {
   name: "+"
   pin_class: POWER
   func_type: ELECTRICAL
@@ -31,7 +31,7 @@ pin {
   status: false
   v_bound {
     lb: 0
-    ub: 0 
+    ub: 0
   }
   i_bound {
     lb: 0

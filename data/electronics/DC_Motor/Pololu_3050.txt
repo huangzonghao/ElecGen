@@ -10,9 +10,9 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 0 
+    lb: 0
     ub: 12
-  } 
+  }
   i_bound {
     lb: 0
     ub: 0.75
@@ -30,9 +30,9 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 0 
+    lb: 0
     ub: 0
-  } 
+  }
   i_bound {
     lb: 0
     ub: 0
@@ -58,5 +58,3 @@ price: 18.95
   torq: 0.065704555
   vel: 68.06784075
 }
-
-

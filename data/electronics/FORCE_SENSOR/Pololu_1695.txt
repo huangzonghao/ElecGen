@@ -14,11 +14,11 @@ pin {
     ub: 12
   }
   i_bound {
-	lb: 0
-	ub: 0.02
+    lb: 0
+    ub: 0.02
   }
   dependents {
-	others: "RIGHT"
+    others: "RIGHT"
   }
 }
 pin {

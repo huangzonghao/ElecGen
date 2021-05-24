@@ -4,7 +4,7 @@ component_class: "SENSOR"
 pin {
   name: "VIN"
   pin_class: POWER
-  func_type: ELECTRICAL	
+  func_type: ELECTRICAL
   phys_type: NORMAL
   io: IN
   connection: OTO
@@ -14,11 +14,11 @@ pin {
     ub: 16
   }
   i_bound {
-	lb: 0
-	ub: 0.03
+    lb: 0
+    ub: 0.03
   }
   dependents {
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -34,11 +34,11 @@ pin {
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
+    lb: 0
+    ub: 0
   }
   dependents {
-	others: "VIN"
+    others: "VIN"
   }
 }
 pin {
@@ -54,15 +54,15 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "VIN"
-	others: "MISO"
-	others: "MOSI"
-	others: "CS"
-	others: "GND"
+    others: "VIN"
+    others: "MISO"
+    others: "MOSI"
+    others: "CS"
+    others: "GND"
   }
 }
 pin {
@@ -78,15 +78,15 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.0001
+    lb: 0
+    ub: 0.0001
   }
   dependents {
-	others: "VIN"
-	others: "MOSI"
-	others: "SCK"
-	others: "CS"
-	others: "GND"
+    others: "VIN"
+    others: "MOSI"
+    others: "SCK"
+    others: "CS"
+    others: "GND"
   }
 }
 pin {
@@ -103,14 +103,14 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.0001
+    ub: 0.0001
   }
   dependents {
-	others: "VIN"
-	others: "MISO"
-	others: "SCK"
-	others: "CS"
-	others: "GND"
+    others: "VIN"
+    others: "MISO"
+    others: "SCK"
+    others: "CS"
+    others: "GND"
   }
 }
 pin {
@@ -126,15 +126,15 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.0001
+    lb: 0
+    ub: 0.0001
   }
   dependents {
-	others: "VIN"
-	others: "MOSI"
-	others: "MISO"
-	others: "SCK"
-	others: "GND"
+    others: "VIN"
+    others: "MOSI"
+    others: "MISO"
+    others: "SCK"
+    others: "GND"
   }
 }
 pin {
@@ -150,37 +150,37 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.0001
+    lb: 0
+    ub: 0.0001
   }
   dependents {
-	others: "VIN"
-	others: "MOSI"
-	others: "MISO"
-	others: "SCK"
-	others: "CS"
-	others: "GND"
+    others: "VIN"
+    others: "MOSI"
+    others: "MISO"
+    others: "SCK"
+    others: "CS"
+    others: "GND"
   }
 }
 pin {
   name: "DFU"
   pin_class: FUNCTION
-  func_type: OTHER	
+  func_type: OTHER
   phys_type: NORMAL
   io: IN
   connection: OTO
   status: 0
   v_bound {
-    lb: 0 
+    lb: 0
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.0001
+    lb: 0
+    ub: 0.0001
   }
   dependents {
-	others: "VIN"
-	others: "GND"
+    others: "VIN"
+    others: "GND"
   }
 }
 pin {
@@ -196,12 +196,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.0001
+    lb: 0
+    ub: 0.0001
   }
   dependents {
-	others: "VIN"
-	others: "GND"
+    others: "VIN"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -215,6 +215,3 @@ price: 17.5
 [Electronics.Bluetooth.bluetooth] {
   frequency: 4000000
 }
-
-
-

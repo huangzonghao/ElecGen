@@ -15,7 +15,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 1
+    ub: 1
   }
   dependents {
     others: "GND"
@@ -35,11 +35,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.05
+    ub: 0.05
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -56,31 +56,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.05
+    ub: 0.05
   }
   dependents {
     others: "Vin"
-	others: "GND"
-  }
-}
-pin {
-  name: "GND"
-  pin_class: POWER
-  func_type: ELECTRICAL
-  phys_type: NORMAL
-  io: IN
-  connection: OTM
-  status: false
-  v_bound {
-    lb: 0
-    ub: 0
-  }
-  i_bound {
-    lb: 0
-	ub: 0
-  }
-  dependents {
-    others: "Vin"
+    others: "GND"
   }
 }
 pin {
@@ -117,7 +97,27 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
   }
   dependents {
     others: "Vin"
@@ -137,16 +137,16 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "1"
-	others: "GND"
+    others: "1"
+    others: "GND"
   }
 }
 pin {
-  name: "1" 
+  name: "1"
   pin_class: FUNCTION
   func_type: DIGITAL_UART_TX
   phys_type: NORMAL
@@ -159,12 +159,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "0"
-	others: "GND"
+    others: "0"
+    others: "GND"
   }
 }
 pin {
@@ -181,11 +181,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -202,11 +202,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -223,11 +223,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -244,11 +244,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -265,11 +265,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -286,11 +286,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -307,11 +307,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -328,11 +328,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -349,14 +349,14 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "11"
-	others: "12"
-	others: "13"
-	others: "GND"
+    others: "11"
+    others: "12"
+    others: "13"
+    others: "GND"
   }
 }
 pin {
@@ -373,14 +373,14 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "10"
-	others: "12"
-	others: "13"
-	others: "GND"
+    others: "10"
+    others: "12"
+    others: "13"
+    others: "GND"
   }
 }
 pin {
@@ -397,15 +397,15 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "RAW"
-	others: "10"
-	others: "11"
-	others: "13"
-	others: "GND"
+    others: "RAW"
+    others: "10"
+    others: "11"
+    others: "13"
+    others: "GND"
   }
 }
 pin {
@@ -422,15 +422,15 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "RAW"
-	others: "10"
-	others: "11"
-	others: "12"
-	others: "GND"
+    others: "RAW"
+    others: "10"
+    others: "11"
+    others: "12"
+    others: "GND"
   }
 }
 pin {
@@ -447,11 +447,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -468,12 +468,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "SCL"
-	others: "GND"
+    others: "SCL"
+    others: "GND"
   }
 }
 pin {
@@ -490,12 +490,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "SDA"
-	others: "GND"
+    others: "SDA"
+    others: "GND"
   }
 }
 pin {
@@ -512,11 +512,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -533,11 +533,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -554,11 +554,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -575,11 +575,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -596,12 +596,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "A5"
-	others: "GND"
+    others: "A5"
+    others: "GND"
   }
 }
 pin {
@@ -618,12 +618,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "A4"
-	others: "GND"
+    others: "A4"
+    others: "GND"
   }
 }
 pin {
@@ -640,11 +640,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -661,11 +661,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "RAW"
-	others: "GND"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -677,7 +677,7 @@ size {
 weight: 25
 price: 22
 [Electronics.Micro_Controller.micro_controller] {
-logic_level 
+logic_level
 {
   lb: 0.8
   ub: 3.3

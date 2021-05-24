@@ -10,16 +10,16 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 0 
+    lb: 0
     ub: 6
   }
   i_bound {
-    lb: 0 
-    ub: 1.5 
+    lb: 0
+    ub: 1.5
   }
   dependents {
     others: "-"
-  } 
+  }
 }
 pin {
   name: "-"
@@ -30,9 +30,9 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 0 
+    lb: 0
     ub: 0
-  } 
+  }
   i_bound {
     lb: 0
     ub: 0
@@ -50,7 +50,7 @@ size {
 weight: 9.5
 price: 18.95
 [Electronics.Motor.motor] {
-  kt: 0.3269	
+  kt: 0.3269
   ke: 0.6291
   r: 4
   vin: 6
@@ -58,4 +58,3 @@ price: 18.95
   torq: 0.4903325
   vel: 8.901179175
 }
-

@@ -14,7 +14,7 @@ pin {
     ub: 7
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 0.0002
   }
   dependents {
@@ -35,7 +35,7 @@ pin {
     ub: 11
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 2.4
   }
   dependents {
@@ -57,7 +57,7 @@ pin {
     ub: 11
   }
   i_bound {
-    lb: 0	
+    lb: 0
     ub: 2.4
   }
   dependents {
@@ -213,7 +213,7 @@ pin {
     ub: 11
   }
   i_bound {
-    lb: 0 
+    lb: 0
     ub: 1.2
   }
   dependents {
@@ -261,7 +261,7 @@ pin {
     ub: 11
   }
   i_bound {
-    lb: 0 
+    lb: 0
     ub: 1.2
   }
   dependents {
@@ -329,6 +329,3 @@ price: 4.49
     ub: 3.5
   }
 }
-
-
-

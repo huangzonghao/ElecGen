@@ -15,7 +15,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 3
+    ub: 3
   }
   dependents {
     others: "VIN-"
@@ -35,12 +35,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 3
+    ub: 3
   }
   dependents {
     others: "VIN+"
-	others: "VIN-"
-	others: "VOUT-"
+    others: "VIN-"
+    others: "VOUT-"
   }
 }
 pin {
@@ -57,7 +57,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
   }
   dependents {
     others: "VIN+"
@@ -77,10 +77,10 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
   }
   dependents {
-	others: "VOUT+"
+    others: "VOUT+"
   }
 }
 nonlin: 0
@@ -99,5 +99,5 @@ price: 4.9
     coefficient: -1
     constant: 1.5
     type: GREATER
-	}
+    }
 }

@@ -15,10 +15,10 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.075
+    ub: 0.075
   }
   dependents {
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -34,11 +34,11 @@ pin {
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
+    lb: 0
+    ub: 0
   }
   dependents {
-	others: "5V"
+    others: "5V"
   }
 }
 pin {
@@ -54,11 +54,11 @@ pin {
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
-  } 
+    lb: 0
+    ub: 0
+  }
   dependents {
-	others: "5V"
+    others: "5V"
   }
 }
 pin {
@@ -74,13 +74,13 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "5V"
-	others: "RX"
-	others: "GNd"
+    others: "5V"
+    others: "RX"
+    others: "GNd"
   }
 }
 pin {
@@ -96,13 +96,13 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "5V"
-	others: "TX"
-	others: "GND"
+    others: "5V"
+    others: "TX"
+    others: "GND"
   }
 }
 pin {
@@ -118,14 +118,14 @@ pin {
     ub: 5
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "5V"
-	others: "TX"
-	others: "RX"
-	others: "GND"
+    others: "5V"
+    others: "TX"
+    others: "RX"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -139,5 +139,3 @@ price: 39.95
 [Electronics.Camera.camera] {
   frequency: 38400
 }
-
-                                      

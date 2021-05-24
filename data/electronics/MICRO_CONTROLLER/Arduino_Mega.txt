@@ -15,7 +15,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 3
+    ub: 3
   }
   dependents {
     others: "GND"
@@ -35,11 +35,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.05
+    ub: 0.05
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -56,11 +56,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.05
+    ub: 0.05
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -77,27 +77,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
-  }
-  dependents {
-    others: "Vin"
-  }
-}
-pin {
-  name: "GND"
-  pin_class: POWER
-  func_type: ELECTRICAL
-  phys_type: NORMAL
-  io: IN
-  connection: OTM
-  status: false
-  v_bound {
-    lb: 0
     ub: 0
-  }
-  i_bound {
-    lb: 0
-	ub: 0
   }
   dependents {
     others: "Vin"
@@ -117,7 +97,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
   }
   dependents {
     others: "Vin"
@@ -137,7 +117,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
   }
   dependents {
     others: "Vin"
@@ -157,7 +137,27 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
+  }
+  dependents {
+    others: "Vin"
+  }
+}
+pin {
+  name: "GND"
+  pin_class: POWER
+  func_type: ELECTRICAL
+  phys_type: NORMAL
+  io: IN
+  connection: OTM
+  status: false
+  v_bound {
+    lb: 0
+    ub: 0
+  }
+  i_bound {
+    lb: 0
+    ub: 0
   }
   dependents {
     others: "Vin"
@@ -177,12 +177,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "1"
-	others: "GND"
+    others: "1"
+    others: "GND"
   }
 }
 pin {
@@ -199,12 +199,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "0"
-	others: "GND"
+    others: "0"
+    others: "GND"
   }
 }
 pin {
@@ -221,11 +221,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -242,11 +242,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -263,11 +263,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -284,11 +284,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -302,14 +302,14 @@ pin {
   v_bound {
     lb: 0
     ub: 5
-  }  
+  }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -326,11 +326,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -347,11 +347,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -368,11 +368,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -389,11 +389,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -410,11 +410,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -431,11 +431,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -452,11 +452,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -473,12 +473,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "15"
-	others: "GND"
+    others: "15"
+    others: "GND"
   }
 }
 pin {
@@ -495,12 +495,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "14"
-	others: "GND"
+    others: "14"
+    others: "GND"
   }
 }
 pin {
@@ -517,12 +517,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "17"
-	others: "GND"
+    others: "17"
+    others: "GND"
   }
 }
 pin {
@@ -539,12 +539,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "16"
-	others: "GND"
+    others: "16"
+    others: "GND"
   }
 }
 pin {
@@ -561,12 +561,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "19"
-	others: "GND"
+    others: "19"
+    others: "GND"
   }
 }
 pin {
@@ -583,12 +583,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "18"
-	others: "GND"
+    others: "18"
+    others: "GND"
   }
 }
 pin {
@@ -605,12 +605,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "21"
-	others: "GND"
+    others: "21"
+    others: "GND"
   }
 }
 pin {
@@ -627,12 +627,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "20"
-	others: "GND"
+    others: "20"
+    others: "GND"
   }
 }
 pin {
@@ -649,11 +649,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -670,11 +670,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -691,11 +691,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -712,11 +712,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -733,11 +733,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -754,11 +754,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -775,11 +775,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -796,11 +796,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -817,11 +817,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -838,11 +838,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -859,11 +859,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -880,11 +880,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -901,11 +901,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -922,11 +922,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -943,11 +943,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -964,11 +964,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -985,11 +985,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1006,11 +1006,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1027,11 +1027,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1048,11 +1048,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1069,11 +1069,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1090,11 +1090,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1111,11 +1111,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1132,11 +1132,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1153,11 +1153,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1174,11 +1174,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1195,11 +1195,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1216,11 +1216,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1237,14 +1237,14 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "51"
-	others: "52"
-	others: "53"
-	others: "GND"
+    others: "51"
+    others: "52"
+    others: "53"
+    others: "GND"
   }
 }
 pin {
@@ -1261,14 +1261,14 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "50"
-	others: "52"
-	others: "53"
-	others: "GND"
+    others: "50"
+    others: "52"
+    others: "53"
+    others: "GND"
   }
 }
 pin {
@@ -1285,14 +1285,14 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "50"
-	others: "51"
-	others: "53"
-	others: "GND"
+    others: "50"
+    others: "51"
+    others: "53"
+    others: "GND"
   }
 }
 pin {
@@ -1309,14 +1309,14 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "50"
-	others: "51"
-	others: "52"
-	others: "GND"
+    others: "50"
+    others: "51"
+    others: "52"
+    others: "GND"
   }
 }
 pin {
@@ -1333,11 +1333,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1354,12 +1354,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "SCL"
-	others: "GND"
+    others: "SCL"
+    others: "GND"
   }
 }
 pin {
@@ -1376,12 +1376,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "SDA"
-	others: "GND"
+    others: "SDA"
+    others: "GND"
   }
 }
 pin {
@@ -1398,11 +1398,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1419,11 +1419,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1440,11 +1440,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1461,11 +1461,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1482,11 +1482,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1503,11 +1503,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1524,11 +1524,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1545,11 +1545,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1566,11 +1566,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1587,11 +1587,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1608,11 +1608,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1629,11 +1629,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1650,11 +1650,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1671,11 +1671,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1692,11 +1692,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1713,11 +1713,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1734,11 +1734,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -1755,11 +1755,11 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.02
+    ub: 0.02
   }
   dependents {
     others: "Vin"
-	others: "GND"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -1771,7 +1771,7 @@ size {
 weight: 37
 price: 38.50
 [Electronics.Micro_Controller.micro_controller] {
-logic_level 
+logic_level
 {
   lb: 0.8
   ub: 3.3

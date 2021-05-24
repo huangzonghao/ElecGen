@@ -14,11 +14,11 @@ pin {
     ub: 12
   }
   i_bound {
-	lb: 0
-	ub: 0.05
+    lb: 0
+    ub: 0.05
   }
   dependents {
-	others: "GND"
+    others: "GND"
   }
 }
 pin {
@@ -34,11 +34,11 @@ pin {
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
+    lb: 0
+    ub: 0
   }
   dependents {
-	others: "VCC"
+    others: "VCC"
   }
 }
 pin {
@@ -54,11 +54,11 @@ pin {
     ub: 12
   }
   i_bound {
-	lb: 0
-	ub: 1.5
+    lb: 0
+    ub: 1.5
   }
   dependents {
-	others: ""
+    others: ""
   }
 }
 pin {
@@ -74,11 +74,11 @@ pin {
     ub: 12
   }
   i_bound {
-	lb: 0
-	ub: 1.5
+    lb: 0
+    ub: 1.5
   }
   dependents {
-	others: ""
+    others: ""
   }
 }
 pin {
@@ -94,13 +94,13 @@ pin {
     ub: 5
   }
   i_bound {
-	lb: 0
-	ub: 0.001
+    lb: 0
+    ub: 0.001
   }
   dependents {
-	others: "VCC"
-	others: "OUTB"
-	others: "GND"
+    others: "VCC"
+    others: "OUTB"
+    others: "GND"
   }
 }
 pin {
@@ -116,13 +116,13 @@ pin {
     ub: 5
   }
   i_bound {
-	lb: 0
-	ub: 0.001
+    lb: 0
+    ub: 0.001
   }
   dependents {
-	others: "VCC"
-	others: "OUTA"
-	others: "GND"
+    others: "VCC"
+    others: "OUTA"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -136,12 +136,3 @@ price: 7.95
 [Electronics.Encoder.encoder] {
   frequency: 10000
 }
-
-
-
-
-
-
-
-
-

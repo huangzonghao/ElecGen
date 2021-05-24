@@ -15,7 +15,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 3
+    ub: 3
   }
   dependents {
     others: "-"
@@ -31,17 +31,17 @@ pin {
   status: false
   v_bound {
     lb: 0
-    ub: 0 
+    ub: 0
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
   }
   dependents {
     others: "+"
   }
 }
-nonlin: 0 
+nonlin: 0
 size {
   length: 16
   width: 25

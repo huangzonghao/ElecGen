@@ -1,6 +1,6 @@
 component_name: "Pololu_3081"
 component_type: "ENCODER"
-component_class: "SENSOR" 
+component_class: "SENSOR"
 pin {
   name: "VCC"
   pin_class: POWER
@@ -10,12 +10,12 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 2.7   
+    lb: 2.7
     ub: 18
   }
   i_bound {
     lb: 0
-	ub: 0.05
+    ub: 0.05
   }
   dependents {
     others: "GND"
@@ -35,12 +35,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0
+    ub: 0
   }
   dependents {
     others: "VCC"
   }
-} 
+}
 pin {
   name: "M1"
   pin_class: FUNCTION
@@ -55,7 +55,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 1.5
+    ub: 1.5
   }
   dependents {
     others: ""
@@ -75,7 +75,7 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 1.5
+    ub: 1.5
   }
   dependents {
     others: ""
@@ -90,17 +90,17 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 0   
+    lb: 0
     ub: 5
   }
   i_bound {
     lb: 0
-	ub: 0.01
+    ub: 0.01
   }
   dependents {
     others: "VCC"
-	others: "OUTB"
-	others: "GND"
+    others: "OUTB"
+    others: "GND"
   }
 }
 pin {
@@ -117,12 +117,12 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.01
+    ub: 0.01
   }
   dependents {
     others: "VCC"
-	others: "OUTA"
-	others: "GND"
+    others: "OUTA"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -137,6 +137,3 @@ price: 8.95
 {
   frequency: 320000
 }
-
-
-

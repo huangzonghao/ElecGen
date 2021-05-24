@@ -15,16 +15,16 @@ pin {
   }
   i_bound {
     lb: 0
-	ub: 0.05
+    ub: 0.05
   }
   dependents {
-	others: "G"
+    others: "G"
   }
 }
 pin {
   name: "G"
   pin_class: POWER
-  func_type: GND 
+  func_type: GND
   phys_type: NORMAL
   io: IN
   connection: OTM
@@ -34,11 +34,11 @@ pin {
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
+    lb: 0
+    ub: 0
   }
   dependents {
-	others: "V"
+    others: "V"
   }
 }
 pin {
@@ -54,13 +54,13 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "V"
-	others: "TX/SCL"
-	others: "GS"
+    others: "V"
+    others: "TX/SCL"
+    others: "GS"
   }
 }
 pin {
@@ -76,13 +76,13 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "V"
-	others: "RX/SDA"
-	others: "G"
+    others: "V"
+    others: "RX/SDA"
+    others: "G"
   }
 }
 nonlin: 0
@@ -96,7 +96,3 @@ price: 59
 [Electronics.Camera.camera] {
   frequency: 9600
 }
-
-
-
-

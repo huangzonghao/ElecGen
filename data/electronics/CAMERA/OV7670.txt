@@ -24,7 +24,7 @@ pin {
 pin {
   name: "GND"
   pin_class: POWER
-  func_type: GND 
+  func_type: GND
   phys_type: NORMAL
   io: IN
   connection: OTM
@@ -34,11 +34,11 @@ pin {
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
+    lb: 0
+    ub: 0
   }
   dependents {
-	others: "3.3V"
+    others: "3.3V"
   }
 }
 pin {
@@ -54,13 +54,13 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "SCL"
-	others: "GND"
+    others: "3.3V"
+    others: "SCL"
+    others: "GND"
   }
 }
 pin {
@@ -76,13 +76,13 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "SDA"
-	others: "GND"
+    others: "3.3V"
+    others: "SDA"
+    others: "GND"
   }
 }
 pin {
@@ -98,12 +98,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -119,12 +119,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -140,12 +140,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -161,12 +161,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -182,12 +182,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -203,12 +203,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -224,12 +224,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -245,12 +245,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -266,12 +266,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -287,12 +287,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -308,12 +308,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -329,12 +329,12 @@ pin {
     ub: 3.3
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 pin {
@@ -350,12 +350,12 @@ pin {
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0.00001
+    lb: 0
+    ub: 0.00001
   }
   dependents {
-	others: "3.3V"
-	others: "GND"
+    others: "3.3V"
+    others: "GND"
   }
 }
 nonlin: 0
@@ -369,7 +369,3 @@ price: 8.99
 [Electronics.Camera.camera] {
   frequency: 9600
 }
-
-
-
-

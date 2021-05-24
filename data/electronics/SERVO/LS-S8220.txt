@@ -10,16 +10,16 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 4.8 
+    lb: 4.8
     ub: 6
   }
   i_bound {
-	lb: 0
-	ub: 1
+    lb: 0
+    ub: 1
   }
   dependents {
-	others: "-"
-  }  
+    others: "-"
+  }
 }
 pin {
   name: "-"
@@ -30,15 +30,15 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 0 
+    lb: 0
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
+    lb: 0
+    ub: 0
   }
   dependents {
-	others: "+"
+    others: "+"
   }
 }
 pin {
@@ -54,12 +54,12 @@ pin {
     ub: 5
   }
   i_bound {
-	lb: 0
-	ub: 0.01
+    lb: 0
+    ub: 0.01
   }
   dependents {
-	others: "+"
-	others: "-"
+    others: "+"
+    others: "-"
   }
 }
 nonlin: 0

@@ -10,15 +10,15 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 4.8 
+    lb: 4.8
     ub: 6
   }
   i_bound {
-	lb: 0
-	ub: 0.5
+    lb: 0
+    ub: 0.5
   }
   dependents {
-	others: "-"
+    others: "-"
   }
 }
 pin {
@@ -30,15 +30,15 @@ pin {
   connection: OTO
   status: 0
   v_bound {
-    lb: 0 
+    lb: 0
     ub: 0
   }
   i_bound {
-	lb: 0
-	ub: 0
+    lb: 0
+    ub: 0
   }
   dependents {
-	others: "+"
+    others: "+"
   }
 }
 pin {
@@ -54,12 +54,12 @@ pin {
     ub: 5
   }
   i_bound {
-	lb: 0
-	ub: 0.01
+    lb: 0
+    ub: 0.01
   }
   dependents {
-	others: "+"
-	others: "-"
+    others: "+"
+    others: "-"
   }
 }
 nonlin: 0
@@ -79,4 +79,3 @@ price: 7.98
   torq: 0.0588399
   vel: 14.9600
 }
-
