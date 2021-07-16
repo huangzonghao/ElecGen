@@ -1278,7 +1278,7 @@ void treeVisualize(std::shared_ptr<InferredNode> root, unsigned cnt)
 }
 */
 /*
-std::string indexComponent(std::string component)
+std::string indexComponent(const std::string& component)
 {
 	std::string post_fix = "";
 	auto tpos = component.rfind("t") + 1, endpos = component.rfind(*component.rbegin()) + 2;

@@ -28,10 +28,10 @@ class  SimulationManager {
     }
 
     void SetSystemType(SystemType new_type){ system_type_ = new_type; }
-    void SetUrdfFile(std::string filename);
+    void SetUrdfFile(const std::string& filename);
     // force user to input xyz dimension of the map, especially for bmp and urdf maps
     void SetEnv(bool enable_map);
-    void SetEnv(std::string filename, double env_x, double env_y, double env_z);
+    void SetEnv(const std::string& filename, double env_x, double env_y, double env_z);
     // TODO: should be done within SetEnv, but currently having difficulty readin bitmap in c++
     void SetEigenHeightmap(const std::shared_ptr<const Eigen::MatrixXd>& heightmap);
     void SetFrictionS(double fs) {s_friction_ = fs;};

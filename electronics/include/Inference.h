@@ -261,7 +261,7 @@ connection_relation_vec sameLevelComponentsReduction(bbnodevec &);
 // visualization function
 // void treeVisualize(nodeptr root, unsigned cnt = 0);
 
-std::string indexComponent(std::string);
+std::string indexComponent(const std::string&);
 // void writeTree(const nodeptrvec &, std::ofstream &, str_unsigned_uomap &);
 // void writeDesign(const nodeptrvec &, const Circuit &, str_unsigned_uomap &);
 */

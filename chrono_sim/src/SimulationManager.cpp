@@ -27,12 +27,12 @@ SimulationManager::SimulationManager(double step_size,
     SetChronoDataPath(CHRONO_DATA_DIR);
 }
 
-void SimulationManager::SetUrdfFile(std::string filename){
+void SimulationManager::SetUrdfFile(const std::string& filename){
     urdf_doc_ = std::make_shared<ChUrdfDoc>(filename);
     auxrefs_ = urdf_doc_->GetAuxRef();
 }
 
-// this function only disables maps, to enable map, use SetEnv(std::string, double, double, double)
+// this function only disables maps, to enable map, use SetEnv(const std::string&, double, double, double)
 void SimulationManager::SetEnv(bool enable_map){
     if (enable_map){
         std::cout << "Error: To enable map, pass in map name and sizes. Map not enabled";
@@ -41,7 +41,7 @@ void SimulationManager::SetEnv(bool enable_map){
     load_map_ = false;
 }
 
-void SimulationManager::SetEnv(std::string filename, double env_x, double env_y, double env_z){
+void SimulationManager::SetEnv(const std::string& filename, double env_x, double env_y, double env_z){
     env_file_ = filename;
     env_x_ = env_x;
     env_y_ = env_y;

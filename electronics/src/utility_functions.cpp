@@ -74,13 +74,13 @@ doublevec sample(const double &lb, const double &ub, const unsigned &num)
 	return samples;
 }
 
-std::string removeComponentPrePostfix(std::string component)
+std::string removeComponentPrePostfix(const std::string& component)
 {
 	auto beg_pos = component.rfind("\\") + 1, end_pos = component.find(".");
 	return component.substr(beg_pos, end_pos - beg_pos);
 }
 
-string removeComponentPostfix(std::string component)
+string removeComponentPostfix(const std::string& component)
 {
 	auto end_pos = component.rfind("t");
 	return component.substr(0, end_pos+1);

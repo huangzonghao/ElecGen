@@ -79,8 +79,8 @@ std::vector<T> getSubVector(const std::vector<T> &, const size_t &, const size_t
 doublepairs makePairs(const doublevec &, const doublevec &);
 
 doublevec sample(const double &, const double &, const unsigned & = unsigned(100));
-std::string removeComponentPrePostfix(std::string);
-std::string removeComponentPostfix(std::string);
+std::string removeComponentPrePostfix(const std::string&);
+std::string removeComponentPostfix(const std::string&);
 
 double roundByPrecision(const double &, const double & = 1e-4);
 
