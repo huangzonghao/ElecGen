@@ -332,7 +332,7 @@ void SimulationManager::GetComponentTypes(std::vector<std::string> &types_vec) c
 }
 
 void SimulationManager::
-GetActuatorVels(std::vector<std::pair<double, double> > &vels_vec) const {
+GetActuatorVels(std::vector<std::pair<double, double>> &vels_vec) const {
     if (vels_vec.empty()){
         vels_vec.resize(motors_.size());
     }
@@ -346,7 +346,7 @@ GetActuatorVels(std::vector<std::pair<double, double> > &vels_vec) const {
 }
 
 void SimulationManager::
-GetActuatorTorques(std::vector<std::pair<double, double> > &torqs_vec) const {
+GetActuatorTorques(std::vector<std::pair<double, double>> &torqs_vec) const {
     if (torqs_vec.empty()){
         torqs_vec.resize(motors_.size());
     }

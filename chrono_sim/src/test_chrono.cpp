@@ -169,8 +169,8 @@ void test_fourleg3(){
     bool task_done = sm.RunSimulation(true);
     // export data
     std::vector<std::string> component_types;
-    std::vector<std::pair<double, double> > torqs_vec;
-    std::vector<std::pair<double, double> > vels_vec;
+    std::vector<std::pair<double, double>> torqs_vec;
+    std::vector<std::pair<double, double>> vels_vec;
     sm.GetComponentTypes(component_types);
     sm.GetActuatorTorques(torqs_vec);
     sm.GetActuatorVels(vels_vec);

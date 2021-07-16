@@ -2,15 +2,15 @@
 #include "LeggedGaits.h"
 
 RobotController::
-RobotController(std::vector<std::shared_ptr<SimMotor> > *motors, ControllerType type):
+RobotController(std::vector<std::shared_ptr<SimMotor>> *motors, ControllerType type):
     motors_(motors), type(type){}
 
-RobotController::RobotController(std::vector<std::shared_ptr<SimMotor> > *motors,
-                                 std::vector<chrono::ChVector<> > *waypoints,
+RobotController::RobotController(std::vector<std::shared_ptr<SimMotor>> *motors,
+                                 std::vector<chrono::ChVector<>> *waypoints,
                                  ControllerType type):
     motors_(motors), waypoints_(waypoints), type(type){}
 
-ManipulatorController::ManipulatorController(std::vector<std::shared_ptr<SimMotor> > *motors):
+ManipulatorController::ManipulatorController(std::vector<std::shared_ptr<SimMotor>> *motors):
     RobotController(motors, MANIPULATOR){
         for (const auto& motor : *motors_){
             motor->SetMaxVel(joint_max_vel_);
@@ -18,8 +18,8 @@ ManipulatorController::ManipulatorController(std::vector<std::shared_ptr<SimMoto
 }
 
 void ManipulatorController::
-SetJointPos(const std::shared_ptr<std::vector<double> >& start_joint_pos,
-            const std::shared_ptr<std::vector<double> >& goal_joint_pos){
+SetJointPos(const std::shared_ptr<std::vector<double>>& start_joint_pos,
+            const std::shared_ptr<std::vector<double>>& goal_joint_pos){
 
     if (motors_->size() != start_joint_pos->size() || motors_->size() != goal_joint_pos->size()){
         std::cout << "Error: cannot initialize manipulator controller, number of motors not equal to number of joint vaules" << std::endl;

@@ -33,7 +33,7 @@ class ChUrdfDoc {
 
     urdf::ModelInterfaceSharedPtr GetUrdfRobot() const { return urdf_robot_; }
 
-    const std::shared_ptr<std::unordered_set<std::string> >& GetAuxRef() { return auxrefs_; }
+    const std::shared_ptr<std::unordered_set<std::string>>& GetAuxRef() { return auxrefs_; }
 
     bool Load_URDF(const std::string& filename);
     bool AddtoSystem(const std::shared_ptr<ChSystem>& sys, double x=0, double y=0, double z=0, double rx=0, double ry=0, double rz=0);
@@ -56,7 +56,7 @@ class ChUrdfDoc {
 
     void SetCollisionMaterial(const std::shared_ptr<ChMaterialSurfaceNSC>& new_mat){ collision_material_ = new_mat; }
 
-    std::shared_ptr<std::vector<std::shared_ptr<ChBody> > >& GetBodyList() {return body_list_;}
+    std::shared_ptr<std::vector<std::shared_ptr<ChBody>>>& GetBodyList() {return body_list_;}
 
   private:
     struct ChMatPair{
@@ -88,9 +88,9 @@ class ChUrdfDoc {
     std::shared_ptr<ChBody> ch_root_body_;
     std::shared_ptr<ChMaterialSurfaceNSC> collision_material_;
     // names of bodies that would use ChBodyAuxRef
-    std::shared_ptr<std::unordered_set<std::string> > auxrefs_;
+    std::shared_ptr<std::unordered_set<std::string>> auxrefs_;
 
-    std::shared_ptr<std::vector<std::shared_ptr<ChBody> > > body_list_;
+    std::shared_ptr<std::vector<std::shared_ptr<ChBody>>> body_list_;
 };
 
 // torque functor for a rot spring with constant spring coefficient and constant damping coefficient

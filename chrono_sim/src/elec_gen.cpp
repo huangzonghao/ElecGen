@@ -20,8 +20,8 @@ void setup_manipulator(SimulationManager& sm){
     sm.AddMotor("SERVO", "base_fixed", "base_middle",    0.01, 0.01, 0.01, 0.01);
     sm.AddMotor("SERVO", "middle", "middle_upper",   0.01, 0.01, 0.01, 0.01);
 
-    auto start_joint_pos = std::make_shared<std::vector<double> >();
-    auto goal_joint_pos = std::make_shared<std::vector<double> >();
+    auto start_joint_pos = std::make_shared<std::vector<double>>();
+    auto goal_joint_pos = std::make_shared<std::vector<double>>();
     start_joint_pos->push_back(0.0);
     start_joint_pos->push_back(0.0);
     goal_joint_pos->push_back(-1.57);

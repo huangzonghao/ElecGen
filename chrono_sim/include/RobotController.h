@@ -11,10 +11,10 @@ class RobotController {
   public:
     enum ControllerType {MANIPULATOR, WHEEL, LEGGED} type;
 
-    RobotController(std::vector<std::shared_ptr<SimMotor> > *motors, ControllerType type);
+    RobotController(std::vector<std::shared_ptr<SimMotor>> *motors, ControllerType type);
 
-    RobotController(std::vector<std::shared_ptr<SimMotor> > *motors,
-                    std::vector<chrono::ChVector<> > *waypoints,
+    RobotController(std::vector<std::shared_ptr<SimMotor>> *motors,
+                    std::vector<chrono::ChVector<>> *waypoints,
                     ControllerType type);
     virtual ~RobotController() = default;
 
@@ -23,19 +23,19 @@ class RobotController {
   protected:
     bool gait_lock = false;
     int waypoint_idx = 0;
-    std::vector<std::shared_ptr<SimMotor> > *motors_;
-    std::vector<chrono::ChVector<> > *waypoints_;
+    std::vector<std::shared_ptr<SimMotor>> *motors_;
+    std::vector<chrono::ChVector<>> *waypoints_;
 
 };
 
 class ManipulatorController : public RobotController {
   public:
-    ManipulatorController(std::vector<std::shared_ptr<SimMotor> > *motors);
+    ManipulatorController(std::vector<std::shared_ptr<SimMotor>> *motors);
 
     ~ManipulatorController(){};
 
-    void SetJointPos(const std::shared_ptr<std::vector<double> >& start_joint_pos,
-                     const std::shared_ptr<std::vector<double> >& goal_joint_pos);
+    void SetJointPos(const std::shared_ptr<std::vector<double>>& start_joint_pos,
+                     const std::shared_ptr<std::vector<double>>& goal_joint_pos);
 
     // TODO:need to modify simmotor controller
     void SetJointMaxVel(double new_max);
@@ -45,15 +45,15 @@ class ManipulatorController : public RobotController {
     // TODO: should be the size of waypoint vector
     int num_waypoints = 2;
     double joint_max_vel_ = 0.2;
-    std::shared_ptr<std::vector<double> > start_joint_pos_;
-    std::shared_ptr<std::vector<double> > goal_joint_pos_;
+    std::shared_ptr<std::vector<double>> start_joint_pos_;
+    std::shared_ptr<std::vector<double>> goal_joint_pos_;
 };
 
 class WheelController : public RobotController {
   public:
 
-    WheelController(std::vector<std::shared_ptr<SimMotor> > *motors,
-                    std::vector<chrono::ChVector<> > *waypoints,
+    WheelController(std::vector<std::shared_ptr<SimMotor>> *motors,
+                    std::vector<chrono::ChVector<>> *waypoints,
                     const std::shared_ptr<chrono::ChBody>& ch_body):
         RobotController(motors, waypoints, WHEEL), robot_body(ch_body.get()){}
 
@@ -72,8 +72,8 @@ class WheelController : public RobotController {
 class LeggedController : public RobotController {
   public:
     enum Model {M1, M2, M3} model;
-    LeggedController(std::vector<std::shared_ptr<SimMotor> > *motors,
-                     std::vector<chrono::ChVector<> > *waypoints,
+    LeggedController(std::vector<std::shared_ptr<SimMotor>> *motors,
+                     std::vector<chrono::ChVector<>> *waypoints,
                      const std::shared_ptr<chrono::ChBody>& ch_body):
         RobotController(motors, waypoints, LEGGED), robot_body(ch_body.get()){}
 

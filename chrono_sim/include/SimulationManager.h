@@ -50,8 +50,8 @@ class  SimulationManager {
                   double pos_x=0, double pos_y=0, double pos_z=0);
     void AddWaypoint(double x, double y, double z);
     void AddWaypoints(const std::shared_ptr<const Eigen::MatrixXd>& waypoints_ptr);
-    void SetStartJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {start_joint_pos_ = jointpos;};
-    void SetGoalJointPos(const std::shared_ptr<std::vector<double> >& jointpos) {goal_joint_pos_ = jointpos;};
+    void SetStartJointPos(const std::shared_ptr<std::vector<double>>& jointpos) {start_joint_pos_ = jointpos;};
+    void SetGoalJointPos(const std::shared_ptr<std::vector<double>>& jointpos) {goal_joint_pos_ = jointpos;};
 
     const std::shared_ptr<SimMotor> GetMotor(int motor_idx) const { return motors_[motor_idx];}
 
@@ -60,8 +60,8 @@ class  SimulationManager {
 
     /** Interface functions **/
     void GetComponentTypes(std::vector<std::string> &types_vec) const;
-    void GetActuatorVels(std::vector<std::pair<double, double> > &vels_vec) const;
-    void GetActuatorTorques(std::vector<std::pair<double, double> > &torqs_vec) const;
+    void GetActuatorVels(std::vector<std::pair<double, double>> &vels_vec) const;
+    void GetActuatorTorques(std::vector<std::pair<double, double>> &torqs_vec) const;
     void UpdateMassInfo(const std::vector<double>& mass_vec);
     int GetMotorNumber() const { return motors_.size(); }
     int GetComponentNumber() const { return motors_.size() + payloads_.size(); }
@@ -77,12 +77,12 @@ class  SimulationManager {
 
     // for manipulator
     // TODO: automatically switch waypoints to be pose of ee?
-    std::shared_ptr<std::vector<double> > start_joint_pos_;
-    std::shared_ptr<std::vector<double> > goal_joint_pos_;
+    std::shared_ptr<std::vector<double>> start_joint_pos_;
+    std::shared_ptr<std::vector<double>> goal_joint_pos_;
 
-    std::vector<std::shared_ptr<SimPayload> > payloads_;
-    std::vector<std::shared_ptr<SimMotor> > motors_;
-    std::vector<chrono::ChVector<> > ch_waypoints_;
+    std::vector<std::shared_ptr<SimPayload>> payloads_;
+    std::vector<std::shared_ptr<SimMotor>> motors_;
+    std::vector<chrono::ChVector<>> ch_waypoints_;
     std::shared_ptr<chrono::ChUrdfDoc> urdf_doc_;
     std::shared_ptr<const Eigen::MatrixXd> eigen_waypoints_;
     std::shared_ptr<chrono::ChSystem> ch_system_;
@@ -101,7 +101,7 @@ class  SimulationManager {
 
     // names of bodies that would use ChBodyAuxRef
     // this pointer is initialized when a urdf file has been loaded
-    std::shared_ptr<std::unordered_set<std::string> > auxrefs_;
+    std::shared_ptr<std::unordered_set<std::string>> auxrefs_;
 
 };
 

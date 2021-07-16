@@ -423,7 +423,7 @@ bool ChUrdfDoc::Load_URDF(const std::string& filename) {
         auxrefs_->clear();
     }
     else {
-        auxrefs_ = std::make_shared<std::unordered_set<std::string> >();
+        auxrefs_ = std::make_shared<std::unordered_set<std::string>>();
     }
     urdf_file_ = filename;
     urdf_robot_ = urdf::parseURDFFile(filename);
@@ -462,7 +462,7 @@ bool ChUrdfDoc::AddtoSystem(const std::shared_ptr<ChSystem>& sys, const std::sha
     std::cout << "robot name is: " << urdf_robot_->getName() << std::endl;
     ch_system_ = sys;
 
-    body_list_ = std::make_shared<std::vector<std::shared_ptr<ChBody> > >();
+    body_list_ = std::make_shared<std::vector<std::shared_ptr<ChBody>>>();
 
     convert_materials();
 
